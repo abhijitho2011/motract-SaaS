@@ -46,8 +46,8 @@ export declare class JobCardService {
         createdAt: Date;
         updatedAt: Date;
         workshopId: string;
-        stage: import("@prisma/client").$Enums.JobStage;
-        priority: import("@prisma/client").$Enums.JobPriority;
+        stage: import(".prisma/client").$Enums.JobStage;
+        priority: import(".prisma/client").$Enums.JobPriority;
         odometer: number | null;
         fuelLevel: number | null;
         entryTime: Date;
@@ -74,7 +74,7 @@ export declare class JobCardService {
             } & {
                 id: string;
                 name: string;
-                fuelType: import("@prisma/client").$Enums.FuelType;
+                fuelType: import(".prisma/client").$Enums.FuelType;
                 modelId: string;
             };
         } & {
@@ -104,8 +104,8 @@ export declare class JobCardService {
         createdAt: Date;
         updatedAt: Date;
         workshopId: string;
-        stage: import("@prisma/client").$Enums.JobStage;
-        priority: import("@prisma/client").$Enums.JobPriority;
+        stage: import(".prisma/client").$Enums.JobStage;
+        priority: import(".prisma/client").$Enums.JobPriority;
         odometer: number | null;
         fuelLevel: number | null;
         entryTime: Date;
@@ -132,7 +132,7 @@ export declare class JobCardService {
             } & {
                 id: string;
                 name: string;
-                fuelType: import("@prisma/client").$Enums.FuelType;
+                fuelType: import(".prisma/client").$Enums.FuelType;
                 modelId: string;
             };
         } & {
@@ -210,8 +210,8 @@ export declare class JobCardService {
         createdAt: Date;
         updatedAt: Date;
         workshopId: string;
-        stage: import("@prisma/client").$Enums.JobStage;
-        priority: import("@prisma/client").$Enums.JobPriority;
+        stage: import(".prisma/client").$Enums.JobStage;
+        priority: import(".prisma/client").$Enums.JobPriority;
         odometer: number | null;
         fuelLevel: number | null;
         entryTime: Date;
@@ -227,8 +227,8 @@ export declare class JobCardService {
         createdAt: Date;
         updatedAt: Date;
         workshopId: string;
-        stage: import("@prisma/client").$Enums.JobStage;
-        priority: import("@prisma/client").$Enums.JobPriority;
+        stage: import(".prisma/client").$Enums.JobStage;
+        priority: import(".prisma/client").$Enums.JobPriority;
         odometer: number | null;
         fuelLevel: number | null;
         entryTime: Date;

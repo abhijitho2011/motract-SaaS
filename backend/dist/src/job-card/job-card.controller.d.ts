@@ -46,8 +46,8 @@ export declare class JobCardController {
         createdAt: Date;
         updatedAt: Date;
         workshopId: string;
-        stage: import("@prisma/client").$Enums.JobStage;
-        priority: import("@prisma/client").$Enums.JobPriority;
+        stage: import(".prisma/client").$Enums.JobStage;
+        priority: import(".prisma/client").$Enums.JobPriority;
         odometer: number | null;
         fuelLevel: number | null;
         entryTime: Date;
@@ -74,7 +74,7 @@ export declare class JobCardController {
             } & {
                 id: string;
                 name: string;
-                fuelType: import("@prisma/client").$Enums.FuelType;
+                fuelType: import(".prisma/client").$Enums.FuelType;
                 modelId: string;
             };
         } & {
@@ -104,8 +104,8 @@ export declare class JobCardController {
         createdAt: Date;
         updatedAt: Date;
         workshopId: string;
-        stage: import("@prisma/client").$Enums.JobStage;
-        priority: import("@prisma/client").$Enums.JobPriority;
+        stage: import(".prisma/client").$Enums.JobStage;
+        priority: import(".prisma/client").$Enums.JobPriority;
         odometer: number | null;
         fuelLevel: number | null;
         entryTime: Date;
@@ -132,7 +132,7 @@ export declare class JobCardController {
             } & {
                 id: string;
                 name: string;
-                fuelType: import("@prisma/client").$Enums.FuelType;
+                fuelType: import(".prisma/client").$Enums.FuelType;
                 modelId: string;
             };
         } & {
@@ -166,11 +166,11 @@ export declare class JobCardController {
         inspection: {
             id: string;
             jobCardId: string;
-            exterior: import("@prisma/client/runtime/client").JsonValue | null;
-            interior: import("@prisma/client/runtime/client").JsonValue | null;
-            tyres: import("@prisma/client/runtime/client").JsonValue | null;
+            exterior: import("@prisma/client/runtime/library").JsonValue | null;
+            interior: import("@prisma/client/runtime/library").JsonValue | null;
+            tyres: import("@prisma/client/runtime/library").JsonValue | null;
             battery: string | null;
-            documents: import("@prisma/client/runtime/client").JsonValue | null;
+            documents: import("@prisma/client/runtime/library").JsonValue | null;
             photos: string[];
         } | null;
         tasks: {
@@ -210,8 +210,8 @@ export declare class JobCardController {
         createdAt: Date;
         updatedAt: Date;
         workshopId: string;
-        stage: import("@prisma/client").$Enums.JobStage;
-        priority: import("@prisma/client").$Enums.JobPriority;
+        stage: import(".prisma/client").$Enums.JobStage;
+        priority: import(".prisma/client").$Enums.JobPriority;
         odometer: number | null;
         fuelLevel: number | null;
         entryTime: Date;
@@ -227,8 +227,8 @@ export declare class JobCardController {
         createdAt: Date;
         updatedAt: Date;
         workshopId: string;
-        stage: import("@prisma/client").$Enums.JobStage;
-        priority: import("@prisma/client").$Enums.JobPriority;
+        stage: import(".prisma/client").$Enums.JobStage;
+        priority: import(".prisma/client").$Enums.JobPriority;
         odometer: number | null;
         fuelLevel: number | null;
         entryTime: Date;

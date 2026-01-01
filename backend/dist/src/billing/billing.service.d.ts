@@ -9,7 +9,7 @@ export declare class BillingService {
         jobCardId: string | null;
         invoiceNumber: string;
         invoiceDate: Date;
-        type: import("@prisma/client").$Enums.InvoiceType;
+        type: import(".prisma/client").$Enums.InvoiceType;
         totalLabor: number;
         totalParts: number;
         cgst: number;

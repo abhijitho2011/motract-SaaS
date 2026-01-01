@@ -7,7 +7,7 @@ export declare class SlotController {
         id: string;
         name: string;
         workshopId: string;
-        type: import("@prisma/client").$Enums.BayType;
+        type: import(".prisma/client").$Enums.BayType;
         isActive: boolean;
     }>;
     findBays(workshopId: string): Promise<({
@@ -20,7 +20,7 @@ export declare class SlotController {
         id: string;
         name: string;
         workshopId: string;
-        type: import("@prisma/client").$Enums.BayType;
+        type: import(".prisma/client").$Enums.BayType;
         isActive: boolean;
     })[]>;
     bookSlot(data: Prisma.SlotBookingCreateInput): Promise<{
@@ -31,6 +31,6 @@ export declare class SlotController {
         date: Date;
         startTime: string;
         endTime: string;
-        status: import("@prisma/client").$Enums.SlotStatus;
+        status: import(".prisma/client").$Enums.SlotStatus;
     }>;
 }

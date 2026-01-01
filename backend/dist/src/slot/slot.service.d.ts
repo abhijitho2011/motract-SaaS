@@ -7,7 +7,7 @@ export declare class SlotService {
         id: string;
         name: string;
         workshopId: string;
-        type: import("@prisma/client").$Enums.BayType;
+        type: import(".prisma/client").$Enums.BayType;
         isActive: boolean;
     }>;
     findBays(workshopId: string): Promise<({
@@ -20,7 +20,7 @@ export declare class SlotService {
         id: string;
         name: string;
         workshopId: string;
-        type: import("@prisma/client").$Enums.BayType;
+        type: import(".prisma/client").$Enums.BayType;
         isActive: boolean;
     })[]>;
     generateSlots(bayId: string, date: Date, startStr: string, endStr: string, durationMin: number): Promise<never[]>;
@@ -32,7 +32,7 @@ export declare class SlotService {
         date: Date;
         startTime: string;
         endTime: string;
-        status: import("@prisma/client").$Enums.SlotStatus;
+        status: import(".prisma/client").$Enums.SlotStatus;
     }[]>;
     bookSlot(data: Prisma.SlotBookingCreateInput): Promise<{
         id: string;
@@ -42,6 +42,6 @@ export declare class SlotService {
         date: Date;
         startTime: string;
         endTime: string;
-        status: import("@prisma/client").$Enums.SlotStatus;
+        status: import(".prisma/client").$Enums.SlotStatus;
     }>;
 }

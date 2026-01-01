@@ -18,7 +18,7 @@ export declare class VehicleController {
         } & {
             id: string;
             name: string;
-            fuelType: import("@prisma/client").$Enums.FuelType;
+            fuelType: import(".prisma/client").$Enums.FuelType;
             modelId: string;
         };
     } & {
@@ -51,7 +51,7 @@ export declare class VehicleController {
         variants: {
             id: string;
             name: string;
-            fuelType: import("@prisma/client").$Enums.FuelType;
+            fuelType: import(".prisma/client").$Enums.FuelType;
             modelId: string;
         }[];
     } & {
