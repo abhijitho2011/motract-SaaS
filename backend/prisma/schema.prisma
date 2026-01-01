@@ -447,7 +447,7 @@ model PurchaseItem {
   itemName   String
   partNumber String?
   quantity   Float
-  unitConfig Float // Unit price
+  unitCost   Float // Unit price
   taxPercent Float
   total      Float
 }
