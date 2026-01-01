@@ -18,12 +18,14 @@ const job_card_module_1 = require("./job-card/job-card.module");
 const inventory_module_1 = require("./inventory/inventory.module");
 const billing_module_1 = require("./billing/billing.module");
 const slot_module_1 = require("./slot/slot.module");
+const dashboard_module_1 = require("./dashboard/dashboard.module");
+const purchase_module_1 = require("./purchase/purchase.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [prisma_module_1.PrismaModule, users_module_1.UsersModule, auth_module_1.AuthModule, vehicle_module_1.VehicleModule, job_card_module_1.JobCardModule, inventory_module_1.InventoryModule, billing_module_1.BillingModule, slot_module_1.SlotModule],
+        imports: [prisma_module_1.PrismaModule, users_module_1.UsersModule, auth_module_1.AuthModule, vehicle_module_1.VehicleModule, job_card_module_1.JobCardModule, inventory_module_1.InventoryModule, billing_module_1.BillingModule, slot_module_1.SlotModule, dashboard_module_1.DashboardModule, purchase_module_1.PurchaseModule],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
     })

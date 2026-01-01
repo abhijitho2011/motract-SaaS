@@ -9,9 +9,11 @@ import { JobCardModule } from './job-card/job-card.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { BillingModule } from './billing/billing.module';
 import { SlotModule } from './slot/slot.module';
+import { DashboardModule } from './dashboard/dashboard.module';
+import { PurchaseModule } from './purchase/purchase.module';
 
 @Module({
-  imports: [PrismaModule, UsersModule, AuthModule, VehicleModule, JobCardModule, InventoryModule, BillingModule, SlotModule],
+  imports: [PrismaModule, UsersModule, AuthModule, VehicleModule, JobCardModule, InventoryModule, BillingModule, SlotModule, DashboardModule, PurchaseModule],
   controllers: [AppController],
   providers: [AppService],
 })
