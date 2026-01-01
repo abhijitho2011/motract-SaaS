@@ -1,0 +1,34 @@
+import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { InventoryService } from './inventory.service';
+import { Prisma } from '@prisma/client';
+
+@Controller('inventory')
+export class InventoryController {
+    constructor(private readonly inventoryService: InventoryService) { }
+
+    @Post('items')
+    async createItem(@Body() data: Prisma.InventoryItemCreateInput) {
+        return this.inventoryService.createItem(data);
+    }
+
+    @Post('items/:id/skus')
+    async addSku(@Param('id') id: string, @Body('skuCode') skuCode: string) {
+        return this.inventoryService.addSku(id, skuCode);
+    }
+
+    @Post('items/:id/batches')
+    async addBatch(@Param('id') id: string, @Body() body: any) {
+        // Body validation needed in real app
+        return this.inventoryService.addBatch(id, body);
+    }
+
+    @Get('items')
+    async findAll(@Query('workshopId') workshopId: string) {
+        return this.inventoryService.findAll(workshopId);
+    }
+
+    @Get('items/:id')
+    async findOne(@Param('id') id: string) {
+        return this.inventoryService.findOne(id);
+    }
+}

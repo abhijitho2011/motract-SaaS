@@ -4,23 +4,571 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-
 }
+
+// -----------------------------------------------------------------------------
+// Enums
+// -----------------------------------------------------------------------------
 
 enum Role {
   SUPER_ADMIN
-  WORKSHOP
+  WORKSHOP_ADMIN
+  WORKSHOP_MANAGER
+  TECHNICIAN
   CLIENT
-  SUPPLIER
   RSA_PROVIDER
-  SPECIALIST
+  SUPPLIER
 }
+
+enum FuelType {
+  PETROL
+  DIESEL
+  CNG
+  ELECTRIC
+  HYBRID
+}
+
+enum JobStage {
+  CREATED
+  INSPECTION
+  ESTIMATE
+  CUSTOMER_APPROVAL
+  WORK_IN_PROGRESS
+  QC
+  BILLING
+  DELIVERY
+  CLOSED
+}
+
+enum JobPriority {
+  NORMAL
+  URGENT
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum BayType {
+  SERVICE
+  WASHING
+  ALIGNMENT
+  ELECTRICAL
+  GENERAL
+}
+
+enum SlotStatus {
+  AVAILABLE
+  BOOKED
+  BLOCKED
+}
+
+enum InvoiceType {
+  JOB_CARD
+  COUNTER_SALE
+}
+
+enum PaymentMode {
+  CASH
+  UPI
+  CARD
+  BANK_TRANSFER
+  CREDIT
+}
+
+enum TxnType {
+  CREDIT
+  DEBIT
+}
+
+// -----------------------------------------------------------------------------
+// User & Auth
+// -----------------------------------------------------------------------------
 
 model User {
   id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
+  email     String?  @unique
+  mobile    String   @unique
+  password  String?
   role      Role
+  name      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  // Relations
+  workshopId String?
+  workshop   Workshop? @relation(fields: [workshopId], references: [id])
+
+  // Client Role
+  clientVehicles VehicleOwner[]
+}
+
+// -----------------------------------------------------------------------------
+// Workshop & Masters
+// -----------------------------------------------------------------------------
+
+model Workshop {
+  id        String   @id @default(uuid())
+  name      String
+  address   String?
+  city      String?
+  state     String?
+  pincode   String?
+  gstin     String?
+  mobile    String
+  email     String?
+  logoUrl   String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Logistics
+  latitude  Float?
+  longitude Float?
+
+  // Settings
+  workingStartHour String @default("09:00") // HH:mm
+  workingEndHour   String @default("19:00") // HH:mm
+  slotDurationMin  Int    @default(30)
+
+  // Relations
+  users          User[]
+  jobCards       JobCard[]
+  customers      Customer[]
+  inventoryItems InventoryItem[]
+  suppliers      Supplier[]
+  purchases      PurchaseOrder[]
+  expenses       Expense[]
+  invoices       Invoice[]
+  bays           Bay[]
+  services       Service[]
+  workshopBreaks WorkshopBreak[]
+}
+
+// -----------------------------------------------------------------------------
+// Global Vehicle Registry
+// -----------------------------------------------------------------------------
+
+model Make {
+  id     String  @id @default(uuid())
+  name   String  @unique // e.g., Maruti Suzuki
+  models VehicleModel[]
+}
+
+model VehicleModel {
+  id                      String                    @id @default(uuid())
+  name                    String // e.g., Swift
+  makeId                  String
+  make                    Make                      @relation(fields: [makeId], references: [id])
+  variants                Variant[]
+  InventoryVehicleMapping InventoryVehicleMapping[]
+
+  @@unique([makeId, name])
+}
+
+model Variant {
+  id       String    @id @default(uuid())
+  name     String // e.g., VXi
+  fuelType FuelType
+  modelId  String
+  model    VehicleModel     @relation(fields: [modelId], references: [id])
+  vehicles Vehicle[]
+
+  @@unique([modelId, name, fuelType])
+}
+
+model Vehicle {
+  id            String  @id @default(uuid())
+  regNumber     String  @unique // Global Identifier
+  chassisNumber String?
+  engineNumber  String?
+  vin           String?
+  mfgYear       Int?
+
+  variantId String
+  variant   Variant @relation(fields: [variantId], references: [id])
+
+  // Relations
+  owners   VehicleOwner[]
+  jobCards JobCard[] // History across all workshops
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VehicleOwner {
+  id        String  @id @default(uuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id])
+  vehicleId String
+  vehicle   Vehicle @relation(fields: [vehicleId], references: [id])
+  isPrimary Boolean @default(true)
+
+  @@unique([userId, vehicleId])
+}
+
+// -----------------------------------------------------------------------------
+// Workshop Customers
+// -----------------------------------------------------------------------------
+
+model Customer {
+  id         String   @id @default(uuid())
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id])
+  name       String
+  mobile     String
+  email      String?
+  address    String?
+  gstin      String?
+
+  jobCards JobCard[]
+  invoices Invoice[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([workshopId, mobile])
+}
+
+// -----------------------------------------------------------------------------
+// Job Card Module
+// -----------------------------------------------------------------------------
+
+model JobCard {
+  id         String   @id @default(uuid())
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id])
+  vehicleId  String
+  vehicle    Vehicle  @relation(fields: [vehicleId], references: [id])
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  stage    JobStage    @default(CREATED)
+  priority JobPriority @default(NORMAL)
+
+  odometer  Int?
+  fuelLevel Int? // 0-100%
+
+  // Dates
+  entryTime             DateTime  @default(now())
+  estimatedDeliveryTime DateTime?
+  actualDeliveryTime    DateTime?
+
+  // Staff
+  advisorId    String? // User Id
+  technicianId String? // User Id
+
+  // Details
+  complaints JobComplaint[]
+  inspection JobInspection?
+  tasks      JobTask[] // Labor
+  parts      JobPart[] // Material
+
+  invoice Invoice?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model JobComplaint {
+  id        String  @id @default(uuid())
+  jobCardId String
+  jobCard   JobCard @relation(fields: [jobCardId], references: [id])
+  complaint String
+  remark    String?
+}
+
+model JobInspection {
+  id        String  @id @default(uuid())
+  jobCardId String  @unique
+  jobCard   JobCard @relation(fields: [jobCardId], references: [id])
+
+  exterior  Json? // Scratches, dents map
+  interior  Json?
+  tyres     Json?
+  battery   String?
+  documents Json? // Checklist
+  photos    String[] // URLs
+}
+
+model JobTask {
+  id          String  @id @default(uuid())
+  jobCardId   String
+  jobCard     JobCard @relation(fields: [jobCardId], references: [id])
+  description String
+  price       Float // Labor cost
+  gstPercent  Float   @default(18.0)
+  isApproved  Boolean @default(false)
+
+  completionStatus String? // Pending, Done
+}
+
+model JobPart {
+  id        String  @id @default(uuid())
+  jobCardId String
+  jobCard   JobCard @relation(fields: [jobCardId], references: [id])
+
+  itemId String
+  item   InventoryItem @relation(fields: [itemId], references: [id])
+
+  batchId String? // If deducted from stock
+  batch   InventoryBatch? @relation(fields: [batchId], references: [id])
+
+  quantity   Float
+  unitPrice  Float
+  gstPercent Float
+  totalPrice Float
+
+  isApproved Boolean @default(false)
+}
+
+// -----------------------------------------------------------------------------
+// Inventory Management
+// -----------------------------------------------------------------------------
+
+model Category {
+  id            String        @id @default(uuid())
+  name          String
+  subCategories SubCategory[]
+}
+
+model SubCategory {
+  id         String   @id @default(uuid())
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  name       String
+}
+
+model InventoryItem {
+  id         String   @id @default(uuid())
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id])
+
+  name  String
+  brand String?
+  isOem Boolean @default(false)
+
+  hsnCode    String?
+  taxPercent Float   @default(18.0)
+
+  skus    InventorySku[]
+  batches InventoryBatch[]
+
+  // Mapping
+  compatibleVehicles InventoryVehicleMapping[]
+
+  jobParts JobPart[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model InventorySku {
+  id      String        @id @default(uuid())
+  itemId  String
+  item    InventoryItem @relation(fields: [itemId], references: [id])
+  skuCode String // Part Number
+
+  @@unique([itemId, skuCode])
+}
+
+model InventoryBatch {
+  id     String        @id @default(uuid())
+  itemId String
+  item   InventoryItem @relation(fields: [itemId], references: [id])
+
+  batchNumber String?
+  expiryDate  DateTime?
+
+  quantity      Float
+  purchasePrice Float // Inclusive of tax
+  salePrice     Float // Inclusive of tax
+
+  purchasedAt DateTime @default(now())
+
+  jobParts JobPart[]
+}
+
+model InventoryVehicleMapping {
+  id     String        @id @default(uuid())
+  itemId String
+  item   InventoryItem @relation(fields: [itemId], references: [id])
+
+  modelId String
+  model   VehicleModel  @relation(fields: [modelId], references: [id])
+
+  // Optional specific variant support
+  variantId String?
+}
+
+// -----------------------------------------------------------------------------
+// Purchases & Suppliers
+// -----------------------------------------------------------------------------
+
+model Supplier {
+  id         String   @id @default(uuid())
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id])
+  name       String
+  mobile     String
+  gstin      String?
+  address    String?
+
+  orders PurchaseOrder[]
+}
+
+model PurchaseOrder {
+  id         String   @id @default(uuid())
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id])
+  supplierId String
+  supplier   Supplier @relation(fields: [supplierId], references: [id])
+
+  invoiceDate   DateTime
+  invoiceNumber String?
+
+  totalAmount Float
+  status      String // DRAFT, RECEIVED
+
+  items PurchaseItem[]
+
+  createdAt DateTime @default(now())
+}
+
+model PurchaseItem {
+  id      String        @id @default(uuid())
+  orderId String
+  order   PurchaseOrder @relation(fields: [orderId], references: [id])
+
+  // Link to inventory item creation/update
+  itemName   String
+  partNumber String?
+  quantity   Float
+  unitConfig Float // Unit price
+  taxPercent Float
+  total      Float
+}
+
+// -----------------------------------------------------------------------------
+// Finance & Billing
+// -----------------------------------------------------------------------------
+
+model Invoice {
+  id         String   @id @default(uuid())
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id])
+
+  customerId String
+  customer   Customer @relation(fields: [customerId], references: [id])
+
+  jobCardId String?  @unique
+  jobCard   JobCard? @relation(fields: [jobCardId], references: [id])
+
+  invoiceNumber String // Sequential
+  invoiceDate   DateTime @default(now())
+
+  type InvoiceType
+
+  // Amounts
+  totalLabor Float @default(0)
+  totalParts Float @default(0)
+
+  cgst Float @default(0)
+  sgst Float @default(0)
+  igst Float @default(0)
+
+  discount   Float @default(0)
+  grandTotal Float
+
+  paidAmount Float @default(0)
+  balance    Float @default(0)
+
+  payments Payment[]
+}
+
+model Payment {
+  id        String  @id @default(uuid())
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id])
+
+  amount    Float
+  mode      PaymentMode
+  reference String? // Transaction ID
+  date      DateTime    @default(now())
+}
+
+model Expense {
+  id         String   @id @default(uuid())
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id])
+
+  category      String // Salary, Rent, Utility
+  amount        Float
+  date          DateTime
+  notes         String?
+  attachmentUrl String?
+}
+
+// -----------------------------------------------------------------------------
+// Slot Booking Engine
+// -----------------------------------------------------------------------------
+
+model Bay {
+  id         String   @id @default(uuid())
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id])
+  name       String
+  type       BayType
+  isActive   Boolean  @default(true)
+
+  services ServiceBayMapping[]
+  bookings SlotBooking[]
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  workshopId  String
+  workshop    Workshop @relation(fields: [workshopId], references: [id])
+  name        String
+  durationMin Int      @default(30)
+  price       Float?
+
+  allowedBays ServiceBayMapping[]
+}
+
+model ServiceBayMapping {
+  id        String  @id @default(uuid())
+  serviceId String
+  service   Service @relation(fields: [serviceId], references: [id])
+  bayId     String
+  bay       Bay     @relation(fields: [bayId], references: [id])
+
+  @@unique([serviceId, bayId])
+}
+
+model SlotBooking {
+  id    String @id @default(uuid())
+  bayId String
+  bay   Bay    @relation(fields: [bayId], references: [id])
+
+  date      DateTime // YYYY-MM-DD
+  startTime String // HH:mm
+  endTime   String // HH:mm
+
+  status SlotStatus
+
+  jobCardId String?
+
+  createdAt DateTime @default(now())
+}
+
+model WorkshopBreak {
+  id         String   @id @default(uuid())
+  workshopId String
+  workshop   Workshop @relation(fields: [workshopId], references: [id])
+  title      String // Lunch, Tea
+  startTime  String // HH:mm
+  endTime    String // HH:mm
 }
