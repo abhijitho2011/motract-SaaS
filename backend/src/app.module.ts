@@ -11,8 +11,21 @@ import { BillingModule } from './billing/billing.module';
 import { SlotModule } from './slot/slot.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { PurchaseModule } from './purchase/purchase.module';
-imports: [PrismaModule, UsersModule, AuthModule, VehicleModule, JobCardModule, InventoryModule, BillingModule, SlotModule, DashboardModule, PurchaseModule],
+
+@Module({
+  imports: [
+    PrismaModule,
+    UsersModule,
+    AuthModule,
+    VehicleModule,
+    JobCardModule,
+    InventoryModule,
+    BillingModule,
+    SlotModule,
+    DashboardModule,
+    PurchaseModule,
+  ],
   controllers: [AppController],
-    providers: [AppService],
+  providers: [AppService],
 })
 export class AppModule { }
