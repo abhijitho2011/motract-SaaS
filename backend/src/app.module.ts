@@ -11,6 +11,7 @@ import { BillingModule } from './billing/billing.module';
 import { SlotModule } from './slot/slot.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { PurchaseModule } from './purchase/purchase.module';
+import { ExpenseModule } from './expense/expense.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PurchaseModule } from './purchase/purchase.module';
     SlotModule,
     DashboardModule,
     PurchaseModule,
+    ExpenseModule,
   ],
   controllers: [AppController],
   providers: [AppService],

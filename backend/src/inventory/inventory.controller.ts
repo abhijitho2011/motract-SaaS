@@ -45,4 +45,12 @@ export class InventoryController {
     async getCompatibility(@Param('id') id: string) {
         return this.inventoryService.getCompatibility(id);
     }
+    @Post('items/:id/adjust')
+    async adjustStock(
+        @Param('id') id: string,
+        @Body('quantity') quantity: number,
+        @Body('reason') reason: string,
+    ) {
+        return this.inventoryService.adjustStock(id, quantity, reason);
+    }
 }

@@ -69,4 +69,51 @@ export class InventoryService {
             include: { model: true },
         });
     }
+    async adjustStock(itemId: string, quantity: number, reason: string) {
+        if (quantity === 0) return this.findOne(itemId);
+
+        // Positive Adjustment: Create "Adjustment Batch"
+        if (quantity > 0) {
+            await this.prisma.inventoryBatch.create({
+                data: {
+                    itemId,
+                    batchNumber: `ADJ-${Date.now()}`,
+                    quantity: quantity,
+                    purchasePrice: 0, // No cost for found items? Or input needed? Assume 0 for now.
+                    salePrice: 0, // Determine from existing? 
+                },
+            });
+        }
+        // Negative Adjustment: Deduct from batches (FIFO)
+        else {
+            const deduction = Math.abs(quantity);
+            let remaining = deduction;
+
+            // Get batches with stock
+            const batches = await this.prisma.inventoryBatch.findMany({
+                where: { itemId, quantity: { gt: 0 } },
+                orderBy: { purchasedAt: 'asc' }, // FIFO
+            });
+
+            const updates = [];
+            for (const batch of batches) {
+                if (remaining <= 0) break;
+
+                const take = Math.min(batch.quantity, remaining);
+                updates.push(this.prisma.inventoryBatch.update({
+                    where: { id: batch.id },
+                    data: { quantity: { decrement: take } },
+                }));
+                remaining -= take;
+            }
+
+            if (remaining > 0) {
+                throw new BadRequestException('Not enough stock to reduce');
+            }
+
+            await this.prisma.$transaction(updates);
+        }
+
+        return this.findOne(itemId);
+    }
 }
