@@ -19,8 +19,8 @@ export declare class PurchaseController {
             invoiceNumber: string | null;
             invoiceDate: Date;
             status: string;
-            totalAmount: number;
             supplierId: string;
+            totalAmount: number;
         }[];
     } & {
         id: string;
@@ -49,8 +49,8 @@ export declare class PurchaseController {
             invoiceNumber: string | null;
             invoiceDate: Date;
             status: string;
-            totalAmount: number;
             supplierId: string;
+            totalAmount: number;
         })[];
     } & {
         id: string;
@@ -60,32 +60,27 @@ export declare class PurchaseController {
         address: string | null;
         gstin: string | null;
     }>;
-    getSupplierLedger(id: string): Promise<{
-        supplierId: string;
-        totalPurchases: number;
-        pendingOrders: number;
-        orders: ({
-            items: {
-                id: string;
-                quantity: number;
-                taxPercent: number;
-                itemName: string;
-                partNumber: string | null;
-                unitCost: number;
-                total: number;
-                orderId: string;
-            }[];
-        } & {
+    getSupplierLedger(id: string): Promise<({
+        items: {
             id: string;
-            createdAt: Date;
-            workshopId: string;
-            invoiceNumber: string | null;
-            invoiceDate: Date;
-            status: string;
-            totalAmount: number;
-            supplierId: string;
-        })[];
-    }>;
+            quantity: number;
+            taxPercent: number;
+            itemName: string;
+            partNumber: string | null;
+            unitCost: number;
+            total: number;
+            orderId: string;
+        }[];
+    } & {
+        id: string;
+        createdAt: Date;
+        workshopId: string;
+        invoiceNumber: string | null;
+        invoiceDate: Date;
+        status: string;
+        supplierId: string;
+        totalAmount: number;
+    })[]>;
     createPurchaseOrder(data: any): Promise<{
         supplier: {
             id: string;
@@ -112,8 +107,8 @@ export declare class PurchaseController {
         invoiceNumber: string | null;
         invoiceDate: Date;
         status: string;
-        totalAmount: number;
         supplierId: string;
+        totalAmount: number;
     }>;
     getPurchaseOrders(workshopId: string): Promise<({
         supplier: {
@@ -141,8 +136,8 @@ export declare class PurchaseController {
         invoiceNumber: string | null;
         invoiceDate: Date;
         status: string;
-        totalAmount: number;
         supplierId: string;
+        totalAmount: number;
     })[]>;
     getPurchaseOrder(id: string): Promise<{
         supplier: {
@@ -170,8 +165,8 @@ export declare class PurchaseController {
         invoiceNumber: string | null;
         invoiceDate: Date;
         status: string;
-        totalAmount: number;
         supplierId: string;
+        totalAmount: number;
     }>;
     updateStatus(id: string, status: string): Promise<{
         id: string;
@@ -180,7 +175,36 @@ export declare class PurchaseController {
         invoiceNumber: string | null;
         invoiceDate: Date;
         status: string;
-        totalAmount: number;
         supplierId: string;
+        totalAmount: number;
+    }>;
+    receiveOrder(id: string): Promise<{
+        supplier: {
+            id: string;
+            name: string;
+            mobile: string;
+            workshopId: string;
+            address: string | null;
+            gstin: string | null;
+        };
+        items: {
+            id: string;
+            quantity: number;
+            taxPercent: number;
+            itemName: string;
+            partNumber: string | null;
+            unitCost: number;
+            total: number;
+            orderId: string;
+        }[];
+    } & {
+        id: string;
+        createdAt: Date;
+        workshopId: string;
+        invoiceNumber: string | null;
+        invoiceDate: Date;
+        status: string;
+        supplierId: string;
+        totalAmount: number;
     }>;
 }

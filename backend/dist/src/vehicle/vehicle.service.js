@@ -35,8 +35,41 @@ let VehicleService = class VehicleService {
         return vehicle;
     }
     async register(data) {
+        const { regNumber, make, model, variant, engineNumber, chassisNumber, vin, year } = data;
+        const makeRecord = await this.prisma.make.upsert({
+            where: { name: make },
+            update: {},
+            create: { name: make },
+        });
+        const modelRecord = await this.prisma.vehicleModel.upsert({
+            where: { makeId_name: { makeId: makeRecord.id, name: model } },
+            update: {},
+            create: { name: model, makeId: makeRecord.id },
+        });
+        const variantRecord = await this.prisma.variant.upsert({
+            where: {
+                modelId_name_fuelType: {
+                    modelId: modelRecord.id,
+                    name: variant,
+                    fuelType: 'PETROL'
+                }
+            },
+            update: {},
+            create: {
+                name: variant,
+                modelId: modelRecord.id,
+                fuelType: 'PETROL'
+            },
+        });
         return this.prisma.vehicle.create({
-            data,
+            data: {
+                regNumber,
+                engineNumber,
+                chassisNumber,
+                vin,
+                mfgYear: year,
+                variantId: variantRecord.id,
+            },
         });
     }
     async findAllModels() {

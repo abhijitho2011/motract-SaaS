@@ -1,13 +1,13 @@
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { SlotService } from './slot.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, BayType } from '@prisma/client';
 
 @Controller('slots')
 export class SlotController {
     constructor(private readonly slotService: SlotService) { }
 
     @Post('bays')
-    async createBay(@Body() data: { workshopId: string; name: string; type: Prisma.BayType }) {
+    async createBay(@Body() data: { workshopId: string; name: string; type: BayType }) {
         return this.slotService.createBay(data);
     }
 

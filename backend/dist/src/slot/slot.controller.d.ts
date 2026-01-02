@@ -1,9 +1,13 @@
 import { SlotService } from './slot.service';
-import { Prisma } from '@prisma/client';
+import { Prisma, BayType } from '@prisma/client';
 export declare class SlotController {
     private readonly slotService;
     constructor(slotService: SlotService);
-    createBay(data: Prisma.BayCreateInput): Promise<{
+    createBay(data: {
+        workshopId: string;
+        name: string;
+        type: BayType;
+    }): Promise<{
         id: string;
         name: string;
         workshopId: string;

@@ -140,7 +140,7 @@ export class JobCardService {
             data: {
                 fuelLevel: data.fuelLevel,
                 odometer: data.odometer,
-                stage: JobStage.INSPECTION_COMPLETED,
+                stage: JobStage.ESTIMATE,
             },
         });
 

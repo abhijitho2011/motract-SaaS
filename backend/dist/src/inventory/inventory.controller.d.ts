@@ -4,15 +4,15 @@ export declare class InventoryController {
     private readonly inventoryService;
     constructor(inventoryService: InventoryService);
     createItem(data: Prisma.InventoryItemCreateInput): Promise<{
-        skus: {
+        partNumbers: {
             id: string;
             itemId: string;
             skuCode: string;
         }[];
         batches: {
             id: string;
-            itemId: string;
             quantity: number;
+            itemId: string;
             batchNumber: string | null;
             expiryDate: Date | null;
             purchasePrice: number;
@@ -37,8 +37,8 @@ export declare class InventoryController {
     }>;
     addBatch(id: string, body: any): Promise<{
         id: string;
-        itemId: string;
         quantity: number;
+        itemId: string;
         batchNumber: string | null;
         expiryDate: Date | null;
         purchasePrice: number;
@@ -46,15 +46,15 @@ export declare class InventoryController {
         purchasedAt: Date;
     }>;
     findAll(workshopId: string): Promise<({
-        skus: {
+        partNumbers: {
             id: string;
             itemId: string;
             skuCode: string;
         }[];
         batches: {
             id: string;
-            itemId: string;
             quantity: number;
+            itemId: string;
             batchNumber: string | null;
             expiryDate: Date | null;
             purchasePrice: number;
@@ -73,21 +73,96 @@ export declare class InventoryController {
         taxPercent: number;
     })[]>;
     findOne(id: string): Promise<{
-        skus: {
+        partNumbers: {
             id: string;
             itemId: string;
             skuCode: string;
         }[];
         batches: {
             id: string;
-            itemId: string;
             quantity: number;
+            itemId: string;
             batchNumber: string | null;
             expiryDate: Date | null;
             purchasePrice: number;
             salePrice: number;
             purchasedAt: Date;
         }[];
+        compatibleVehicles: ({
+            model: {
+                id: string;
+                name: string;
+                makeId: string;
+            };
+        } & {
+            id: string;
+            modelId: string;
+            variantId: string | null;
+            itemId: string;
+        })[];
+    } & {
+        id: string;
+        name: string;
+        createdAt: Date;
+        updatedAt: Date;
+        workshopId: string;
+        brand: string | null;
+        isOem: boolean;
+        hsnCode: string | null;
+        taxPercent: number;
+    }>;
+    addCompatibility(id: string, modelId: string, variantId?: string): Promise<{
+        model: {
+            id: string;
+            name: string;
+            makeId: string;
+        };
+    } & {
+        id: string;
+        modelId: string;
+        variantId: string | null;
+        itemId: string;
+    }>;
+    getCompatibility(id: string): Promise<({
+        model: {
+            id: string;
+            name: string;
+            makeId: string;
+        };
+    } & {
+        id: string;
+        modelId: string;
+        variantId: string | null;
+        itemId: string;
+    })[]>;
+    adjustStock(id: string, quantity: number, reason: string): Promise<{
+        partNumbers: {
+            id: string;
+            itemId: string;
+            skuCode: string;
+        }[];
+        batches: {
+            id: string;
+            quantity: number;
+            itemId: string;
+            batchNumber: string | null;
+            expiryDate: Date | null;
+            purchasePrice: number;
+            salePrice: number;
+            purchasedAt: Date;
+        }[];
+        compatibleVehicles: ({
+            model: {
+                id: string;
+                name: string;
+                makeId: string;
+            };
+        } & {
+            id: string;
+            modelId: string;
+            variantId: string | null;
+            itemId: string;
+        })[];
     } & {
         id: string;
         name: string;

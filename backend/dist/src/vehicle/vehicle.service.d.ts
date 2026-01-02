@@ -1,5 +1,4 @@
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
 export declare class VehicleService {
     private prisma;
     constructor(prisma: PrismaService);
@@ -32,7 +31,7 @@ export declare class VehicleService {
         mfgYear: number | null;
         variantId: string;
     }) | null>;
-    register(data: Prisma.VehicleCreateInput): Promise<{
+    register(data: any): Promise<{
         id: string;
         createdAt: Date;
         updatedAt: Date;

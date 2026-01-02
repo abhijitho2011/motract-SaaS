@@ -98,6 +98,12 @@ let DashboardService = class DashboardService {
             revenue,
             lowStockCount: lowStockItems.length,
             lowStockItems,
+            recentJobs: await this.prisma.jobCard.findMany({
+                where: { workshopId },
+                orderBy: { createdAt: 'desc' },
+                take: 5,
+                include: { vehicle: true, customer: true },
+            }),
         };
     }
     async getJobStatusFunnel(workshopId) {
@@ -140,7 +146,7 @@ let DashboardService = class DashboardService {
         return data;
     }
     async getTopServices(workshopId, limit = 5) {
-        const tasks = await this.prisma.jobTask.groupBy({
+        const tasks = await this.prisma.jobItem.groupBy({
             by: ['description'],
             where: {
                 jobCard: {

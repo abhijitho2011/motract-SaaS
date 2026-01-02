@@ -1,15 +1,15 @@
 import { Controller, Get, Query, Param, UseGuards, Request } from '@nestjs/common';
 import { ReportsService } from './reports.service';
-import { AuthGuard } from '../auth/auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('reports')
-@UseGuards(AuthGuard)
+@UseGuards(JwtAuthGuard)
 export class ReportsController {
     constructor(private readonly reportsService: ReportsService) { }
 
     @Get('sales')
     async getSales(
-        @Request() req,
+        @Request() req: any,
         @Query('startDate') startDate: string,
         @Query('endDate') endDate: string
     ) {
@@ -22,7 +22,7 @@ export class ReportsController {
 
     @Get('gst')
     async getGST(
-        @Request() req,
+        @Request() req: any,
         @Query('month') month: string,
         @Query('year') year: string
     ) {
@@ -35,7 +35,7 @@ export class ReportsController {
 
     @Get('pnl')
     async getPnL(
-        @Request() req,
+        @Request() req: any,
         @Query('startDate') startDate: string,
         @Query('endDate') endDate: string
     ) {

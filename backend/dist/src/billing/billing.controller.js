@@ -20,18 +20,28 @@ let BillingController = class BillingController {
     constructor(billingService) {
         this.billingService = billingService;
     }
-    async createJobCardInvoice(jobCardId) {
-        return this.billingService.createJobCardInvoice(jobCardId);
+    async generateInvoice(jobCardId) {
+        return this.billingService.generateInvoice(jobCardId);
+    }
+    async getInvoice(id) {
+        return this.billingService.getInvoice(id);
     }
 };
 exports.BillingController = BillingController;
 __decorate([
-    (0, common_1.Post)('invoice/job-card/:id'),
+    (0, common_1.Post)('generate/:jobCardId'),
+    __param(0, (0, common_1.Param)('jobCardId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], BillingController.prototype, "generateInvoice", null);
+__decorate([
+    (0, common_1.Get)('invoices/:id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], BillingController.prototype, "createJobCardInvoice", null);
+], BillingController.prototype, "getInvoice", null);
 exports.BillingController = BillingController = __decorate([
     (0, common_1.Controller)('billing'),
     __metadata("design:paramtypes", [billing_service_1.BillingService])

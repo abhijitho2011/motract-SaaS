@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, SlotStatus } from '@prisma/client';
+import { Prisma, BayType, SlotStatus } from '@prisma/client';
 
 @Injectable()
 export class SlotService {
     constructor(private prisma: PrismaService) { }
 
-    async createBay(data: { workshopId: string; name: string; type: Prisma.BayType }) {
+    async createBay(data: { workshopId: string; name: string; type: BayType }) {
         return this.prisma.bay.create({
             data: {
                 name: data.name,

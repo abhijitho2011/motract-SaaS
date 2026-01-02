@@ -18,6 +18,46 @@ export declare class DashboardController {
                 quantity: number;
             }[];
         }[];
+        recentJobs: ({
+            vehicle: {
+                id: string;
+                createdAt: Date;
+                updatedAt: Date;
+                regNumber: string;
+                chassisNumber: string | null;
+                engineNumber: string | null;
+                vin: string | null;
+                mfgYear: number | null;
+                variantId: string;
+            };
+            customer: {
+                id: string;
+                name: string;
+                email: string | null;
+                mobile: string;
+                createdAt: Date;
+                updatedAt: Date;
+                workshopId: string;
+                address: string | null;
+                gstin: string | null;
+            };
+        } & {
+            id: string;
+            createdAt: Date;
+            updatedAt: Date;
+            workshopId: string;
+            stage: import(".prisma/client").$Enums.JobStage;
+            priority: import(".prisma/client").$Enums.JobPriority;
+            odometer: number | null;
+            fuelLevel: number | null;
+            entryTime: Date;
+            estimatedDeliveryTime: Date | null;
+            actualDeliveryTime: Date | null;
+            advisorId: string | null;
+            technicianId: string | null;
+            vehicleId: string;
+            customerId: string;
+        })[];
     }>;
     getJobStatusFunnel(workshopId: string): Promise<{
         stage: "CREATED" | "INSPECTION" | "ESTIMATE" | "CUSTOMER_APPROVAL" | "WORK_IN_PROGRESS" | "QC" | "BILLING" | "DELIVERY" | "CLOSED";

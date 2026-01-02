@@ -18,7 +18,13 @@ let SlotService = class SlotService {
         this.prisma = prisma;
     }
     async createBay(data) {
-        return this.prisma.bay.create({ data });
+        return this.prisma.bay.create({
+            data: {
+                name: data.name,
+                type: data.type,
+                workshop: { connect: { id: data.workshopId } },
+            },
+        });
     }
     async findBays(workshopId) {
         return this.prisma.bay.findMany({ where: { workshopId }, include: { services: true } });

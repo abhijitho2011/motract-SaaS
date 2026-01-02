@@ -37,6 +37,16 @@ export class PurchaseService {
         return supplier;
     }
 
+    async getSupplierLedger(id: string) {
+        // Return transaction history for a supplier
+        // For Phase 1, we can return completed orders as "ledger" entries
+        return this.prisma.purchaseOrder.findMany({
+            where: { supplierId: id },
+            orderBy: { createdAt: 'desc' },
+            include: { items: true },
+        });
+    }
+
     // Purchase Order Management
     async createPurchaseOrder(data: {
         workshopId: string;

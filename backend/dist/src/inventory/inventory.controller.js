@@ -36,6 +36,15 @@ let InventoryController = class InventoryController {
     async findOne(id) {
         return this.inventoryService.findOne(id);
     }
+    async addCompatibility(id, modelId, variantId) {
+        return this.inventoryService.addCompatibility(id, modelId, variantId);
+    }
+    async getCompatibility(id) {
+        return this.inventoryService.getCompatibility(id);
+    }
+    async adjustStock(id, quantity, reason) {
+        return this.inventoryService.adjustStock(id, quantity, reason);
+    }
 };
 exports.InventoryController = InventoryController;
 __decorate([
@@ -75,6 +84,31 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Post)('items/:id/compatibility'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('modelId')),
+    __param(2, (0, common_1.Body)('variantId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, String]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "addCompatibility", null);
+__decorate([
+    (0, common_1.Get)('items/:id/compatibility'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "getCompatibility", null);
+__decorate([
+    (0, common_1.Post)('items/:id/adjust'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('quantity')),
+    __param(2, (0, common_1.Body)('reason')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Number, String]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "adjustStock", null);
 exports.InventoryController = InventoryController = __decorate([
     (0, common_1.Controller)('inventory'),
     __metadata("design:paramtypes", [inventory_service_1.InventoryService])

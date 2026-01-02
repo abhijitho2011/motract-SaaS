@@ -33,6 +33,21 @@ let JobCardController = class JobCardController {
     async updateStage(id, stage) {
         return this.jobCardService.updateStage(id, stage);
     }
+    async saveInspection(id, body) {
+        return this.jobCardService.saveInspection(id, body);
+    }
+    async addTask(id, body) {
+        return this.jobCardService.addTask(id, body);
+    }
+    async addPart(id, body) {
+        return this.jobCardService.addPart(id, body);
+    }
+    async assignTechnician(id, body) {
+        return this.jobCardService.assignTechnician(id, body.technicianId);
+    }
+    async updateTaskStatus(id, taskId, body) {
+        return this.jobCardService.updateTaskStatus(id, taskId, body.status);
+    }
 };
 exports.JobCardController = JobCardController;
 __decorate([
@@ -64,6 +79,47 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], JobCardController.prototype, "updateStage", null);
+__decorate([
+    (0, common_1.Put)(':id/inspection'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], JobCardController.prototype, "saveInspection", null);
+__decorate([
+    (0, common_1.Post)(':id/tasks'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], JobCardController.prototype, "addTask", null);
+__decorate([
+    (0, common_1.Post)(':id/parts'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], JobCardController.prototype, "addPart", null);
+__decorate([
+    (0, common_1.Patch)(':id/technician'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], JobCardController.prototype, "assignTechnician", null);
+__decorate([
+    (0, common_1.Patch)(':id/tasks/:taskId/status'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Param)('taskId')),
+    __param(2, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, String, Object]),
+    __metadata("design:returntype", Promise)
+], JobCardController.prototype, "updateTaskStatus", null);
 exports.JobCardController = JobCardController = __decorate([
     (0, common_1.Controller)('job-cards'),
     __metadata("design:paramtypes", [job_card_service_1.JobCardService])

@@ -45,6 +45,13 @@ let PurchaseService = class PurchaseService {
             throw new common_1.NotFoundException('Supplier not found');
         return supplier;
     }
+    async getSupplierLedger(id) {
+        return this.prisma.purchaseOrder.findMany({
+            where: { supplierId: id },
+            orderBy: { createdAt: 'desc' },
+            include: { items: true },
+        });
+    }
     async createPurchaseOrder(data) {
         const totalAmount = data.items.reduce((sum, item) => {
             const itemTotal = item.quantity * item.unitCost;
@@ -104,22 +111,53 @@ let PurchaseService = class PurchaseService {
             data: { status },
         });
     }
-    async getSupplierLedger(supplierId) {
-        const orders = await this.prisma.purchaseOrder.findMany({
-            where: { supplierId },
-            orderBy: { invoiceDate: 'desc' },
-            include: {
-                items: true,
-            },
+    async receivePurchaseOrder(id) {
+        const po = await this.prisma.purchaseOrder.findUnique({
+            where: { id },
+            include: { items: true },
         });
-        const totalPurchases = orders.reduce((sum, order) => sum + order.totalAmount, 0);
-        const pendingOrders = orders.filter((o) => o.status === 'DRAFT').length;
-        return {
-            supplierId,
-            totalPurchases,
-            pendingOrders,
-            orders,
-        };
+        if (!po)
+            throw new common_1.NotFoundException('PO not found');
+        if (po.status === 'RECEIVED')
+            throw new Error('PO already received');
+        await this.prisma.$transaction(async (tx) => {
+            for (const item of po.items) {
+                let invItem = await tx.inventoryItem.findFirst({
+                    where: {
+                        workshopId: po.workshopId,
+                        name: {
+                            equals: item.itemName,
+                            mode: 'insensitive',
+                        },
+                    },
+                });
+                if (!invItem) {
+                    invItem = await tx.inventoryItem.create({
+                        data: {
+                            workshopId: po.workshopId,
+                            name: item.itemName,
+                            brand: 'Generic',
+                            hsnCode: '0000',
+                            taxPercent: item.taxPercent,
+                        },
+                    });
+                }
+                await tx.inventoryBatch.create({
+                    data: {
+                        itemId: invItem.id,
+                        batchNumber: `PO-${po.invoiceNumber ?? po.id.substring(0, 4)}`,
+                        quantity: item.quantity,
+                        purchasePrice: item.total / item.quantity,
+                        salePrice: (item.total / item.quantity) * 1.5,
+                    },
+                });
+            }
+            await tx.purchaseOrder.update({
+                where: { id },
+                data: { status: 'RECEIVED' },
+            });
+        });
+        return this.getPurchaseOrder(id);
     }
 };
 exports.PurchaseService = PurchaseService;

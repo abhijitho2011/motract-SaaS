@@ -19,8 +19,8 @@ export declare class PurchaseService {
             invoiceNumber: string | null;
             invoiceDate: Date;
             status: string;
-            totalAmount: number;
             supplierId: string;
+            totalAmount: number;
         }[];
     } & {
         id: string;
@@ -49,8 +49,8 @@ export declare class PurchaseService {
             invoiceNumber: string | null;
             invoiceDate: Date;
             status: string;
-            totalAmount: number;
             supplierId: string;
+            totalAmount: number;
         })[];
     } & {
         id: string;
@@ -60,6 +60,27 @@ export declare class PurchaseService {
         address: string | null;
         gstin: string | null;
     }>;
+    getSupplierLedger(id: string): Promise<({
+        items: {
+            id: string;
+            quantity: number;
+            taxPercent: number;
+            itemName: string;
+            partNumber: string | null;
+            unitCost: number;
+            total: number;
+            orderId: string;
+        }[];
+    } & {
+        id: string;
+        createdAt: Date;
+        workshopId: string;
+        invoiceNumber: string | null;
+        invoiceDate: Date;
+        status: string;
+        supplierId: string;
+        totalAmount: number;
+    })[]>;
     createPurchaseOrder(data: {
         workshopId: string;
         supplierId: string;
@@ -98,8 +119,8 @@ export declare class PurchaseService {
         invoiceNumber: string | null;
         invoiceDate: Date;
         status: string;
-        totalAmount: number;
         supplierId: string;
+        totalAmount: number;
     }>;
     getPurchaseOrders(workshopId: string): Promise<({
         supplier: {
@@ -127,8 +148,8 @@ export declare class PurchaseService {
         invoiceNumber: string | null;
         invoiceDate: Date;
         status: string;
-        totalAmount: number;
         supplierId: string;
+        totalAmount: number;
     })[]>;
     getPurchaseOrder(id: string): Promise<{
         supplier: {
@@ -156,8 +177,8 @@ export declare class PurchaseService {
         invoiceNumber: string | null;
         invoiceDate: Date;
         status: string;
-        totalAmount: number;
         supplierId: string;
+        totalAmount: number;
     }>;
     updatePurchaseOrderStatus(id: string, status: string): Promise<{
         id: string;
@@ -166,33 +187,36 @@ export declare class PurchaseService {
         invoiceNumber: string | null;
         invoiceDate: Date;
         status: string;
+        supplierId: string;
         totalAmount: number;
-        supplierId: string;
     }>;
-    getSupplierLedger(supplierId: string): Promise<{
-        supplierId: string;
-        totalPurchases: number;
-        pendingOrders: number;
-        orders: ({
-            items: {
-                id: string;
-                quantity: number;
-                taxPercent: number;
-                itemName: string;
-                partNumber: string | null;
-                unitCost: number;
-                total: number;
-                orderId: string;
-            }[];
-        } & {
+    receivePurchaseOrder(id: string): Promise<{
+        supplier: {
             id: string;
-            createdAt: Date;
+            name: string;
+            mobile: string;
             workshopId: string;
-            invoiceNumber: string | null;
-            invoiceDate: Date;
-            status: string;
-            totalAmount: number;
-            supplierId: string;
-        })[];
+            address: string | null;
+            gstin: string | null;
+        };
+        items: {
+            id: string;
+            quantity: number;
+            taxPercent: number;
+            itemName: string;
+            partNumber: string | null;
+            unitCost: number;
+            total: number;
+            orderId: string;
+        }[];
+    } & {
+        id: string;
+        createdAt: Date;
+        workshopId: string;
+        invoiceNumber: string | null;
+        invoiceDate: Date;
+        status: string;
+        supplierId: string;
+        totalAmount: number;
     }>;
 }

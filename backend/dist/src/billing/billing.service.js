@@ -12,47 +12,90 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BillingService = void 0;
 const common_1 = require("@nestjs/common");
 const prisma_service_1 = require("../prisma/prisma.service");
-const client_1 = require("@prisma/client");
 let BillingService = class BillingService {
     prisma;
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async createJobCardInvoice(jobCardId) {
-        const jobCard = await this.prisma.jobCard.findUnique({
+    async generateInvoice(jobCardId) {
+        const job = await this.prisma.jobCard.findUnique({
             where: { id: jobCardId },
-            include: { tasks: true, parts: { include: { item: true } }, customer: true },
-        });
-        if (!jobCard)
-            throw new common_1.NotFoundException('Job Card not found');
-        let laborTotal = 0;
-        if (jobCard.tasks) {
-            jobCard.tasks.forEach(task => laborTotal += task.price);
-        }
-        let partsTotal = 0;
-        if (jobCard.parts) {
-            jobCard.parts.forEach(part => partsTotal += (part.price * part.quantity));
-        }
-        const totalAmount = laborTotal + partsTotal;
-        const sgst = totalAmount * 0.09;
-        const cgst = totalAmount * 0.09;
-        const finalAmount = totalAmount + sgst + cgst;
-        const invoice = await this.prisma.invoice.create({
-            data: {
-                invoiceType: client_1.InvoiceType.JOB_CARD,
-                jobCardId,
-                customerId: jobCard.customerId,
-                workshopId: jobCard.workshopId,
-                totalAmount: finalAmount,
-                sgst,
-                cgst,
-                igst: 0,
-                paidAmount: 0,
-                balanceAmount: finalAmount,
-                status: 'PENDING',
+            include: {
+                tasks: true,
+                parts: true,
+                customer: true,
+                vehicle: true,
+                workshop: true,
+                invoice: true,
             },
         });
+        if (!job)
+            throw new common_1.NotFoundException('Job Card not found');
+        if (job.invoice)
+            throw new common_1.BadRequestException('Invoice already generated for this Job Card');
+        let totalLabor = 0;
+        job.tasks.forEach((t) => {
+            totalLabor += t.price;
+        });
+        let totalParts = 0;
+        job.parts.forEach((p) => {
+            totalParts += p.totalPrice;
+        });
+        let laborTax = 0;
+        job.tasks.forEach(t => {
+            laborTax += t.price * (t.gstPercent / 100);
+        });
+        let partsTax = 0;
+        job.parts.forEach(p => {
+            const basePrice = p.quantity * p.unitPrice;
+            partsTax += (p.totalPrice - basePrice);
+        });
+        const totalTax = laborTax + partsTax;
+        const cgst = totalTax / 2;
+        const sgst = totalTax / 2;
+        const grandTotal = totalLabor + laborTax + totalParts;
+        let totalLaborBase = 0;
+        job.tasks.forEach(t => totalLaborBase += t.price);
+        let totalPartsBase = 0;
+        job.parts.forEach(p => totalPartsBase += (p.quantity * p.unitPrice));
+        const finalGrandTotal = totalLaborBase + laborTax + totalPartsBase + partsTax;
+        const invoice = await this.prisma.invoice.create({
+            data: {
+                workshopId: job.workshopId,
+                customerId: job.customerId,
+                jobCardId: job.id,
+                invoiceNumber: `INV-${Date.now()}`,
+                type: 'JOB_CARD',
+                totalLabor: totalLaborBase,
+                totalParts: totalPartsBase,
+                cgst: cgst,
+                sgst: sgst,
+                igst: 0,
+                grandTotal: finalGrandTotal,
+                balance: finalGrandTotal,
+            },
+        });
+        await this.prisma.jobCard.update({
+            where: { id: jobCardId },
+            data: { stage: 'BILLING' },
+        });
         return invoice;
+    }
+    async getInvoice(id) {
+        return this.prisma.invoice.findUnique({
+            where: { id },
+            include: {
+                customer: true,
+                jobCard: {
+                    include: {
+                        vehicle: true,
+                        tasks: true,
+                        parts: { include: { item: true } }
+                    }
+                },
+                workshop: true
+            }
+        });
     }
 };
 exports.BillingService = BillingService;

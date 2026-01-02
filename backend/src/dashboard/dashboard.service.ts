@@ -102,7 +102,6 @@ export class DashboardService {
             pendingPayments,
             revenue,
             lowStockCount: lowStockItems.length,
-            lowStockCount: lowStockItems.length,
             lowStockItems,
             recentJobs: await this.prisma.jobCard.findMany({
                 where: { workshopId },

@@ -45,6 +45,9 @@ let PurchaseController = class PurchaseController {
     async updateStatus(id, status) {
         return this.purchaseService.updatePurchaseOrderStatus(id, status);
     }
+    async receiveOrder(id) {
+        return this.purchaseService.receivePurchaseOrder(id);
+    }
 };
 exports.PurchaseController = PurchaseController;
 __decorate([
@@ -104,6 +107,13 @@ __decorate([
     __metadata("design:paramtypes", [String, String]),
     __metadata("design:returntype", Promise)
 ], PurchaseController.prototype, "updateStatus", null);
+__decorate([
+    (0, common_1.Post)('orders/:id/receive'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], PurchaseController.prototype, "receiveOrder", null);
 exports.PurchaseController = PurchaseController = __decorate([
     (0, common_1.Controller)('purchase'),
     __metadata("design:paramtypes", [purchase_service_1.PurchaseService])
