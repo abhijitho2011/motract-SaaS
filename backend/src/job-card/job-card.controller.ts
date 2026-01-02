@@ -52,4 +52,22 @@ export class JobCardController {
     ) {
         return this.jobCardService.saveInspection(id, body);
     }
+    @Post(':id/tasks')
+    async addTask(@Param('id') id: string, @Body() body: {
+        description: string;
+        price: number;
+        gst: number;
+    }) {
+        return this.jobCardService.addTask(id, body);
+    }
+
+    @Post(':id/parts')
+    async addPart(@Param('id') id: string, @Body() body: {
+        itemId: string;
+        quantity: number;
+        unitPrice: number;
+        gst: number;
+    }) {
+        return this.jobCardService.addPart(id, body);
+    }
 }

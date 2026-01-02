@@ -146,4 +146,39 @@ export class JobCardService {
 
         return inspection;
     }
+    async addTask(jobCardId: string, data: {
+        description: string;
+        price: number;
+        gst: number;
+    }) {
+        return this.prisma.jobTask.create({
+            data: {
+                jobCardId,
+                description: data.description,
+                price: data.price,
+                gstPercent: data.gst,
+                isApproved: false,
+            },
+        });
+    }
+
+    async addPart(jobCardId: string, data: {
+        itemId: string;
+        quantity: number;
+        unitPrice: number;
+        gst: number;
+    }) {
+        return this.prisma.jobPart.create({
+            data: {
+                jobCardId,
+                itemId: data.itemId,
+                quantity: data.quantity,
+                unitPrice: data.unitPrice,
+                gstPercent: data.gst,
+                totalPrice: data.quantity * data.unitPrice * (1 + data.gst / 100),
+                isApproved: false, // Default pending
+            },
+            include: { item: true },
+        });
+    }
 }
