@@ -39,7 +39,7 @@ export declare class VehicleController {
         createdAt: string;
         updatedAt: string;
     }>;
-    getModels(): Promise<{
+    getAllModels(): Promise<{
         id: string;
         name: string;
         makeId: string;
@@ -53,5 +53,26 @@ export declare class VehicleController {
             id: string;
             name: string;
         };
+    }[]>;
+    getMakes(): Promise<{
+        id: string;
+        name: string;
+    }[]>;
+    getModels(makeId: string): Promise<{
+        id: string;
+        name: string;
+        makeId: string;
+        variants: {
+            id: string;
+            name: string;
+            fuelType: "PETROL" | "DIESEL" | "CNG" | "ELECTRIC" | "HYBRID";
+            modelId: string;
+        }[];
+    }[]>;
+    getVariants(modelId: string): Promise<{
+        id: string;
+        name: string;
+        fuelType: "PETROL" | "DIESEL" | "CNG" | "ELECTRIC" | "HYBRID";
+        modelId: string;
     }[]>;
 }

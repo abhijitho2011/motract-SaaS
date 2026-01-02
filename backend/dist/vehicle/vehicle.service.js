@@ -141,6 +141,18 @@ let VehicleService = class VehicleService {
             with: { make: true, variants: true },
         });
     }
+    async getMakes() {
+        return this.db.select().from(schema_1.makes);
+    }
+    async getModels(makeId) {
+        return this.db.query.models.findMany({
+            where: (0, drizzle_orm_1.eq)(schema_1.models.makeId, makeId),
+            with: { variants: true },
+        });
+    }
+    async getVariants(modelId) {
+        return this.db.select().from(schema_1.variants).where((0, drizzle_orm_1.eq)(schema_1.variants.modelId, modelId));
+    }
 };
 exports.VehicleService = VehicleService;
 exports.VehicleService = VehicleService = __decorate([

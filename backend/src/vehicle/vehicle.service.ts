@@ -134,6 +134,34 @@ export class VehicleService {
     return vehicle;
   }
 
+  // Masters
+  async createMake(name: string) {
+    const [make] = await this.db.insert(schema.makes).values({
+      id: crypto.randomUUID(),
+      name,
+    }).returning();
+    return make;
+  }
+
+  async createModel(makeId: string, name: string) {
+    const [model] = await this.db.insert(schema.models).values({
+      id: crypto.randomUUID(),
+      makeId,
+      name,
+    }).returning();
+    return model;
+  }
+
+  async createVariant(modelId: string, name: string, fuelType: 'PETROL' | 'DIESEL' | 'CNG' | 'ELECTRIC' | 'HYBRID') {
+    const [variant] = await this.db.insert(schema.variants).values({
+      id: crypto.randomUUID(),
+      modelId,
+      name,
+      fuelType,
+    }).returning();
+    return variant;
+  }
+
   async findAllModels() {
     return this.db.query.models.findMany({
       with: { make: true, variants: true },

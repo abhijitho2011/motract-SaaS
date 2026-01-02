@@ -47,6 +47,9 @@ let PurchaseController = class PurchaseController {
     async receiveOrder(id) {
         return this.purchaseService.receivePurchaseOrder(id);
     }
+    async recordPayment(body) {
+        return this.purchaseService.recordPayment(body);
+    }
 };
 exports.PurchaseController = PurchaseController;
 __decorate([
@@ -113,6 +116,13 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], PurchaseController.prototype, "receiveOrder", null);
+__decorate([
+    (0, common_1.Post)('payments'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], PurchaseController.prototype, "recordPayment", null);
 exports.PurchaseController = PurchaseController = __decorate([
     (0, common_1.Controller)('purchase'),
     __metadata("design:paramtypes", [purchase_service_1.PurchaseService])

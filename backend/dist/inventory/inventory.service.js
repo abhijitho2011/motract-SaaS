@@ -142,7 +142,7 @@ let InventoryService = class InventoryService {
             let remaining = deduction;
             const batches = await this.db.query.inventoryBatches.findMany({
                 where: (0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(schema_1.inventoryBatches.itemId, itemId), (0, drizzle_orm_1.gt)(schema_1.inventoryBatches.quantity, 0)),
-                orderBy: [(0, drizzle_orm_1.asc)(schema_1.inventoryBatches.purchasedAt)],
+                orderBy: [(0, drizzle_orm_1.asc)(schema_1.inventoryBatches.expiryDate), (0, drizzle_orm_1.asc)(schema_1.inventoryBatches.purchasedAt)],
             });
             for (const batch of batches) {
                 if (remaining <= 0)
@@ -159,6 +159,20 @@ let InventoryService = class InventoryService {
             }
         }
         return this.findOne(itemId);
+    }
+    async getExpiringBatches(workshopId, daysThreshold = 30) {
+        const thresholdDate = new Date();
+        thresholdDate.setDate(thresholdDate.getDate() + daysThreshold);
+        const thresholdStr = thresholdDate.toISOString();
+        const todayStr = new Date().toISOString();
+        const res = await this.db.select({
+            batch: schema_1.inventoryBatches,
+            item: schema_1.inventoryItems
+        })
+            .from(schema_1.inventoryBatches)
+            .innerJoin(schema_1.inventoryItems, (0, drizzle_orm_1.eq)(schema_1.inventoryBatches.itemId, schema_1.inventoryItems.id))
+            .where((0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(schema_1.inventoryItems.workshopId, workshopId), (0, drizzle_orm_1.gt)(schema_1.inventoryBatches.quantity, 0), (0, drizzle_orm_1.lte)(schema_1.inventoryBatches.expiryDate, thresholdStr), (0, drizzle_orm_1.gte)(schema_1.inventoryBatches.expiryDate, todayStr)));
+        return res;
     }
 };
 exports.InventoryService = InventoryService;

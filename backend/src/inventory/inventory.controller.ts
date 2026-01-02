@@ -5,6 +5,16 @@ import { InventoryService } from './inventory.service';
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) { }
 
+  @Post('masters/categories')
+  async createCategory(@Body() body: { name: string }) {
+    return this.inventoryService.createCategory(body.name);
+  }
+
+  @Post('masters/sub-categories')
+  async createSubCategory(@Body() body: { categoryId: string; name: string }) {
+    return this.inventoryService.createSubCategory(body.categoryId, body.name);
+  }
+
   @Post('items')
   async createItem(@Body() data: any) {
     return this.inventoryService.createItem(data);

@@ -26,8 +26,17 @@ let VehicleController = class VehicleController {
     async register(data) {
         return this.vehicleService.register(data);
     }
-    async getModels() {
+    async getAllModels() {
         return this.vehicleService.findAllModels();
+    }
+    async getMakes() {
+        return this.vehicleService.getMakes();
+    }
+    async getModels(makeId) {
+        return this.vehicleService.getModels(makeId);
+    }
+    async getVariants(modelId) {
+        return this.vehicleService.getVariants(modelId);
     }
 };
 exports.VehicleController = VehicleController;
@@ -50,7 +59,27 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
+], VehicleController.prototype, "getAllModels", null);
+__decorate([
+    (0, common_1.Get)('masters/makes'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], VehicleController.prototype, "getMakes", null);
+__decorate([
+    (0, common_1.Get)('masters/models/:makeId'),
+    __param(0, (0, common_1.Param)('makeId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
 ], VehicleController.prototype, "getModels", null);
+__decorate([
+    (0, common_1.Get)('masters/variants/:modelId'),
+    __param(0, (0, common_1.Param)('modelId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], VehicleController.prototype, "getVariants", null);
 exports.VehicleController = VehicleController = __decorate([
     (0, common_1.Controller)('vehicle'),
     __metadata("design:paramtypes", [vehicle_service_1.VehicleService])

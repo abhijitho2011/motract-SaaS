@@ -261,6 +261,10 @@ export const inventoryItems = pgTable("inventory_items", {
 	isOem: boolean().default(false).notNull(),
 	hsnCode: text(),
 	taxPercent: doublePrecision().default(18).notNull(),
+	reorderLevel: integer().default(0).notNull(),
+	categoryId: text().notNull(),
+	subCategoryId: text(),
+	description: text(),
 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
 }, (table) => [
@@ -269,6 +273,16 @@ export const inventoryItems = pgTable("inventory_items", {
 		foreignColumns: [workshops.id],
 		name: "inventory_items_workshopId_fkey"
 	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.categoryId],
+		foreignColumns: [categories.id],
+		name: "inventory_items_categoryId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.subCategoryId],
+		foreignColumns: [subCategories.id],
+		name: "inventory_items_subCategoryId_fkey"
+	}).onUpdate("cascade").onDelete("set null"),
 ]);
 
 export const inventoryVehicleMapping = pgTable("inventory_vehicle_mapping", {
@@ -536,7 +550,7 @@ export const slotBookings = pgTable("slot_bookings", {
 		name: "slot_bookings_bayId_fkey"
 	}).onUpdate("cascade").onDelete("restrict"),
 ]);
-export const modelsRelations = relations(models, ({one, many}) => ({
+export const modelsRelations = relations(models, ({ one, many }) => ({
 	make: one(makes, {
 		fields: [models.makeId],
 		references: [makes.id]
@@ -545,11 +559,11 @@ export const modelsRelations = relations(models, ({one, many}) => ({
 	inventoryVehicleMappings: many(inventoryVehicleMapping),
 }));
 
-export const makesRelations = relations(makes, ({many}) => ({
+export const makesRelations = relations(makes, ({ many }) => ({
 	models: many(models),
 }));
 
-export const variantsRelations = relations(variants, ({one, many}) => ({
+export const variantsRelations = relations(variants, ({ one, many }) => ({
 	model: one(models, {
 		fields: [variants.modelId],
 		references: [models.id]
@@ -557,7 +571,7 @@ export const variantsRelations = relations(variants, ({one, many}) => ({
 	vehicles: many(vehicles),
 }));
 
-export const vehiclesRelations = relations(vehicles, ({one, many}) => ({
+export const vehiclesRelations = relations(vehicles, ({ one, many }) => ({
 	variant: one(variants, {
 		fields: [vehicles.variantId],
 		references: [variants.id]
@@ -566,7 +580,7 @@ export const vehiclesRelations = relations(vehicles, ({one, many}) => ({
 	jobCards: many(jobCards),
 }));
 
-export const vehicleOwnersRelations = relations(vehicleOwners, ({one}) => ({
+export const vehicleOwnersRelations = relations(vehicleOwners, ({ one }) => ({
 	user: one(users, {
 		fields: [vehicleOwners.userId],
 		references: [users.id]
@@ -577,7 +591,7 @@ export const vehicleOwnersRelations = relations(vehicleOwners, ({one}) => ({
 	}),
 }));
 
-export const usersRelations = relations(users, ({one, many}) => ({
+export const usersRelations = relations(users, ({ one, many }) => ({
 	vehicleOwners: many(vehicleOwners),
 	workshop: one(workshops, {
 		fields: [users.workshopId],
@@ -585,7 +599,7 @@ export const usersRelations = relations(users, ({one, many}) => ({
 	}),
 }));
 
-export const customersRelations = relations(customers, ({one, many}) => ({
+export const customersRelations = relations(customers, ({ one, many }) => ({
 	workshop: one(workshops, {
 		fields: [customers.workshopId],
 		references: [workshops.id]
@@ -594,7 +608,7 @@ export const customersRelations = relations(customers, ({one, many}) => ({
 	invoices: many(invoices),
 }));
 
-export const workshopsRelations = relations(workshops, ({many}) => ({
+export const workshopsRelations = relations(workshops, ({ many }) => ({
 	customers: many(customers),
 	jobCards: many(jobCards),
 	inventoryItems: many(inventoryItems),
@@ -608,7 +622,7 @@ export const workshopsRelations = relations(workshops, ({many}) => ({
 	services: many(services),
 }));
 
-export const jobCardsRelations = relations(jobCards, ({one, many}) => ({
+export const jobCardsRelations = relations(jobCards, ({ one, many }) => ({
 	customer: one(customers, {
 		fields: [jobCards.customerId],
 		references: [customers.id]
@@ -628,14 +642,14 @@ export const jobCardsRelations = relations(jobCards, ({one, many}) => ({
 	invoices: many(invoices),
 }));
 
-export const jobComplaintsRelations = relations(jobComplaints, ({one}) => ({
+export const jobComplaintsRelations = relations(jobComplaints, ({ one }) => ({
 	jobCard: one(jobCards, {
 		fields: [jobComplaints.jobCardId],
 		references: [jobCards.id]
 	}),
 }));
 
-export const jobPartsRelations = relations(jobParts, ({one}) => ({
+export const jobPartsRelations = relations(jobParts, ({ one }) => ({
 	inventoryBatch: one(inventoryBatches, {
 		fields: [jobParts.batchId],
 		references: [inventoryBatches.id]
@@ -650,7 +664,7 @@ export const jobPartsRelations = relations(jobParts, ({one}) => ({
 	}),
 }));
 
-export const inventoryBatchesRelations = relations(inventoryBatches, ({one, many}) => ({
+export const inventoryBatchesRelations = relations(inventoryBatches, ({ one, many }) => ({
 	jobParts: many(jobParts),
 	inventoryItem: one(inventoryItems, {
 		fields: [inventoryBatches.itemId],
@@ -658,43 +672,51 @@ export const inventoryBatchesRelations = relations(inventoryBatches, ({one, many
 	}),
 }));
 
-export const inventoryItemsRelations = relations(inventoryItems, ({one, many}) => ({
+export const inventoryItemsRelations = relations(inventoryItems, ({ one, many }) => ({
 	jobParts: many(jobParts),
 	workshop: one(workshops, {
 		fields: [inventoryItems.workshopId],
 		references: [workshops.id]
+	}),
+	category: one(categories, {
+		fields: [inventoryItems.categoryId],
+		references: [categories.id]
+	}),
+	subCategory: one(subCategories, {
+		fields: [inventoryItems.subCategoryId],
+		references: [subCategories.id]
 	}),
 	inventoryVehicleMappings: many(inventoryVehicleMapping),
 	inventoryPartNumbers: many(inventoryPartNumbers),
 	inventoryBatches: many(inventoryBatches),
 }));
 
-export const jobInspectionsRelations = relations(jobInspections, ({one}) => ({
+export const jobInspectionsRelations = relations(jobInspections, ({ one }) => ({
 	jobCard: one(jobCards, {
 		fields: [jobInspections.jobCardId],
 		references: [jobCards.id]
 	}),
 }));
 
-export const jobItemsRelations = relations(jobItems, ({one}) => ({
+export const jobItemsRelations = relations(jobItems, ({ one }) => ({
 	jobCard: one(jobCards, {
 		fields: [jobItems.jobCardId],
 		references: [jobCards.id]
 	}),
 }));
 
-export const subCategoriesRelations = relations(subCategories, ({one}) => ({
+export const subCategoriesRelations = relations(subCategories, ({ one }) => ({
 	category: one(categories, {
 		fields: [subCategories.categoryId],
 		references: [categories.id]
 	}),
 }));
 
-export const categoriesRelations = relations(categories, ({many}) => ({
+export const categoriesRelations = relations(categories, ({ many }) => ({
 	subCategories: many(subCategories),
 }));
 
-export const inventoryVehicleMappingRelations = relations(inventoryVehicleMapping, ({one}) => ({
+export const inventoryVehicleMappingRelations = relations(inventoryVehicleMapping, ({ one }) => ({
 	inventoryItem: one(inventoryItems, {
 		fields: [inventoryVehicleMapping.itemId],
 		references: [inventoryItems.id]
@@ -705,14 +727,14 @@ export const inventoryVehicleMappingRelations = relations(inventoryVehicleMappin
 	}),
 }));
 
-export const inventoryPartNumbersRelations = relations(inventoryPartNumbers, ({one}) => ({
+export const inventoryPartNumbersRelations = relations(inventoryPartNumbers, ({ one }) => ({
 	inventoryItem: one(inventoryItems, {
 		fields: [inventoryPartNumbers.itemId],
 		references: [inventoryItems.id]
 	}),
 }));
 
-export const suppliersRelations = relations(suppliers, ({one, many}) => ({
+export const suppliersRelations = relations(suppliers, ({ one, many }) => ({
 	workshop: one(workshops, {
 		fields: [suppliers.workshopId],
 		references: [workshops.id]
@@ -720,7 +742,7 @@ export const suppliersRelations = relations(suppliers, ({one, many}) => ({
 	purchases: many(purchases),
 }));
 
-export const purchasesRelations = relations(purchases, ({one, many}) => ({
+export const purchasesRelations = relations(purchases, ({ one, many }) => ({
 	supplier: one(suppliers, {
 		fields: [purchases.supplierId],
 		references: [suppliers.id]
@@ -732,14 +754,14 @@ export const purchasesRelations = relations(purchases, ({one, many}) => ({
 	purchaseItems: many(purchaseItems),
 }));
 
-export const purchaseItemsRelations = relations(purchaseItems, ({one}) => ({
+export const purchaseItemsRelations = relations(purchaseItems, ({ one }) => ({
 	purchase: one(purchases, {
 		fields: [purchaseItems.orderId],
 		references: [purchases.id]
 	}),
 }));
 
-export const invoicesRelations = relations(invoices, ({one, many}) => ({
+export const invoicesRelations = relations(invoices, ({ one, many }) => ({
 	customer: one(customers, {
 		fields: [invoices.customerId],
 		references: [customers.id]
@@ -755,28 +777,28 @@ export const invoicesRelations = relations(invoices, ({one, many}) => ({
 	payments: many(payments),
 }));
 
-export const paymentsRelations = relations(payments, ({one}) => ({
+export const paymentsRelations = relations(payments, ({ one }) => ({
 	invoice: one(invoices, {
 		fields: [payments.invoiceId],
 		references: [invoices.id]
 	}),
 }));
 
-export const workshopBreaksRelations = relations(workshopBreaks, ({one}) => ({
+export const workshopBreaksRelations = relations(workshopBreaks, ({ one }) => ({
 	workshop: one(workshops, {
 		fields: [workshopBreaks.workshopId],
 		references: [workshops.id]
 	}),
 }));
 
-export const expensesRelations = relations(expenses, ({one}) => ({
+export const expensesRelations = relations(expenses, ({ one }) => ({
 	workshop: one(workshops, {
 		fields: [expenses.workshopId],
 		references: [workshops.id]
 	}),
 }));
 
-export const baysRelations = relations(bays, ({one, many}) => ({
+export const baysRelations = relations(bays, ({ one, many }) => ({
 	workshop: one(workshops, {
 		fields: [bays.workshopId],
 		references: [workshops.id]
@@ -785,7 +807,7 @@ export const baysRelations = relations(bays, ({one, many}) => ({
 	slotBookings: many(slotBookings),
 }));
 
-export const servicesRelations = relations(services, ({one, many}) => ({
+export const servicesRelations = relations(services, ({ one, many }) => ({
 	workshop: one(workshops, {
 		fields: [services.workshopId],
 		references: [workshops.id]
@@ -793,7 +815,7 @@ export const servicesRelations = relations(services, ({one, many}) => ({
 	serviceBayMappings: many(serviceBayMapping),
 }));
 
-export const serviceBayMappingRelations = relations(serviceBayMapping, ({one}) => ({
+export const serviceBayMappingRelations = relations(serviceBayMapping, ({ one }) => ({
 	bay: one(bays, {
 		fields: [serviceBayMapping.bayId],
 		references: [bays.id]
@@ -804,7 +826,7 @@ export const serviceBayMappingRelations = relations(serviceBayMapping, ({one}) =
 	}),
 }));
 
-export const slotBookingsRelations = relations(slotBookings, ({one}) => ({
+export const slotBookingsRelations = relations(slotBookings, ({ one }) => ({
 	bay: one(bays, {
 		fields: [slotBookings.bayId],
 		references: [bays.id]

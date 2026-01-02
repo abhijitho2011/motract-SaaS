@@ -12,12 +12,12 @@ export declare class ReportsController {
         };
         transactions: {
             id: string;
+            type: "JOB_CARD" | "COUNTER_SALE";
             workshopId: string;
             customerId: string;
             jobCardId: string | null;
             invoiceDate: string;
             invoiceNumber: string;
-            type: "JOB_CARD" | "COUNTER_SALE";
             totalLabor: number;
             totalParts: number;
             cgst: number;

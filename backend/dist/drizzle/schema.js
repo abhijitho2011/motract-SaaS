@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.jobComplaintsRelations = exports.jobCardsRelations = exports.workshopsRelations = exports.customersRelations = exports.usersRelations = exports.vehicleOwnersRelations = exports.vehiclesRelations = exports.variantsRelations = exports.makesRelations = exports.modelsRelations = exports.slotBookings = exports.serviceBayMapping = exports.services = exports.bays = exports.expenses = exports.users = exports.workshopBreaks = exports.inventoryBatches = exports.payments = exports.invoices = exports.purchaseItems = exports.purchases = exports.suppliers = exports.inventoryPartNumbers = exports.inventoryVehicleMapping = exports.inventoryItems = exports.subCategories = exports.jobItems = exports.jobInspections = exports.categories = exports.jobParts = exports.workshops = exports.jobComplaints = exports.jobCards = exports.customers = exports.vehicleOwners = exports.vehicles = exports.variants = exports.models = exports.makes = exports.txnType = exports.slotStatus = exports.role = exports.paymentMode = exports.jobStage = exports.jobPriority = exports.invoiceType = exports.fuelType = exports.bayType = exports.approvalStatus = void 0;
-exports.slotBookingsRelations = exports.serviceBayMappingRelations = exports.servicesRelations = exports.baysRelations = exports.expensesRelations = exports.workshopBreaksRelations = exports.paymentsRelations = exports.invoicesRelations = exports.purchaseItemsRelations = exports.purchasesRelations = exports.suppliersRelations = exports.inventoryPartNumbersRelations = exports.inventoryVehicleMappingRelations = exports.categoriesRelations = exports.subCategoriesRelations = exports.jobItemsRelations = exports.jobInspectionsRelations = exports.inventoryItemsRelations = exports.inventoryBatchesRelations = exports.jobPartsRelations = void 0;
+exports.variantsRelations = exports.makesRelations = exports.modelsRelations = exports.slotBlocks = exports.slots = exports.workshopWorkingHours = exports.slotBookings = exports.serviceBayMapping = exports.services = exports.bays = exports.expenses = exports.users = exports.workshopBreaks = exports.inventoryBatches = exports.purchasePayments = exports.payments = exports.invoices = exports.purchaseItems = exports.purchases = exports.suppliers = exports.inventoryPartNumbers = exports.inventoryVehicleMapping = exports.inventoryItems = exports.subCategories = exports.jobItems = exports.jobInspections = exports.categories = exports.jobParts = exports.workshops = exports.jobComplaints = exports.jobCards = exports.customers = exports.vehicleOwners = exports.vehicles = exports.variants = exports.models = exports.brands = exports.makes = exports.slotBlockType = exports.brandType = exports.txnType = exports.slotStatus = exports.role = exports.paymentMode = exports.jobStage = exports.jobPriority = exports.invoiceType = exports.fuelType = exports.bayType = exports.approvalStatus = void 0;
+exports.slotBlocksRelations = exports.slotsRelations = exports.workshopWorkingHoursRelations = exports.brandsRelations = exports.slotBookingsRelations = exports.serviceBayMappingRelations = exports.servicesRelations = exports.baysRelations = exports.expensesRelations = exports.workshopBreaksRelations = exports.paymentsRelations = exports.invoicesRelations = exports.purchasePaymentsRelations = exports.purchaseItemsRelations = exports.purchasesRelations = exports.suppliersRelations = exports.inventoryPartNumbersRelations = exports.inventoryVehicleMappingRelations = exports.categoriesRelations = exports.subCategoriesRelations = exports.jobItemsRelations = exports.jobInspectionsRelations = exports.inventoryItemsRelations = exports.inventoryBatchesRelations = exports.jobPartsRelations = exports.jobComplaintsRelations = exports.jobCardsRelations = exports.workshopsRelations = exports.customersRelations = exports.usersRelations = exports.vehicleOwnersRelations = exports.vehiclesRelations = void 0;
 const pg_core_1 = require("drizzle-orm/pg-core");
 const drizzle_orm_1 = require("drizzle-orm");
 const relations_1 = require("drizzle-orm/relations");
@@ -15,12 +15,20 @@ exports.paymentMode = (0, pg_core_1.pgEnum)("PaymentMode", ['CASH', 'UPI', 'CARD
 exports.role = (0, pg_core_1.pgEnum)("Role", ['SUPER_ADMIN', 'WORKSHOP_ADMIN', 'WORKSHOP_MANAGER', 'TECHNICIAN', 'CLIENT', 'RSA_PROVIDER', 'SUPPLIER']);
 exports.slotStatus = (0, pg_core_1.pgEnum)("SlotStatus", ['AVAILABLE', 'BOOKED', 'BLOCKED']);
 exports.txnType = (0, pg_core_1.pgEnum)("TxnType", ['CREDIT', 'DEBIT']);
+exports.brandType = (0, pg_core_1.pgEnum)("BrandType", ['OEM', 'AFTERMARKET']);
+exports.slotBlockType = (0, pg_core_1.pgEnum)("SlotBlockType", ['MANUAL', 'OFFLINE', 'MAINTENANCE']);
 exports.makes = (0, pg_core_1.pgTable)("makes", {
     id: (0, pg_core_1.text)().primaryKey().notNull(),
     name: (0, pg_core_1.text)().notNull(),
 }, (table) => [
     (0, pg_core_1.uniqueIndex)("makes_name_key").using("btree", table.name.asc().nullsLast().op("text_ops")),
 ]);
+exports.brands = (0, pg_core_1.pgTable)("brands", {
+    id: (0, pg_core_1.text)().primaryKey().notNull(),
+    name: (0, pg_core_1.text)().notNull(),
+    type: (0, exports.brandType)().notNull(),
+    status: (0, pg_core_1.boolean)().default(true).notNull(),
+});
 exports.models = (0, pg_core_1.pgTable)("models", {
     id: (0, pg_core_1.text)().primaryKey().notNull(),
     name: (0, pg_core_1.text)().notNull(),
@@ -248,6 +256,11 @@ exports.inventoryItems = (0, pg_core_1.pgTable)("inventory_items", {
     isOem: (0, pg_core_1.boolean)().default(false).notNull(),
     hsnCode: (0, pg_core_1.text)(),
     taxPercent: (0, pg_core_1.doublePrecision)().default(18).notNull(),
+    reorderLevel: (0, pg_core_1.integer)().default(0),
+    description: (0, pg_core_1.text)(),
+    brandId: (0, pg_core_1.text)(),
+    categoryId: (0, pg_core_1.text)(),
+    subCategoryId: (0, pg_core_1.text)(),
     createdAt: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).default((0, drizzle_orm_1.sql) `CURRENT_TIMESTAMP`).notNull(),
     updatedAt: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).notNull(),
 }, (table) => [
@@ -256,6 +269,21 @@ exports.inventoryItems = (0, pg_core_1.pgTable)("inventory_items", {
         foreignColumns: [exports.workshops.id],
         name: "inventory_items_workshopId_fkey"
     }).onUpdate("cascade").onDelete("restrict"),
+    (0, pg_core_1.foreignKey)({
+        columns: [table.brandId],
+        foreignColumns: [exports.brands.id],
+        name: "inventory_items_brandId_fkey"
+    }).onUpdate("cascade").onDelete("set null"),
+    (0, pg_core_1.foreignKey)({
+        columns: [table.categoryId],
+        foreignColumns: [exports.categories.id],
+        name: "inventory_items_categoryId_fkey"
+    }).onUpdate("cascade").onDelete("set null"),
+    (0, pg_core_1.foreignKey)({
+        columns: [table.subCategoryId],
+        foreignColumns: [exports.subCategories.id],
+        name: "inventory_items_subCategoryId_fkey"
+    }).onUpdate("cascade").onDelete("set null"),
 ]);
 exports.inventoryVehicleMapping = (0, pg_core_1.pgTable)("inventory_vehicle_mapping", {
     id: (0, pg_core_1.text)().primaryKey().notNull(),
@@ -386,6 +414,20 @@ exports.payments = (0, pg_core_1.pgTable)("payments", {
         name: "payments_invoiceId_fkey"
     }).onUpdate("cascade").onDelete("restrict"),
 ]);
+exports.purchasePayments = (0, pg_core_1.pgTable)("purchase_payments", {
+    id: (0, pg_core_1.text)().primaryKey().notNull(),
+    purchaseId: (0, pg_core_1.text)().notNull(),
+    amount: (0, pg_core_1.doublePrecision)().notNull(),
+    mode: (0, exports.paymentMode)().notNull(),
+    reference: (0, pg_core_1.text)(),
+    date: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).default((0, drizzle_orm_1.sql) `CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+    (0, pg_core_1.foreignKey)({
+        columns: [table.purchaseId],
+        foreignColumns: [exports.purchases.id],
+        name: "purchase_payments_purchaseId_fkey"
+    }).onUpdate("cascade").onDelete("restrict"),
+]);
 exports.inventoryBatches = (0, pg_core_1.pgTable)("inventory_batches", {
     id: (0, pg_core_1.text)().primaryKey().notNull(),
     itemId: (0, pg_core_1.text)().notNull(),
@@ -508,6 +550,51 @@ exports.slotBookings = (0, pg_core_1.pgTable)("slot_bookings", {
         name: "slot_bookings_bayId_fkey"
     }).onUpdate("cascade").onDelete("restrict"),
 ]);
+exports.workshopWorkingHours = (0, pg_core_1.pgTable)("workshop_working_hours", {
+    id: (0, pg_core_1.text)().primaryKey().notNull(),
+    workshopId: (0, pg_core_1.text)().notNull(),
+    dayOfWeek: (0, pg_core_1.text)().notNull(),
+    openingTime: (0, pg_core_1.text)().notNull(),
+    closingTime: (0, pg_core_1.text)().notNull(),
+}, (table) => [
+    (0, pg_core_1.foreignKey)({
+        columns: [table.workshopId],
+        foreignColumns: [exports.workshops.id],
+        name: "workshop_working_hours_workshopId_fkey"
+    }).onUpdate("cascade").onDelete("restrict"),
+]);
+exports.slots = (0, pg_core_1.pgTable)("slots", {
+    id: (0, pg_core_1.text)().primaryKey().notNull(),
+    workshopId: (0, pg_core_1.text)().notNull(),
+    bayId: (0, pg_core_1.text)().notNull(),
+    date: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).notNull(),
+    startTime: (0, pg_core_1.text)().notNull(),
+    endTime: (0, pg_core_1.text)().notNull(),
+    status: (0, exports.slotStatus)().notNull(),
+    bookingId: (0, pg_core_1.text)(),
+    isGenerated: (0, pg_core_1.boolean)().default(true).notNull(),
+}, (table) => [
+    (0, pg_core_1.foreignKey)({
+        columns: [table.workshopId],
+        foreignColumns: [exports.workshops.id],
+        name: "slots_workshopId_fkey"
+    }).onUpdate("cascade").onDelete("restrict"),
+    (0, pg_core_1.foreignKey)({
+        columns: [table.bayId],
+        foreignColumns: [exports.bays.id],
+        name: "slots_bayId_fkey"
+    }).onUpdate("cascade").onDelete("restrict"),
+]);
+exports.slotBlocks = (0, pg_core_1.pgTable)("slot_blocks", {
+    id: (0, pg_core_1.text)().primaryKey().notNull(),
+    workshopId: (0, pg_core_1.text)().notNull(),
+    bayId: (0, pg_core_1.text)(),
+    reason: (0, pg_core_1.text)().notNull(),
+    startTime: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).notNull(),
+    endTime: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).notNull(),
+    type: (0, exports.slotBlockType)().notNull(),
+    createdAt: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).default((0, drizzle_orm_1.sql) `CURRENT_TIMESTAMP`).notNull(),
+});
 exports.modelsRelations = (0, relations_1.relations)(exports.models, ({ one, many }) => ({
     make: one(exports.makes, {
         fields: [exports.models.makeId],
@@ -571,6 +658,10 @@ exports.workshopsRelations = (0, relations_1.relations)(exports.workshops, ({ ma
     expenses: many(exports.expenses),
     bays: many(exports.bays),
     services: many(exports.services),
+    brands: many(exports.brands),
+    workshopWorkingHours: many(exports.workshopWorkingHours),
+    slots: many(exports.slots),
+    slotBlocks: many(exports.slotBlocks),
 }));
 exports.jobCardsRelations = (0, relations_1.relations)(exports.jobCards, ({ one, many }) => ({
     customer: one(exports.customers, {
@@ -682,10 +773,17 @@ exports.purchasesRelations = (0, relations_1.relations)(exports.purchases, ({ on
         references: [exports.workshops.id]
     }),
     purchaseItems: many(exports.purchaseItems),
+    payments: many(exports.purchasePayments),
 }));
 exports.purchaseItemsRelations = (0, relations_1.relations)(exports.purchaseItems, ({ one }) => ({
     purchase: one(exports.purchases, {
         fields: [exports.purchaseItems.orderId],
+        references: [exports.purchases.id]
+    }),
+}));
+exports.purchasePaymentsRelations = (0, relations_1.relations)(exports.purchasePayments, ({ one }) => ({
+    purchase: one(exports.purchases, {
+        fields: [exports.purchasePayments.purchaseId],
         references: [exports.purchases.id]
     }),
 }));
@@ -751,6 +849,31 @@ exports.slotBookingsRelations = (0, relations_1.relations)(exports.slotBookings,
     bay: one(exports.bays, {
         fields: [exports.slotBookings.bayId],
         references: [exports.bays.id]
+    }),
+}));
+exports.brandsRelations = (0, relations_1.relations)(exports.brands, ({ many }) => ({
+    inventoryItems: many(exports.inventoryItems),
+}));
+exports.workshopWorkingHoursRelations = (0, relations_1.relations)(exports.workshopWorkingHours, ({ one }) => ({
+    workshop: one(exports.workshops, {
+        fields: [exports.workshopWorkingHours.workshopId],
+        references: [exports.workshops.id]
+    }),
+}));
+exports.slotsRelations = (0, relations_1.relations)(exports.slots, ({ one }) => ({
+    workshop: one(exports.workshops, {
+        fields: [exports.slots.workshopId],
+        references: [exports.workshops.id]
+    }),
+    bay: one(exports.bays, {
+        fields: [exports.slots.bayId],
+        references: [exports.bays.id]
+    }),
+}));
+exports.slotBlocksRelations = (0, relations_1.relations)(exports.slotBlocks, ({ one }) => ({
+    workshop: one(exports.workshops, {
+        fields: [exports.slotBlocks.workshopId],
+        references: [exports.workshops.id]
     }),
 }));
 //# sourceMappingURL=schema.js.map

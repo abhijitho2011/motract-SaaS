@@ -16,6 +16,11 @@ export declare class InventoryService {
         isOem: boolean;
         hsnCode: string | null;
         taxPercent: number;
+        reorderLevel: number | null;
+        description: string | null;
+        brandId: string | null;
+        categoryId: string | null;
+        subCategoryId: string | null;
     }>;
     addSku(itemId: string, skuCode: string): Promise<{
         id: string;
@@ -48,6 +53,11 @@ export declare class InventoryService {
         isOem: boolean;
         hsnCode: string | null;
         taxPercent: number;
+        reorderLevel: number | null;
+        description: string | null;
+        brandId: string | null;
+        categoryId: string | null;
+        subCategoryId: string | null;
         inventoryPartNumbers: {
             id: string;
             itemId: string;
@@ -88,4 +98,32 @@ export declare class InventoryService {
         };
     }[]>;
     adjustStock(itemId: string, quantity: number, reason: string): Promise<any>;
+    getExpiringBatches(workshopId: string, daysThreshold?: number): Promise<{
+        batch: {
+            id: string;
+            itemId: string;
+            batchNumber: string | null;
+            expiryDate: string | null;
+            quantity: number;
+            purchasePrice: number;
+            salePrice: number;
+            purchasedAt: string;
+        };
+        item: {
+            id: string;
+            workshopId: string;
+            name: string;
+            brand: string | null;
+            isOem: boolean;
+            hsnCode: string | null;
+            taxPercent: number;
+            reorderLevel: number | null;
+            description: string | null;
+            brandId: string | null;
+            categoryId: string | null;
+            subCategoryId: string | null;
+            createdAt: string;
+            updatedAt: string;
+        };
+    }[]>;
 }

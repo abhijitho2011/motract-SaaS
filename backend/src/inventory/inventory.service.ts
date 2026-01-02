@@ -23,10 +23,74 @@ export class InventoryService {
     private db: NodePgDatabase<typeof schema>,
   ) { }
 
-  async createItem(data: typeof inventoryItems.$inferInsert) {
-    const [item] = await this.db.insert(inventoryItems).values(data).returning();
-    // Return with empty relations as created
-    return { ...item, partNumbers: [], batches: [] };
+  async createCategory(name: string) {
+    const [category] = await this.db.insert(schema.categories).values({
+      id: crypto.randomUUID(),
+      name,
+    }).returning();
+    return category;
+  }
+
+  async createSubCategory(categoryId: string, name: string) {
+    const [sub] = await this.db.insert(schema.subCategories).values({
+      id: crypto.randomUUID(),
+      categoryId,
+      name,
+    }).returning();
+    return sub;
+  }
+
+  async createItem(data: any) {
+    // 1. Create Item
+    const [item] = await this.db.insert(inventoryItems).values({
+      id: crypto.randomUUID(),
+      workshopId: data.workshopId,
+      name: data.name,
+      brand: data.brand,
+      isOem: data.isOem,
+      hsnCode: data.hsnCode,
+      taxPercent: data.taxPercent,
+      reorderLevel: data.reorderLevel,
+      categoryId: data.categoryId,
+      subCategoryId: data.subCategoryId,
+      description: data.description,
+    }).returning();
+
+    // 2. Add Part Numbers (SKUs)
+    if (data.partNumbers && data.partNumbers.length > 0) {
+      await this.db.insert(inventoryPartNumbers).values(
+        data.partNumbers.map((sku: string) => ({
+          id: crypto.randomUUID(),
+          itemId: item.id,
+          skuCode: sku,
+        }))
+      );
+    }
+
+    // 3. Add Compatibility
+    if (data.compatibleVehicles && data.compatibleVehicles.length > 0) {
+      // Expecting array of { modelId, variantId? }
+      await this.db.insert(inventoryVehicleMapping).values(
+        data.compatibleVehicles.map((v: any) => ({
+          id: crypto.randomUUID(),
+          itemId: item.id,
+          modelId: v.modelId,
+          variantId: v.variantId || null,
+        }))
+      );
+    }
+
+    // 4. Initial Stock (Optional)
+    if (data.initialStock) {
+      await this.addBatch(item.id, {
+        quantity: data.initialStock.quantity,
+        purchasePrice: data.initialStock.purchasePrice,
+        salePrice: data.initialStock.salePrice,
+        batchNumber: 'INITIAL',
+      });
+    }
+
+    return this.findOne(item.id);
   }
 
   async addSku(itemId: string, skuCode: string) {

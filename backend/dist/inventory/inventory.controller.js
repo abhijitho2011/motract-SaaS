@@ -44,6 +44,9 @@ let InventoryController = class InventoryController {
     async adjustStock(id, quantity, reason) {
         return this.inventoryService.adjustStock(id, quantity, reason);
     }
+    async getExpiringBatches(workshopId) {
+        return this.inventoryService.getExpiringBatches(workshopId);
+    }
 };
 exports.InventoryController = InventoryController;
 __decorate([
@@ -108,6 +111,13 @@ __decorate([
     __metadata("design:paramtypes", [String, Number, String]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "adjustStock", null);
+__decorate([
+    (0, common_1.Get)('alerts/expiring'),
+    __param(0, (0, common_1.Query)('workshopId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "getExpiringBatches", null);
 exports.InventoryController = InventoryController = __decorate([
     (0, common_1.Controller)('inventory'),
     __metadata("design:paramtypes", [inventory_service_1.InventoryService])
