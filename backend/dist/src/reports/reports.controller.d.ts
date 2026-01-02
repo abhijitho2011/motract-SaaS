@@ -10,26 +10,14 @@ export declare class ReportsController {
             partsRevenue: number;
             taxCollected: number;
         };
-        transactions: ({
-            customer: {
-                id: string;
-                name: string;
-                email: string | null;
-                mobile: string;
-                createdAt: Date;
-                updatedAt: Date;
-                workshopId: string;
-                address: string | null;
-                gstin: string | null;
-            };
-        } & {
+        transactions: {
             id: string;
             workshopId: string;
             customerId: string;
             jobCardId: string | null;
+            invoiceDate: string;
             invoiceNumber: string;
-            invoiceDate: Date;
-            type: import(".prisma/client").$Enums.InvoiceType;
+            type: "JOB_CARD" | "COUNTER_SALE";
             totalLabor: number;
             totalParts: number;
             cgst: number;
@@ -39,7 +27,18 @@ export declare class ReportsController {
             grandTotal: number;
             paidAmount: number;
             balance: number;
-        })[];
+            customer: {
+                id: string;
+                name: string;
+                createdAt: string;
+                updatedAt: string;
+                email: string | null;
+                mobile: string;
+                workshopId: string;
+                address: string | null;
+                gstin: string | null;
+            };
+        }[];
     }>;
     getGST(req: any, month: string, year: string): Promise<{
         period: string;

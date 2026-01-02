@@ -1,8 +1,10 @@
-import { PrismaService } from '../prisma/prisma.service';
-import { BayType } from '@prisma/client';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../drizzle/schema';
+import { slotBookings } from '../drizzle/schema';
+import { BayType } from '../drizzle/types';
 export declare class SlotService {
-    private prisma;
-    constructor(prisma: PrismaService);
+    private db;
+    constructor(db: NodePgDatabase<typeof schema>);
     createBay(data: {
         workshopId: string;
         name: string;
@@ -11,41 +13,35 @@ export declare class SlotService {
         id: string;
         name: string;
         workshopId: string;
-        type: import(".prisma/client").$Enums.BayType;
         isActive: boolean;
+        type: "SERVICE" | "WASHING" | "ALIGNMENT" | "ELECTRICAL" | "GENERAL";
     }>;
-    findBays(workshopId: string): Promise<({
-        services: {
-            id: string;
-            bayId: string;
-            serviceId: string;
-        }[];
-    } & {
+    findBays(workshopId: string): Promise<{
         id: string;
         name: string;
         workshopId: string;
-        type: import(".prisma/client").$Enums.BayType;
         isActive: boolean;
-    })[]>;
+        type: "SERVICE" | "WASHING" | "ALIGNMENT" | "ELECTRICAL" | "GENERAL";
+    }[]>;
     generateSlots(bayId: string, date: Date, startStr: string, endStr: string, durationMin: number): Promise<never[]>;
     getSlots(bayId: string, date: Date): Promise<{
         id: string;
-        createdAt: Date;
-        jobCardId: string | null;
         bayId: string;
-        date: Date;
+        date: string;
         startTime: string;
         endTime: string;
-        status: import(".prisma/client").$Enums.SlotStatus;
+        status: "AVAILABLE" | "BOOKED" | "BLOCKED";
+        jobCardId: string | null;
+        createdAt: string;
     }[]>;
-    bookSlot(data: Prisma.SlotBookingCreateInput): Promise<{
+    bookSlot(data: typeof slotBookings.$inferInsert): Promise<{
+        date: string;
         id: string;
-        createdAt: Date;
+        createdAt: string;
         jobCardId: string | null;
-        bayId: string;
-        date: Date;
+        status: "AVAILABLE" | "BOOKED" | "BLOCKED";
         startTime: string;
         endTime: string;
-        status: import(".prisma/client").$Enums.SlotStatus;
+        bayId: string;
     }>;
 }

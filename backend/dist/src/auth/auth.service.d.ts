@@ -1,6 +1,6 @@
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { Prisma } from '@prisma/client';
+import { users } from '../drizzle/schema';
 export declare class AuthService {
     private usersService;
     private jwtService;
@@ -10,15 +10,15 @@ export declare class AuthService {
         access_token: string;
         user: any;
     }>;
-    register(data: Prisma.UserCreateInput): Promise<{
+    register(data: typeof users.$inferInsert): Promise<{
+        password: string | null;
         id: string;
         name: string | null;
+        createdAt: string;
+        updatedAt: string;
         email: string | null;
         mobile: string;
-        password: string | null;
-        role: import(".prisma/client").$Enums.Role;
-        createdAt: Date;
-        updatedAt: Date;
+        role: "SUPER_ADMIN" | "WORKSHOP_ADMIN" | "WORKSHOP_MANAGER" | "TECHNICIAN" | "CLIENT" | "RSA_PROVIDER" | "SUPPLIER";
         workshopId: string | null;
     }>;
 }

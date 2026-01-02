@@ -16,7 +16,7 @@ exports.VehicleModule = VehicleModule;
 exports.VehicleModule = VehicleModule = __decorate([
     (0, common_1.Module)({
         providers: [vehicle_service_1.VehicleService],
-        controllers: [vehicle_controller_1.VehicleController]
+        controllers: [vehicle_controller_1.VehicleController],
     })
 ], VehicleModule);
 //# sourceMappingURL=vehicle.module.js.map

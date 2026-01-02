@@ -16,7 +16,7 @@ exports.SlotModule = SlotModule;
 exports.SlotModule = SlotModule = __decorate([
     (0, common_1.Module)({
         providers: [slot_service_1.SlotService],
-        controllers: [slot_controller_1.SlotController]
+        controllers: [slot_controller_1.SlotController],
     })
 ], SlotModule);
 //# sourceMappingURL=slot.module.js.map

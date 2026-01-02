@@ -1,7 +1,9 @@
-import { PrismaService } from '../prisma/prisma.service';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../drizzle/schema';
+import { JobStage } from '../drizzle/types';
 export declare class DashboardService {
-    private prisma;
-    constructor(prisma: PrismaService);
+    private db;
+    constructor(db: NodePgDatabase<typeof schema>);
     getKPIs(workshopId: string): Promise<{
         vehiclesIn: number;
         jobsInProgress: number;
@@ -18,49 +20,48 @@ export declare class DashboardService {
                 quantity: number;
             }[];
         }[];
-        recentJobs: ({
+        recentJobs: {
+            id: string;
+            createdAt: string;
+            updatedAt: string;
+            vehicleId: string;
+            workshopId: string;
+            customerId: string;
+            stage: "CREATED" | "INSPECTION" | "ESTIMATE" | "CUSTOMER_APPROVAL" | "WORK_IN_PROGRESS" | "QC" | "BILLING" | "DELIVERY" | "CLOSED";
+            priority: "NORMAL" | "URGENT";
+            odometer: number | null;
+            fuelLevel: number | null;
+            entryTime: string;
+            estimatedDeliveryTime: string | null;
+            actualDeliveryTime: string | null;
+            advisorId: string | null;
+            technicianId: string | null;
             vehicle: {
                 id: string;
-                createdAt: Date;
-                updatedAt: Date;
                 regNumber: string;
                 chassisNumber: string | null;
                 engineNumber: string | null;
                 vin: string | null;
                 mfgYear: number | null;
                 variantId: string;
+                createdAt: string;
+                updatedAt: string;
             };
             customer: {
                 id: string;
                 name: string;
+                createdAt: string;
+                updatedAt: string;
                 email: string | null;
                 mobile: string;
-                createdAt: Date;
-                updatedAt: Date;
                 workshopId: string;
                 address: string | null;
                 gstin: string | null;
             };
-        } & {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            workshopId: string;
-            stage: import(".prisma/client").$Enums.JobStage;
-            priority: import(".prisma/client").$Enums.JobPriority;
-            odometer: number | null;
-            fuelLevel: number | null;
-            entryTime: Date;
-            estimatedDeliveryTime: Date | null;
-            actualDeliveryTime: Date | null;
-            advisorId: string | null;
-            technicianId: string | null;
-            vehicleId: string;
-            customerId: string;
-        })[];
+        }[];
     }>;
     getJobStatusFunnel(workshopId: string): Promise<{
-        stage: "CREATED" | "INSPECTION" | "ESTIMATE" | "CUSTOMER_APPROVAL" | "WORK_IN_PROGRESS" | "QC" | "BILLING" | "DELIVERY" | "CLOSED";
+        stage: JobStage;
         count: number;
     }[]>;
     getRevenueGraph(workshopId: string, days?: number): Promise<{

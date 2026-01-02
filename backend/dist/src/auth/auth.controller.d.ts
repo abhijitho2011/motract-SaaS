@@ -9,14 +9,14 @@ export declare class AuthController {
         message: string;
     }>;
     register(userData: any): Promise<{
+        password: string | null;
         id: string;
         name: string | null;
+        createdAt: string;
+        updatedAt: string;
         email: string | null;
         mobile: string;
-        password: string | null;
-        role: import(".prisma/client").$Enums.Role;
-        createdAt: Date;
-        updatedAt: Date;
+        role: "SUPER_ADMIN" | "WORKSHOP_ADMIN" | "WORKSHOP_MANAGER" | "TECHNICIAN" | "CLIENT" | "RSA_PROVIDER" | "SUPPLIER";
         workshopId: string | null;
     }>;
 }

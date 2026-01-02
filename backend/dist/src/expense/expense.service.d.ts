@@ -1,33 +1,34 @@
-import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../drizzle/schema';
+import { expenses } from '../drizzle/schema';
 export declare class ExpenseService {
-    private prisma;
-    constructor(prisma: PrismaService);
-    createExpense(data: Prisma.ExpenseCreateInput): Promise<{
+    private db;
+    constructor(db: NodePgDatabase<typeof schema>);
+    createExpense(data: typeof expenses.$inferInsert): Promise<{
+        date: string;
         id: string;
-        category: string;
         workshopId: string;
-        date: Date;
         amount: number;
+        category: string;
         notes: string | null;
         attachmentUrl: string | null;
     }>;
     getExpenses(workshopId: string): Promise<{
+        date: string;
         id: string;
-        category: string;
         workshopId: string;
-        date: Date;
         amount: number;
+        category: string;
         notes: string | null;
         attachmentUrl: string | null;
     }[]>;
     deleteExpense(id: string): Promise<{
+        date: string;
         id: string;
-        category: string;
         workshopId: string;
-        date: Date;
         amount: number;
+        category: string;
         notes: string | null;
         attachmentUrl: string | null;
-    }>;
+    }[]>;
 }

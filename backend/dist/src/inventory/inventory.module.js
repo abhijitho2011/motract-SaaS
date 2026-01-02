@@ -16,7 +16,7 @@ exports.InventoryModule = InventoryModule;
 exports.InventoryModule = InventoryModule = __decorate([
     (0, common_1.Module)({
         providers: [inventory_service_1.InventoryService],
-        controllers: [inventory_controller_1.InventoryController]
+        controllers: [inventory_controller_1.InventoryController],
     })
 ], InventoryModule);
 //# sourceMappingURL=inventory.module.js.map

@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InventoryController = void 0;
 const common_1 = require("@nestjs/common");
 const inventory_service_1 = require("./inventory.service");
-const client_1 = require("@prisma/client");
 let InventoryController = class InventoryController {
     inventoryService;
     constructor(inventoryService) {

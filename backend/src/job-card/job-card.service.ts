@@ -17,7 +17,7 @@ import {
   users,
 } from '../drizzle/schema';
 import { eq, and, desc } from 'drizzle-orm'; // Added desc for ordering
-import { JobStage, JobPriority } from '@prisma/client';
+import { JobStage, JobPriority } from '../drizzle/types';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -73,6 +73,7 @@ export class JobCardService {
         workshopId: data.workshopId,
         name: data.customerName,
         mobile: data.customerMobile,
+        updatedAt: new Date().toISOString(),
       }).returning();
       customer = created;
     }

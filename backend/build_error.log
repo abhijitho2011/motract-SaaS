@@ -1,0 +1,160 @@
+[96mprisma/create-test-data.ts[0m:[93m33[0m:[93m17[0m - [91merror[0m[90m TS2322: [0mType '"PAINTING"' is not assignable to type 'BayType'.
+
+[7m33[0m                 type: 'PAINTING',
+[7m  [0m [91m                ~~~~[0m
+
+  [96mnode_modules/.prisma/client/index.d.ts[0m:[93m38954[0m:[93m5[0m
+    [7m38954[0m     type: $Enums.BayType
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'type' which is declared here on type '(Without<BayCreateInput, BayUncheckedCreateInput> & BayUncheckedCreateInput) | (Without<BayUncheckedCreateInput, BayCreateInput> & BayCreateInput)'
+[96mprisma/create-test-data.ts[0m:[93m68[0m:[93m21[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'registrationNumber' does not exist in type 'Without<VehicleCreateInput, VehicleUncheckedCreateInput> & VehicleUncheckedCreateInput'.
+
+[7m68[0m                     registrationNumber: 'DL01AB1234',
+[7m  [0m [91m                    ~~~~~~~~~~~~~~~~~~[0m
+
+  [96mnode_modules/.prisma/client/index.d.ts[0m:[93m10250[0m:[93m5[0m
+    [7m10250[0m     data: XOR<VehicleCreateInput, VehicleUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: VehicleSelect<DefaultArgs> | null | undefined; include?: VehicleInclude<DefaultArgs> | null | undefined; data: (Without<...> & VehicleUncheckedCreateInput) | (Without<...> & VehicleCreateInput); }'
+[96mprisma/create-test-data.ts[0m:[93m76[0m:[93m21[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'registrationNumber' does not exist in type 'Without<VehicleCreateInput, VehicleUncheckedCreateInput> & VehicleUncheckedCreateInput'.
+
+[7m76[0m                     registrationNumber: 'DL02CD5678',
+[7m  [0m [91m                    ~~~~~~~~~~~~~~~~~~[0m
+
+  [96mnode_modules/.prisma/client/index.d.ts[0m:[93m10250[0m:[93m5[0m
+    [7m10250[0m     data: XOR<VehicleCreateInput, VehicleUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: VehicleSelect<DefaultArgs> | null | undefined; include?: VehicleInclude<DefaultArgs> | null | undefined; data: (Without<...> & VehicleUncheckedCreateInput) | (Without<...> & VehicleCreateInput); }'
+[96mprisma/create-test-data.ts[0m:[93m133[0m:[93m21[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'categoryId' does not exist in type 'Without<InventoryItemCreateInput, InventoryItemUncheckedCreateInput> & InventoryItemUncheckedCreateInput'.
+
+[7m133[0m                     categoryId: category.id,
+[7m   [0m [91m                    ~~~~~~~~~~[0m
+
+  [96mnode_modules/.prisma/client/index.d.ts[0m:[93m20236[0m:[93m5[0m
+    [7m20236[0m     data: XOR<InventoryItemCreateInput, InventoryItemUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: InventoryItemSelect<DefaultArgs> | null | undefined; include?: InventoryItemInclude<DefaultArgs> | null | undefined; data: (Without<...> & InventoryItemUncheckedCreateInput) | (Without<...> & InventoryItemCreateInput); }'
+[96mprisma/create-test-data.ts[0m:[93m144[0m:[93m21[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'categoryId' does not exist in type 'Without<InventoryItemCreateInput, InventoryItemUncheckedCreateInput> & InventoryItemUncheckedCreateInput'.
+
+[7m144[0m                     categoryId: category.id,
+[7m   [0m [91m                    ~~~~~~~~~~[0m
+
+  [96mnode_modules/.prisma/client/index.d.ts[0m:[93m20236[0m:[93m5[0m
+    [7m20236[0m     data: XOR<InventoryItemCreateInput, InventoryItemUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: InventoryItemSelect<DefaultArgs> | null | undefined; include?: InventoryItemInclude<DefaultArgs> | null | undefined; data: (Without<...> & InventoryItemUncheckedCreateInput) | (Without<...> & InventoryItemCreateInput); }'
+[96mprisma/create-test-vehicle.ts[0m:[93m57[0m:[93m17[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'registrationNumber' does not exist in type 'Without<VehicleCreateInput, VehicleUncheckedCreateInput> & VehicleUncheckedCreateInput'.
+
+[7m57[0m                 registrationNumber: 'DL01AB1234',
+[7m  [0m [91m                ~~~~~~~~~~~~~~~~~~[0m
+
+  [96mnode_modules/.prisma/client/index.d.ts[0m:[93m10250[0m:[93m5[0m
+    [7m10250[0m     data: XOR<VehicleCreateInput, VehicleUncheckedCreateInput>
+    [7m     [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: VehicleSelect<DefaultArgs> | null | undefined; include?: VehicleInclude<DefaultArgs> | null | undefined; data: (Without<...> & VehicleUncheckedCreateInput) | (Without<...> & VehicleCreateInput); }'
+[96mprisma/create-test-vehicle.ts[0m:[93m65[0m:[93m48[0m - [91merror[0m[90m TS2339: [0mProperty 'registrationNumber' does not exist on type '{ id: string; createdAt: Date; updatedAt: Date; regNumber: string; chassisNumber: string | null; engineNumber: string | null; vin: string | null; mfgYear: number | null; variantId: string; }'.
+
+[7m65[0m         console.log('  Registration:', vehicle.registrationNumber);
+[7m  [0m [91m                                               ~~~~~~~~~~~~~~~~~~[0m
+[96mprisma/create-workshop.ts[0m:[93m26[0m:[93m17[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'gstNumber' does not exist in type '(Without<WorkshopCreateInput, WorkshopUncheckedCreateInput> & WorkshopUncheckedCreateInput) | (Without<...> & WorkshopCreateInput)'.
+
+[7m26[0m                 gstNumber: 'GST123456789',
+[7m  [0m [91m                ~~~~~~~~~[0m
+
+  [96mnode_modules/.prisma/client/index.d.ts[0m:[93m6191[0m:[93m5[0m
+    [7m6191[0m     data: XOR<WorkshopCreateInput, WorkshopUncheckedCreateInput>
+    [7m    [0m [96m    ~~~~[0m
+    The expected type comes from property 'data' which is declared here on type '{ select?: WorkshopSelect<DefaultArgs> | null | undefined; include?: WorkshopInclude<DefaultArgs> | null | undefined; data: (Without<...> & WorkshopUncheckedCreateInput) | (Without<...> & WorkshopCreateInput); }'
+[96msrc/billing/billing.service.ts[0m:[93m131[0m:[93m52[0m - [91merror[0m[90m TS7006: [0mParameter 'p' implicitly has an 'any' type.
+
+[7m131[0m       res.jobCard.parts = res.jobCard.jobParts.map(p => ({
+[7m   [0m [91m                                                   ~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m28[0m:[93m24[0m - [91merror[0m[90m TS2304: [0mCannot find name 'async'.
+
+[7m28[0m     const countQuery = async((table, condition) => {
+[7m  [0m [91m                       ~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m28[0m:[93m31[0m - [91merror[0m[90m TS7006: [0mParameter 'table' implicitly has an 'any' type.
+
+[7m28[0m     const countQuery = async((table, condition) => {
+[7m  [0m [91m                              ~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m28[0m:[93m38[0m - [91merror[0m[90m TS7006: [0mParameter 'condition' implicitly has an 'any' type.
+
+[7m28[0m     const countQuery = async((table, condition) => {
+[7m  [0m [91m                                     ~~~~~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m29[0m:[93m19[0m - [91merror[0m[90m TS1308: [0m'await' expressions are only allowed within async functions and at the top levels of modules.
+
+[7m29[0m       const res = await this.db.select({ count: count() }).from(table).where(condition);
+[7m  [0m [91m                  ~~~~~[0m
+
+  [96msrc/dashboard/dashboard.service.ts[0m:[93m28[0m:[93m30[0m
+    [7m28[0m     const countQuery = async((table, condition) => {
+    [7m  [0m [96m                             ~~~~~~~~~~~~~~~~~~~~~~~[0m
+    Did you mean to mark this function as 'async'?
+[96msrc/dashboard/dashboard.service.ts[0m:[93m125[0m:[93m34[0m - [91merror[0m[90m TS2693: [0m'JobStage' only refers to a type, but is being used as a value here.
+
+[7m125[0m     const stages = Object.values(JobStage);
+[7m   [0m [91m                                 ~~~~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m130[0m:[93m57[0m - [91merror[0m[90m TS2769: [0mNo overload matches this call.
+  Overload 1 of 3, '(left: PgColumn<{ name: "stage"; tableName: "job_cards"; dataType: "string"; columnType: "PgEnumColumn"; data: "CREATED" | "INSPECTION" | "ESTIMATE" | "CUSTOMER_APPROVAL" | "WORK_IN_PROGRESS" | "QC" | "BILLING" | "DELIVERY" | "CLOSED"; ... 9 more ...; generated: undefined; }, {}, {}>, right: "CREATED" | ... 8 more ... | SQLWrapper): SQL<...>', gave the following error.
+    Argument of type 'unknown' is not assignable to parameter of type '"CREATED" | "INSPECTION" | "ESTIMATE" | "CUSTOMER_APPROVAL" | "WORK_IN_PROGRESS" | "QC" | "BILLING" | "DELIVERY" | "CLOSED" | SQLWrapper'.
+  Overload 2 of 3, '(left: Aliased<unknown>, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "stage"; tableName: "job_cards"; dataType: "string"; columnType: "PgEnumColumn"; data: "CREATED" | "INSPECTION" | "ESTIMATE" | "CUSTOMER_APPROVAL" | "WORK_IN_PROGRESS" | "QC" | "BILLING" | "DELIVERY" | "CLOSED"; ... 9 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'Aliased<unknown>'.
+      Type 'PgColumn<{ name: "stage"; tableName: "job_cards"; dataType: "string"; columnType: "PgEnumColumn"; data: "CREATED" | "INSPECTION" | "ESTIMATE" | "CUSTOMER_APPROVAL" | "WORK_IN_PROGRESS" | "QC" | "BILLING" | "DELIVERY" | "CLOSED"; ... 9 more ...; generated: undefined; }, {}, {}>' is missing the following properties from type 'Aliased<unknown>': sql, fieldAlias
+  Overload 3 of 3, '(left: never, right: unknown): SQL<unknown>', gave the following error.
+    Argument of type 'PgColumn<{ name: "stage"; tableName: "job_cards"; dataType: "string"; columnType: "PgEnumColumn"; data: "CREATED" | "INSPECTION" | "ESTIMATE" | "CUSTOMER_APPROVAL" | "WORK_IN_PROGRESS" | "QC" | "BILLING" | "DELIVERY" | "CLOSED"; ... 9 more ...; generated: undefined; }, {}, {}>' is not assignable to parameter of type 'never'.
+
+[7m130[0m         .where(and(eq(jobCards.workshopId, workshopId), eq(jobCards.stage, stage)));
+[7m   [0m [91m                                                        ~~[0m
+
+[96msrc/expense/expense.service.ts[0m:[93m18[0m:[93m7[0m - [91merror[0m[90m TS2783: [0m'id' is specified more than once, so this usage will be overwritten.
+
+[7m18[0m       id: crypto.randomUUID(),
+[7m  [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  [96msrc/expense/expense.service.ts[0m:[93m19[0m:[93m7[0m
+    [7m19[0m       ...data
+    [7m  [0m [96m      ~~~~~~~[0m
+    This spread always overwrites this property.
+[96msrc/inventory/inventory.service.ts[0m:[93m64[0m:[93m15[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'partNumbers' does not exist in type '{ jobParts?: true | DBQueryConfig<"many", false, ExtractTablesWithRelations<typeof import("D:/Motract-SaaS/backend/src/drizzle/schema")>, { tsName: "jobParts"; dbName: "job_parts"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }> | undefined; workshop?: true | ... 1 more ... | undefined; inventory...'.
+
+[7m64[0m       with: { partNumbers: true, inventoryBatches: true }, // inventoryBatches relation name from relations.ts (plural)
+[7m  [0m [91m              ~~~~~~~~~~~[0m
+[96msrc/inventory/inventory.service.ts[0m:[93m72[0m:[93m9[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'partNumbers' does not exist in type '{ jobParts?: true | DBQueryConfig<"many", false, ExtractTablesWithRelations<typeof import("D:/Motract-SaaS/backend/src/drizzle/schema")>, { tsName: "jobParts"; dbName: "job_parts"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }> | undefined; workshop?: true | ... 1 more ... | undefined; inventory...'.
+
+[7m72[0m         partNumbers: true, // inventoryPartNumbers -> partNumbers check relations.ts
+[7m  [0m [91m        ~~~~~~~~~~~[0m
+[96msrc/inventory/inventory.service.ts[0m:[93m156[0m:[93m16[0m - [91merror[0m[90m TS2304: [0mCannot find name 'and'.
+
+[7m156[0m         where: and(eq(inventoryBatches.itemId, itemId), gt(inventoryBatches.quantity, 0)),
+[7m   [0m [91m               ~~~[0m
+[96msrc/job-card/job-card.controller.ts[0m:[93m47[0m:[93m68[0m - [91merror[0m[90m TS1272: [0mA type referenced in a decorated signature must be imported with 'import type' or a namespace import when 'isolatedModules' and 'emitDecoratorMetadata' are enabled.
+
+[7m47[0m   async updateStage(@Param('id') id: string, @Body('stage') stage: JobStage) {
+[7m  [0m [91m                                                                   ~~~~~~~~[0m
+
+  [96msrc/job-card/job-card.controller.ts[0m:[93m12[0m:[93m10[0m
+    [7m12[0m import { JobStage, JobPriority } from '../drizzle/types';
+    [7m  [0m [96m         ~~~~~~~~[0m
+    'JobStage' was imported here.
+[96msrc/job-card/job-card.service.ts[0m:[93m71[0m:[93m57[0m - [91merror[0m[90m TS2769: [0mNo overload matches this call.
+  Overload 1 of 2, '(value: { id: string | SQL<unknown> | Placeholder<string, any>; workshopId: string | SQL<unknown> | Placeholder<string, any>; updatedAt: string | SQL<unknown> | Placeholder<...>; ... 5 more ...; email?: string | ... 3 more ... | undefined; }): PgInsertBase<...>', gave the following error.
+    Argument of type '{ id: `${string}-${string}-${string}-${string}-${string}`; workshopId: string; name: string; mobile: string; }' is not assignable to parameter of type '{ id: string | SQL<unknown> | Placeholder<string, any>; workshopId: string | SQL<unknown> | Placeholder<string, any>; updatedAt: string | SQL<unknown> | Placeholder<...>; ... 5 more ...; email?: string | ... 3 more ... | undefined; }'.
+      Property 'updatedAt' is missing in type '{ id: `${string}-${string}-${string}-${string}-${string}`; workshopId: string; name: string; mobile: string; }' but required in type '{ id: string | SQL<unknown> | Placeholder<string, any>; workshopId: string | SQL<unknown> | Placeholder<string, any>; updatedAt: string | SQL<unknown> | Placeholder<...>; ... 5 more ...; email?: string | ... 3 more ... | undefined; }'.
+  Overload 2 of 2, '(values: { id: string | SQL<unknown> | Placeholder<string, any>; workshopId: string | SQL<unknown> | Placeholder<string, any>; updatedAt: string | SQL<unknown> | Placeholder<...>; ... 5 more ...; email?: string | ... 3 more ... | undefined; }[]): PgInsertBase<...>', gave the following error.
+    Object literal may only specify known properties, and 'id' does not exist in type '{ id: string | SQL<unknown> | Placeholder<string, any>; workshopId: string | SQL<unknown> | Placeholder<string, any>; updatedAt: string | SQL<unknown> | Placeholder<...>; ... 5 more ...; email?: string | ... 3 more ... | undefined; }[]'.
+
+[7m71[0m       const [created] = await this.db.insert(customers).values({
+[7m  [0m [91m                                                        ~~~~~~[0m
+
+[96msrc/purchase/purchase.service.ts[0m:[93m25[0m:[93m7[0m - [91merror[0m[90m TS2783: [0m'id' is specified more than once, so this usage will be overwritten.
+
+[7m25[0m       id: crypto.randomUUID(),
+[7m  [0m [91m      ~~~~~~~~~~~~~~~~~~~~~~~[0m
+
+  [96msrc/purchase/purchase.service.ts[0m:[93m26[0m:[93m7[0m
+    [7m26[0m       ...data
+    [7m  [0m [96m      ~~~~~~~[0m
+    This spread always overwrites this property.
+
+Found 22 error(s).
+

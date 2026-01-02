@@ -10,7 +10,12 @@ import {
   jobItems,
 } from '../drizzle/schema';
 import { eq, and, gte, gt, lte, desc, sum, count, sql } from 'drizzle-orm';
-import { JobStage } from '@prisma/client';
+import { JobStage } from '../drizzle/types';
+
+const JOB_STAGES: JobStage[] = [
+  'CREATED', 'INSPECTION', 'ESTIMATE', 'CUSTOMER_APPROVAL',
+  'WORK_IN_PROGRESS', 'QC', 'BILLING', 'DELIVERY', 'CLOSED'
+];
 
 @Injectable()
 export class DashboardService {
@@ -24,22 +29,12 @@ export class DashboardService {
     today.setHours(0, 0, 0, 0);
     const todayStr = today.toISOString();
 
-    // Helper: count query
-    const countQuery = async((table, condition) => {
-      const res = await this.db.select({ count: count() }).from(table).where(condition);
-      return res[0].count;
-    });
-
-    // Vehicles In (today)
     const vehiclesIn = await this.db.select({ count: count() }).from(jobCards)
       .where(and(eq(jobCards.workshopId, workshopId), gte(jobCards.entryTime, todayStr)));
 
-    // Jobs In Progress
     const jobsInProgress = await this.db.select({ count: count() }).from(jobCards)
       .where(and(eq(jobCards.workshopId, workshopId), eq(jobCards.stage, 'WORK_IN_PROGRESS')));
 
-    // Jobs Completed (today)
-    // updatedAt check for completion today?
     const jobsCompleted = await this.db.select({ count: count() }).from(jobCards)
       .where(and(
         eq(jobCards.workshopId, workshopId),
@@ -47,54 +42,23 @@ export class DashboardService {
         gte(jobCards.updatedAt, todayStr)
       ));
 
-    // Pending Deliveries
     const pendingDeliveries = await this.db.select({ count: count() }).from(jobCards)
       .where(and(eq(jobCards.workshopId, workshopId), eq(jobCards.stage, 'BILLING')));
 
-    // Pending Approvals
     const pendingApprovals = await this.db.select({ count: count() }).from(jobCards)
       .where(and(eq(jobCards.workshopId, workshopId), eq(jobCards.stage, 'CUSTOMER_APPROVAL')));
 
-    // Pending Payments
     const pendingPayments = await this.db.select({ count: count() }).from(invoices)
       .where(and(eq(invoices.workshopId, workshopId), gt(invoices.balance, 0)));
 
-    // Revenue (today)
     const revenueResult = await this.db.select({ sum: sum(invoices.grandTotal) }).from(invoices)
       .where(and(eq(invoices.workshopId, workshopId), gte(invoices.invoiceDate, todayStr)));
     const revenue = parseFloat(revenueResult[0].sum || '0');
 
-    // Low Stock Items
-    // Complex query: find items where ANY batch has quantity <= 10?
-    // Prisma query was: items where batches SOME quantity lte 10.
-    // Drizzle doesn't support easy "some" in filters yet without subqueries or joins.
-    // We can fetch items with batches, then filter in memory (easy) or write smart join.
-    // Given load, let's fetch items + batches and filter. Or use SQL exists.
-    // Using simple fetch and filter for now as MVP.
-    // Actually, SQL `EXISTS` is better.
-    // select * from items where exists (select 1 from batches where itemId = items.id and quantity <= 10)
-    // Drizzle: where(exists(...))
-    /*
-    const lowStockItems = await this.db.select().from(inventoryItems)
-        .where(and(
-            eq(inventoryItems.workshopId, workshopId),
-            exists(
-                this.db.select().from(inventoryBatches)
-                .where(and(
-                    eq(inventoryBatches.itemId, inventoryItems.id),
-                    lte(inventoryBatches.quantity, 10)
-                ))
-            )
-        ))
-        .limit(5);
-    */
-    // Since I need to select specific fields and include count...
-    // Let's iterate.
     const allItems = await this.db.query.inventoryItems.findMany({
       where: eq(inventoryItems.workshopId, workshopId),
-      with: { inventoryBatches: true }, // 'batches'
+      with: { inventoryBatches: true },
     });
-    // Filter in memory for simplicity/speed dev
     const lowStock = allItems.filter(i => i.inventoryBatches.some(b => b.quantity <= 10));
     const lowStockItemsFull = lowStock.slice(0, 5).map(i => ({
       id: i.id,
@@ -122,7 +86,7 @@ export class DashboardService {
   }
 
   async getJobStatusFunnel(workshopId: string) {
-    const stages = Object.values(JobStage);
+    const stages = JOB_STAGES;
     const funnel = [];
 
     for (const stage of stages) {
@@ -152,8 +116,8 @@ export class DashboardService {
         .where(and(
           eq(invoices.workshopId, workshopId),
           gte(invoices.invoiceDate, dateStr),
-          sql`${invoices.invoiceDate} < ${nextDateStr}` // using simple sql operator for less than
-        )); // or user lt()
+          sql`${invoices.invoiceDate} < ${nextDateStr}`
+        ));
 
       data.push({
         date: date.toISOString().split('T')[0],
@@ -165,15 +129,6 @@ export class DashboardService {
   }
 
   async getTopServices(workshopId: string, limit: number = 5) {
-    // Group by description
-    /*
-    await this.prisma.jobItem.groupBy({
-        by: ['description'],
-        _count: ...,
-        _sum: ...
-    })
-    */
-    // Drizzle group by
     const tasks = await this.db.select({
       description: jobItems.description,
       count: count(jobItems.description),

@@ -13,7 +13,7 @@ import {
   inventoryBatches,
   inventoryVehicleMapping,
 } from '../drizzle/schema';
-import { eq, gt, asc } from 'drizzle-orm';
+import { eq, gt, asc, and } from 'drizzle-orm';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -61,7 +61,7 @@ export class InventoryService {
   async findAll(workshopId: string) {
     return this.db.query.inventoryItems.findMany({
       where: eq(inventoryItems.workshopId, workshopId),
-      with: { partNumbers: true, inventoryBatches: true }, // inventoryBatches relation name from relations.ts (plural)
+      with: { inventoryPartNumbers: true, inventoryBatches: true }, // relations verified from schema
     });
   }
 
@@ -69,7 +69,7 @@ export class InventoryService {
     const item = await this.db.query.inventoryItems.findFirst({
       where: eq(inventoryItems.id, id),
       with: {
-        partNumbers: true, // inventoryPartNumbers -> partNumbers check relations.ts
+        inventoryPartNumbers: true,
         inventoryBatches: true,
         inventoryVehicleMappings: { with: { model: true } },
       },

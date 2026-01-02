@@ -1,16 +1,16 @@
 import { Controller, Post, Body, Get, Query } from '@nestjs/common';
 import { SlotService } from './slot.service';
-import { Prisma, BayType } from '@prisma/client';
 
 @Controller('slots')
 export class SlotController {
-  constructor(private readonly slotService: SlotService) {}
+  constructor(private readonly slotService: SlotService) { }
 
   @Post('bays')
   async createBay(
-    @Body() data: { workshopId: string; name: string; type: BayType },
+    @Body() data: { workshopId: string; name: string; type: 'SERVICE' | 'WASHING' | 'ALIGNMENT' | 'ELECTRICAL' | 'GENERAL' },
   ) {
-    return this.slotService.createBay(data);
+    // Map string to enum if needed, but Drizzle accepts strings matching enum
+    return this.slotService.createBay(data as any);
   }
 
   @Get('bays')
@@ -19,7 +19,7 @@ export class SlotController {
   }
 
   @Post('book')
-  async bookSlot(@Body() data: Prisma.SlotBookingCreateInput) {
+  async bookSlot(@Body() data: any) {
     return this.slotService.bookSlot(data);
   }
 }

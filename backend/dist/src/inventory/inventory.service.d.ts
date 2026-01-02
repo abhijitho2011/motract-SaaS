@@ -1,31 +1,18 @@
-import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../drizzle/schema';
+import { inventoryItems } from '../drizzle/schema';
 export declare class InventoryService {
-    private prisma;
-    constructor(prisma: PrismaService);
-    createItem(data: Prisma.InventoryItemCreateInput): Promise<{
-        partNumbers: {
-            id: string;
-            itemId: string;
-            skuCode: string;
-        }[];
-        batches: {
-            id: string;
-            quantity: number;
-            itemId: string;
-            batchNumber: string | null;
-            expiryDate: Date | null;
-            purchasePrice: number;
-            salePrice: number;
-            purchasedAt: Date;
-        }[];
-    } & {
+    private db;
+    constructor(db: NodePgDatabase<typeof schema>);
+    createItem(data: typeof inventoryItems.$inferInsert): Promise<{
+        partNumbers: never[];
+        batches: never[];
         id: string;
         name: string;
-        createdAt: Date;
-        updatedAt: Date;
-        workshopId: string;
         brand: string | null;
+        createdAt: string;
+        updatedAt: string;
+        workshopId: string;
         isOem: boolean;
         hsnCode: string | null;
         taxPercent: number;
@@ -34,7 +21,7 @@ export declare class InventoryService {
         id: string;
         itemId: string;
         skuCode: string;
-    }>;
+    }[]>;
     addBatch(itemId: string, data: {
         quantity: number;
         purchasePrice: number;
@@ -43,141 +30,62 @@ export declare class InventoryService {
         expiryDate?: Date;
     }): Promise<{
         id: string;
-        quantity: number;
         itemId: string;
+        quantity: number;
         batchNumber: string | null;
-        expiryDate: Date | null;
+        expiryDate: string | null;
         purchasePrice: number;
         salePrice: number;
-        purchasedAt: Date;
-    }>;
-    findAll(workshopId: string): Promise<({
-        partNumbers: {
+        purchasedAt: string;
+    }[]>;
+    findAll(workshopId: string): Promise<{
+        id: string;
+        name: string;
+        brand: string | null;
+        createdAt: string;
+        updatedAt: string;
+        workshopId: string;
+        isOem: boolean;
+        hsnCode: string | null;
+        taxPercent: number;
+        inventoryPartNumbers: {
             id: string;
             itemId: string;
             skuCode: string;
         }[];
-        batches: {
+        inventoryBatches: {
             id: string;
-            quantity: number;
             itemId: string;
+            quantity: number;
             batchNumber: string | null;
-            expiryDate: Date | null;
+            expiryDate: string | null;
             purchasePrice: number;
             salePrice: number;
-            purchasedAt: Date;
+            purchasedAt: string;
         }[];
-    } & {
-        id: string;
-        name: string;
-        createdAt: Date;
-        updatedAt: Date;
-        workshopId: string;
-        brand: string | null;
-        isOem: boolean;
-        hsnCode: string | null;
-        taxPercent: number;
-    })[]>;
-    findOne(id: string): Promise<{
-        partNumbers: {
-            id: string;
-            itemId: string;
-            skuCode: string;
-        }[];
-        batches: {
-            id: string;
-            quantity: number;
-            itemId: string;
-            batchNumber: string | null;
-            expiryDate: Date | null;
-            purchasePrice: number;
-            salePrice: number;
-            purchasedAt: Date;
-        }[];
-        compatibleVehicles: ({
-            model: {
-                id: string;
-                name: string;
-                makeId: string;
-            };
-        } & {
-            id: string;
-            modelId: string;
-            variantId: string | null;
-            itemId: string;
-        })[];
-    } & {
-        id: string;
-        name: string;
-        createdAt: Date;
-        updatedAt: Date;
-        workshopId: string;
-        brand: string | null;
-        isOem: boolean;
-        hsnCode: string | null;
-        taxPercent: number;
-    }>;
+    }[]>;
+    findOne(id: string): Promise<any>;
     addCompatibility(itemId: string, modelId: string, variantId?: string): Promise<{
+        id: string;
+        modelId: string;
+        variantId: string | null;
+        itemId: string;
         model: {
             id: string;
             name: string;
             makeId: string;
         };
-    } & {
+    } | undefined>;
+    getCompatibility(itemId: string): Promise<{
         id: string;
         modelId: string;
         variantId: string | null;
         itemId: string;
-    }>;
-    getCompatibility(itemId: string): Promise<({
         model: {
             id: string;
             name: string;
             makeId: string;
         };
-    } & {
-        id: string;
-        modelId: string;
-        variantId: string | null;
-        itemId: string;
-    })[]>;
-    adjustStock(itemId: string, quantity: number, reason: string): Promise<{
-        partNumbers: {
-            id: string;
-            itemId: string;
-            skuCode: string;
-        }[];
-        batches: {
-            id: string;
-            quantity: number;
-            itemId: string;
-            batchNumber: string | null;
-            expiryDate: Date | null;
-            purchasePrice: number;
-            salePrice: number;
-            purchasedAt: Date;
-        }[];
-        compatibleVehicles: ({
-            model: {
-                id: string;
-                name: string;
-                makeId: string;
-            };
-        } & {
-            id: string;
-            modelId: string;
-            variantId: string | null;
-            itemId: string;
-        })[];
-    } & {
-        id: string;
-        name: string;
-        createdAt: Date;
-        updatedAt: Date;
-        workshopId: string;
-        brand: string | null;
-        isOem: boolean;
-        hsnCode: string | null;
-        taxPercent: number;
-    }>;
+    }[]>;
+    adjustStock(itemId: string, quantity: number, reason: string): Promise<any>;
 }

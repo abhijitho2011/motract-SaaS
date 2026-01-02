@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VehicleController = void 0;
 const common_1 = require("@nestjs/common");
 const vehicle_service_1 = require("./vehicle.service");
-const client_1 = require("@prisma/client");
 let VehicleController = class VehicleController {
     vehicleService;
     constructor(vehicleService) {

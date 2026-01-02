@@ -15,8 +15,8 @@ export class ExpenseService {
 
   async createExpense(data: typeof expenses.$inferInsert) {
     const [expense] = await this.db.insert(expenses).values({
+      ...data,
       id: crypto.randomUUID(),
-      ...data
     }).returning();
     return expense;
   }

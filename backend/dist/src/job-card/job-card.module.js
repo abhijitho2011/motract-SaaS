@@ -16,7 +16,7 @@ exports.JobCardModule = JobCardModule;
 exports.JobCardModule = JobCardModule = __decorate([
     (0, common_1.Module)({
         providers: [job_card_service_1.JobCardService],
-        controllers: [job_card_controller_1.JobCardController]
+        controllers: [job_card_controller_1.JobCardController],
     })
 ], JobCardModule);
 //# sourceMappingURL=job-card.module.js.map

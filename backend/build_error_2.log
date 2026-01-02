@@ -1,0 +1,135 @@
+[96msrc/dashboard/dashboard.controller.ts[0m:[93m15[0m:[93m34[0m - [91merror[0m[90m TS2339: [0mProperty 'getJobStatusFunnel' does not exist on type 'DashboardService'.
+
+[7m15[0m     return this.dashboardService.getJobStatusFunnel(workshopId);
+[7m  [0m [91m                                 ~~~~~~~~~~~~~~~~~~[0m
+[96msrc/dashboard/dashboard.controller.ts[0m:[93m24[0m:[93m34[0m - [91merror[0m[90m TS2339: [0mProperty 'getRevenueGraph' does not exist on type 'DashboardService'.
+
+[7m24[0m     return this.dashboardService.getRevenueGraph(workshopId, daysNum);
+[7m  [0m [91m                                 ~~~~~~~~~~~~~~~[0m
+[96msrc/dashboard/dashboard.controller.ts[0m:[93m33[0m:[93m34[0m - [91merror[0m[90m TS2339: [0mProperty 'getTopServices' does not exist on type 'DashboardService'.
+
+[7m33[0m     return this.dashboardService.getTopServices(workshopId, limitNum);
+[7m  [0m [91m                                 ~~~~~~~~~~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m137[0m:[93m3[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m137[0m   async getJobStatusFunnel(workshopId: string) {
+[7m   [0m [91m  ~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m137[0m:[93m3[0m - [91merror[0m[90m TS2304: [0mCannot find name 'async'.
+
+[7m137[0m   async getJobStatusFunnel(workshopId: string) {
+[7m   [0m [91m  ~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m137[0m:[93m9[0m - [91merror[0m[90m TS2304: [0mCannot find name 'getJobStatusFunnel'.
+
+[7m137[0m   async getJobStatusFunnel(workshopId: string) {
+[7m   [0m [91m        ~~~~~~~~~~~~~~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m137[0m:[93m38[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m137[0m   async getJobStatusFunnel(workshopId: string) {
+[7m   [0m [91m                                     ~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m137[0m:[93m40[0m - [91merror[0m[90m TS2693: [0m'string' only refers to a type, but is being used as a value here.
+
+[7m137[0m   async getJobStatusFunnel(workshopId: string) {
+[7m   [0m [91m                                       ~~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m137[0m:[93m48[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m137[0m   async getJobStatusFunnel(workshopId: string) {
+[7m   [0m [91m                                               ~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m150[0m:[93m3[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m150[0m   async getRevenueGraph(workshopId: string, days: number = 7) {
+[7m   [0m [91m  ~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m150[0m:[93m3[0m - [91merror[0m[90m TS2304: [0mCannot find name 'async'.
+
+[7m150[0m   async getRevenueGraph(workshopId: string, days: number = 7) {
+[7m   [0m [91m  ~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m150[0m:[93m9[0m - [91merror[0m[90m TS2304: [0mCannot find name 'getRevenueGraph'.
+
+[7m150[0m   async getRevenueGraph(workshopId: string, days: number = 7) {
+[7m   [0m [91m        ~~~~~~~~~~~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m150[0m:[93m35[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m150[0m   async getRevenueGraph(workshopId: string, days: number = 7) {
+[7m   [0m [91m                                  ~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m150[0m:[93m37[0m - [91merror[0m[90m TS2693: [0m'string' only refers to a type, but is being used as a value here.
+
+[7m150[0m   async getRevenueGraph(workshopId: string, days: number = 7) {
+[7m   [0m [91m                                    ~~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m150[0m:[93m45[0m - [91merror[0m[90m TS2304: [0mCannot find name 'days'.
+
+[7m150[0m   async getRevenueGraph(workshopId: string, days: number = 7) {
+[7m   [0m [91m                                            ~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m150[0m:[93m49[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m150[0m   async getRevenueGraph(workshopId: string, days: number = 7) {
+[7m   [0m [91m                                                ~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m150[0m:[93m51[0m - [91merror[0m[90m TS2693: [0m'number' only refers to a type, but is being used as a value here.
+
+[7m150[0m   async getRevenueGraph(workshopId: string, days: number = 7) {
+[7m   [0m [91m                                                  ~~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m150[0m:[93m63[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m150[0m   async getRevenueGraph(workshopId: string, days: number = 7) {
+[7m   [0m [91m                                                              ~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m154[0m:[93m20[0m - [91merror[0m[90m TS2304: [0mCannot find name 'days'.
+
+[7m154[0m       for (let i = days - 1; i >= 0; i--) {
+[7m   [0m [91m                   ~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m180[0m:[93m3[0m - [91merror[0m[90m TS1434: [0mUnexpected keyword or identifier.
+
+[7m180[0m   async getTopServices(workshopId: string, limit: number = 5) {
+[7m   [0m [91m  ~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m180[0m:[93m3[0m - [91merror[0m[90m TS2304: [0mCannot find name 'async'.
+
+[7m180[0m   async getTopServices(workshopId: string, limit: number = 5) {
+[7m   [0m [91m  ~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m180[0m:[93m9[0m - [91merror[0m[90m TS2304: [0mCannot find name 'getTopServices'.
+
+[7m180[0m   async getTopServices(workshopId: string, limit: number = 5) {
+[7m   [0m [91m        ~~~~~~~~~~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m180[0m:[93m34[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m180[0m   async getTopServices(workshopId: string, limit: number = 5) {
+[7m   [0m [91m                                 ~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m180[0m:[93m36[0m - [91merror[0m[90m TS2693: [0m'string' only refers to a type, but is being used as a value here.
+
+[7m180[0m   async getTopServices(workshopId: string, limit: number = 5) {
+[7m   [0m [91m                                   ~~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m180[0m:[93m44[0m - [91merror[0m[90m TS2304: [0mCannot find name 'limit'.
+
+[7m180[0m   async getTopServices(workshopId: string, limit: number = 5) {
+[7m   [0m [91m                                           ~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m180[0m:[93m49[0m - [91merror[0m[90m TS1005: [0m',' expected.
+
+[7m180[0m   async getTopServices(workshopId: string, limit: number = 5) {
+[7m   [0m [91m                                                ~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m180[0m:[93m51[0m - [91merror[0m[90m TS2693: [0m'number' only refers to a type, but is being used as a value here.
+
+[7m180[0m   async getTopServices(workshopId: string, limit: number = 5) {
+[7m   [0m [91m                                                  ~~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m180[0m:[93m63[0m - [91merror[0m[90m TS1005: [0m';' expected.
+
+[7m180[0m   async getTopServices(workshopId: string, limit: number = 5) {
+[7m   [0m [91m                                                              ~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m200[0m:[93m16[0m - [91merror[0m[90m TS2304: [0mCannot find name 'limit'.
+
+[7m200[0m         .limit(limit);
+[7m   [0m [91m               ~~~~~[0m
+[96msrc/dashboard/dashboard.service.ts[0m:[93m209[0m:[93m1[0m - [91merror[0m[90m TS1005: [0m'}' expected.
+
+[7m209[0m 
+[7m   [0m [91m[0m
+[96msrc/inventory/inventory.service.ts[0m:[93m64[0m:[93m15[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'partNumbers' does not exist in type '{ jobParts?: true | DBQueryConfig<"many", false, ExtractTablesWithRelations<typeof import("D:/Motract-SaaS/backend/src/drizzle/schema")>, { tsName: "jobParts"; dbName: "job_parts"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }> | undefined; workshop?: true | ... 1 more ... | undefined; inventory...'.
+
+[7m64[0m       with: { partNumbers: true, inventoryBatches: true }, // inventoryBatches relation name from relations.ts (plural)
+[7m  [0m [91m              ~~~~~~~~~~~[0m
+[96msrc/inventory/inventory.service.ts[0m:[93m72[0m:[93m9[0m - [91merror[0m[90m TS2353: [0mObject literal may only specify known properties, and 'partNumbers' does not exist in type '{ jobParts?: true | DBQueryConfig<"many", false, ExtractTablesWithRelations<typeof import("D:/Motract-SaaS/backend/src/drizzle/schema")>, { tsName: "jobParts"; dbName: "job_parts"; columns: { ...; }; relations: { ...; }; primaryKey: AnyColumn[]; }> | undefined; workshop?: true | ... 1 more ... | undefined; inventory...'.
+
+[7m72[0m         partNumbers: true, // inventoryPartNumbers -> partNumbers check relations.ts
+[7m  [0m [91m        ~~~~~~~~~~~[0m
+[96msrc/inventory/inventory.service.ts[0m:[93m156[0m:[93m16[0m - [91merror[0m[90m TS2304: [0mCannot find name 'and'.
+
+[7m156[0m         where: and(eq(inventoryBatches.itemId, itemId), gt(inventoryBatches.quantity, 0)),
+[7m   [0m [91m               ~~~[0m
+
+Found 33 error(s).
+

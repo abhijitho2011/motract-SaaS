@@ -8,29 +8,37 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.UsersService = void 0;
 const common_1 = require("@nestjs/common");
-const prisma_service_1 = require("../prisma/prisma.service");
+const drizzle_provider_1 = require("../drizzle/drizzle.provider");
+const node_postgres_1 = require("drizzle-orm/node-postgres");
+const drizzle_orm_1 = require("drizzle-orm");
+const schema_1 = require("../drizzle/schema");
 let UsersService = class UsersService {
-    prisma;
-    constructor(prisma) {
-        this.prisma = prisma;
+    db;
+    constructor(db) {
+        this.db = db;
     }
     async create(data) {
-        return this.prisma.user.create({
-            data,
-        });
+        const result = await this.db.insert(schema_1.users).values(data).returning();
+        return result[0];
     }
     async findOne(mobile) {
-        return this.prisma.user.findUnique({
-            where: { mobile },
-        });
+        const result = await this.db
+            .select()
+            .from(schema_1.users)
+            .where((0, drizzle_orm_1.eq)(schema_1.users.mobile, mobile));
+        return result[0] || null;
     }
 };
 exports.UsersService = UsersService;
 exports.UsersService = UsersService = __decorate([
     (0, common_1.Injectable)(),
-    __metadata("design:paramtypes", [prisma_service_1.PrismaService])
+    __param(0, (0, common_1.Inject)(drizzle_provider_1.DrizzleAsyncProvider)),
+    __metadata("design:paramtypes", [node_postgres_1.NodePgDatabase])
 ], UsersService);
 //# sourceMappingURL=users.service.js.map

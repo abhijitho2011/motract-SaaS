@@ -1,13 +1,12 @@
 import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { InventoryService } from './inventory.service';
-import { Prisma } from '@prisma/client';
 
 @Controller('inventory')
 export class InventoryController {
-  constructor(private readonly inventoryService: InventoryService) {}
+  constructor(private readonly inventoryService: InventoryService) { }
 
   @Post('items')
-  async createItem(@Body() data: Prisma.InventoryItemCreateInput) {
+  async createItem(@Body() data: any) {
     return this.inventoryService.createItem(data);
   }
 

@@ -1,9 +1,10 @@
-import { PrismaService } from '../prisma/prisma.service';
-import { Prisma } from '@prisma/client';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../drizzle/schema';
+import { suppliers } from '../drizzle/schema';
 export declare class PurchaseService {
-    private prisma;
-    constructor(prisma: PrismaService);
-    createSupplier(data: Prisma.SupplierCreateInput): Promise<{
+    private db;
+    constructor(db: NodePgDatabase<typeof schema>);
+    createSupplier(data: typeof suppliers.$inferInsert): Promise<{
         id: string;
         name: string;
         mobile: string;
@@ -11,76 +12,26 @@ export declare class PurchaseService {
         address: string | null;
         gstin: string | null;
     }>;
-    getSuppliers(workshopId: string): Promise<({
-        orders: {
-            id: string;
-            createdAt: Date;
-            workshopId: string;
-            invoiceNumber: string | null;
-            invoiceDate: Date;
-            status: string;
-            supplierId: string;
-            totalAmount: number;
-        }[];
-    } & {
+    getSuppliers(workshopId: string): Promise<{
         id: string;
         name: string;
         mobile: string;
         workshopId: string;
         address: string | null;
         gstin: string | null;
-    })[]>;
-    getSupplier(id: string): Promise<{
-        orders: ({
-            items: {
-                id: string;
-                quantity: number;
-                taxPercent: number;
-                itemName: string;
-                partNumber: string | null;
-                unitCost: number;
-                total: number;
-                orderId: string;
-            }[];
-        } & {
+        purchases: {
             id: string;
-            createdAt: Date;
+            createdAt: string;
             workshopId: string;
-            invoiceNumber: string | null;
-            invoiceDate: Date;
-            status: string;
             supplierId: string;
+            invoiceDate: string;
+            invoiceNumber: string | null;
             totalAmount: number;
-        })[];
-    } & {
-        id: string;
-        name: string;
-        mobile: string;
-        workshopId: string;
-        address: string | null;
-        gstin: string | null;
-    }>;
-    getSupplierLedger(id: string): Promise<({
-        items: {
-            id: string;
-            quantity: number;
-            taxPercent: number;
-            itemName: string;
-            partNumber: string | null;
-            unitCost: number;
-            total: number;
-            orderId: string;
+            status: string;
         }[];
-    } & {
-        id: string;
-        createdAt: Date;
-        workshopId: string;
-        invoiceNumber: string | null;
-        invoiceDate: Date;
-        status: string;
-        supplierId: string;
-        totalAmount: number;
-    })[]>;
+    }[]>;
+    getSupplier(id: string): Promise<any>;
+    getSupplierLedger(id: string): Promise<any[]>;
     createPurchaseOrder(data: {
         workshopId: string;
         supplierId: string;
@@ -93,130 +44,18 @@ export declare class PurchaseService {
             unitCost: number;
             taxPercent: number;
         }>;
-    }): Promise<{
-        supplier: {
-            id: string;
-            name: string;
-            mobile: string;
-            workshopId: string;
-            address: string | null;
-            gstin: string | null;
-        };
-        items: {
-            id: string;
-            quantity: number;
-            taxPercent: number;
-            itemName: string;
-            partNumber: string | null;
-            unitCost: number;
-            total: number;
-            orderId: string;
-        }[];
-    } & {
-        id: string;
-        createdAt: Date;
-        workshopId: string;
-        invoiceNumber: string | null;
-        invoiceDate: Date;
-        status: string;
-        supplierId: string;
-        totalAmount: number;
-    }>;
-    getPurchaseOrders(workshopId: string): Promise<({
-        supplier: {
-            id: string;
-            name: string;
-            mobile: string;
-            workshopId: string;
-            address: string | null;
-            gstin: string | null;
-        };
-        items: {
-            id: string;
-            quantity: number;
-            taxPercent: number;
-            itemName: string;
-            partNumber: string | null;
-            unitCost: number;
-            total: number;
-            orderId: string;
-        }[];
-    } & {
-        id: string;
-        createdAt: Date;
-        workshopId: string;
-        invoiceNumber: string | null;
-        invoiceDate: Date;
-        status: string;
-        supplierId: string;
-        totalAmount: number;
-    })[]>;
-    getPurchaseOrder(id: string): Promise<{
-        supplier: {
-            id: string;
-            name: string;
-            mobile: string;
-            workshopId: string;
-            address: string | null;
-            gstin: string | null;
-        };
-        items: {
-            id: string;
-            quantity: number;
-            taxPercent: number;
-            itemName: string;
-            partNumber: string | null;
-            unitCost: number;
-            total: number;
-            orderId: string;
-        }[];
-    } & {
-        id: string;
-        createdAt: Date;
-        workshopId: string;
-        invoiceNumber: string | null;
-        invoiceDate: Date;
-        status: string;
-        supplierId: string;
-        totalAmount: number;
-    }>;
+    }): Promise<any>;
+    getPurchaseOrders(workshopId: string): Promise<any[]>;
+    getPurchaseOrder(id: string): Promise<any>;
     updatePurchaseOrderStatus(id: string, status: string): Promise<{
         id: string;
-        createdAt: Date;
         workshopId: string;
-        invoiceNumber: string | null;
-        invoiceDate: Date;
-        status: string;
         supplierId: string;
-        totalAmount: number;
-    }>;
-    receivePurchaseOrder(id: string): Promise<{
-        supplier: {
-            id: string;
-            name: string;
-            mobile: string;
-            workshopId: string;
-            address: string | null;
-            gstin: string | null;
-        };
-        items: {
-            id: string;
-            quantity: number;
-            taxPercent: number;
-            itemName: string;
-            partNumber: string | null;
-            unitCost: number;
-            total: number;
-            orderId: string;
-        }[];
-    } & {
-        id: string;
-        createdAt: Date;
-        workshopId: string;
+        invoiceDate: string;
         invoiceNumber: string | null;
-        invoiceDate: Date;
-        status: string;
-        supplierId: string;
         totalAmount: number;
-    }>;
+        status: string;
+        createdAt: string;
+    }[]>;
+    receivePurchaseOrder(id: string): Promise<any>;
 }

@@ -9,7 +9,7 @@ import {
   inventoryItems,
   inventoryBatches,
 } from '../drizzle/schema';
-import { eq, desc, ilike } from 'drizzle-orm';
+import { eq, desc, ilike, and } from 'drizzle-orm';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -22,8 +22,8 @@ export class PurchaseService {
   // Supplier Management
   async createSupplier(data: typeof suppliers.$inferInsert) {
     const [supplier] = await this.db.insert(suppliers).values({
+      ...data,
       id: crypto.randomUUID(),
-      ...data
     }).returning();
     return supplier;
   }
@@ -202,6 +202,7 @@ export class PurchaseService {
             brand: 'Generic',
             hsnCode: '0000',
             taxPercent: item.taxPercent,
+            updatedAt: new Date().toISOString(),
           }).returning();
           invItem = created;
         }

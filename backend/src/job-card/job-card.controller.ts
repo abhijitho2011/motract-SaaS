@@ -9,11 +9,11 @@ import {
   Put,
 } from '@nestjs/common';
 import { JobCardService } from './job-card.service';
-import { JobStage, JobPriority } from '@prisma/client';
+import type { JobStage, JobPriority } from '../drizzle/types';
 
 @Controller('job-cards')
 export class JobCardController {
-  constructor(private readonly jobCardService: JobCardService) {}
+  constructor(private readonly jobCardService: JobCardService) { }
 
   @Post()
   async create(

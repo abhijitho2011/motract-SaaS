@@ -128,7 +128,7 @@ export class BillingService {
     const res: any = { ...invoice };
     if (res.jobCard) {
       res.jobCard.tasks = res.jobCard.jobItems;
-      res.jobCard.parts = res.jobCard.jobParts.map(p => ({
+      res.jobCard.parts = res.jobCard.jobParts.map((p: any) => ({
         ...p,
         item: p.inventoryItem
       }));

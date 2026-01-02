@@ -7,7 +7,6 @@ import {
   models,
   variants,
   vehicles,
-  vehicleModels,
 } from '../drizzle/schema'; // Note: check precise export name for models/vehicle_models
 import { eq, and } from 'drizzle-orm';
 import * as crypto from 'crypto';

@@ -4,7 +4,8 @@ import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../drizzle/schema';
 import { bays, slotBookings } from '../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
-import { BayType, SlotStatus } from '@prisma/client';
+import * as crypto from 'crypto';
+import { BayType, SlotStatus } from '../drizzle/types';
 
 @Injectable()
 export class SlotService {
@@ -17,6 +18,7 @@ export class SlotService {
     const result = await this.db
       .insert(bays)
       .values({
+        id: crypto.randomUUID(),
         workshopId: data.workshopId,
         name: data.name,
         type: data.type, // Enum compatibility might need casting or matching strings

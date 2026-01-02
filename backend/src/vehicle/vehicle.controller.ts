@@ -1,10 +1,9 @@
 import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
 import { VehicleService } from './vehicle.service';
-import { Prisma } from '@prisma/client';
 
 @Controller('vehicle')
 export class VehicleController {
-  constructor(private readonly vehicleService: VehicleService) {}
+  constructor(private readonly vehicleService: VehicleService) { }
 
   @Get('lookup/:regNumber')
   async lookup(@Param('regNumber') regNumber: string) {
@@ -12,7 +11,7 @@ export class VehicleController {
   }
 
   @Post('register')
-  async register(@Body() data: Prisma.VehicleCreateInput) {
+  async register(@Body() data: any) {
     return this.vehicleService.register(data);
   }
 

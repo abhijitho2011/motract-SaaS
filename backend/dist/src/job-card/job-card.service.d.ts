@@ -1,8 +1,9 @@
-import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, JobStage, JobPriority } from '@prisma/client';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../drizzle/schema';
+import { JobStage, JobPriority } from '../drizzle/types';
 export declare class JobCardService {
-    private prisma;
-    constructor(prisma: PrismaService);
+    private db;
+    constructor(db: NodePgDatabase<typeof schema>);
     create(data: {
         workshopId: string;
         vehicleId: string;
@@ -13,233 +14,80 @@ export declare class JobCardService {
         fuelLevel?: number;
         complaints?: string[];
         priority?: JobPriority;
-    }): Promise<{
+        notes?: string;
+    }): Promise<any>;
+    findAll(workshopId: string): Promise<{
+        id: string;
+        createdAt: string;
+        updatedAt: string;
+        vehicleId: string;
+        workshopId: string;
+        customerId: string;
+        stage: "CREATED" | "INSPECTION" | "ESTIMATE" | "CUSTOMER_APPROVAL" | "WORK_IN_PROGRESS" | "QC" | "BILLING" | "DELIVERY" | "CLOSED";
+        priority: "NORMAL" | "URGENT";
+        odometer: number | null;
+        fuelLevel: number | null;
+        entryTime: string;
+        estimatedDeliveryTime: string | null;
+        actualDeliveryTime: string | null;
+        advisorId: string | null;
+        technicianId: string | null;
         vehicle: {
             id: string;
-            createdAt: Date;
-            updatedAt: Date;
             regNumber: string;
             chassisNumber: string | null;
             engineNumber: string | null;
             vin: string | null;
             mfgYear: number | null;
             variantId: string;
-        };
-        customer: {
-            id: string;
-            name: string;
-            email: string | null;
-            mobile: string;
-            createdAt: Date;
-            updatedAt: Date;
-            workshopId: string;
-            address: string | null;
-            gstin: string | null;
-        };
-        complaints: {
-            id: string;
-            complaint: string;
-            remark: string | null;
-            jobCardId: string;
-        }[];
-    } & {
-        id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        workshopId: string;
-        stage: import(".prisma/client").$Enums.JobStage;
-        priority: import(".prisma/client").$Enums.JobPriority;
-        odometer: number | null;
-        fuelLevel: number | null;
-        entryTime: Date;
-        estimatedDeliveryTime: Date | null;
-        actualDeliveryTime: Date | null;
-        advisorId: string | null;
-        technicianId: string | null;
-        vehicleId: string;
-        customerId: string;
-    }>;
-    findAll(workshopId: string): Promise<({
-        vehicle: {
+            createdAt: string;
+            updatedAt: string;
             variant: {
+                id: string;
+                name: string;
+                fuelType: "PETROL" | "DIESEL" | "CNG" | "ELECTRIC" | "HYBRID";
+                modelId: string;
                 model: {
+                    id: string;
+                    name: string;
+                    makeId: string;
                     make: {
                         id: string;
                         name: string;
                     };
-                } & {
-                    id: string;
-                    name: string;
-                    makeId: string;
                 };
-            } & {
-                id: string;
-                name: string;
-                fuelType: import(".prisma/client").$Enums.FuelType;
-                modelId: string;
             };
-        } & {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            regNumber: string;
-            chassisNumber: string | null;
-            engineNumber: string | null;
-            vin: string | null;
-            mfgYear: number | null;
-            variantId: string;
         };
         customer: {
             id: string;
             name: string;
+            createdAt: string;
+            updatedAt: string;
             email: string | null;
             mobile: string;
-            createdAt: Date;
-            updatedAt: Date;
             workshopId: string;
             address: string | null;
             gstin: string | null;
         };
-    } & {
-        id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        workshopId: string;
-        stage: import(".prisma/client").$Enums.JobStage;
-        priority: import(".prisma/client").$Enums.JobPriority;
-        odometer: number | null;
-        fuelLevel: number | null;
-        entryTime: Date;
-        estimatedDeliveryTime: Date | null;
-        actualDeliveryTime: Date | null;
-        advisorId: string | null;
-        technicianId: string | null;
-        vehicleId: string;
-        customerId: string;
-    })[]>;
-    findOne(id: string): Promise<{
-        vehicle: {
-            variant: {
-                model: {
-                    make: {
-                        id: string;
-                        name: string;
-                    };
-                } & {
-                    id: string;
-                    name: string;
-                    makeId: string;
-                };
-            } & {
-                id: string;
-                name: string;
-                fuelType: import(".prisma/client").$Enums.FuelType;
-                modelId: string;
-            };
-        } & {
-            id: string;
-            createdAt: Date;
-            updatedAt: Date;
-            regNumber: string;
-            chassisNumber: string | null;
-            engineNumber: string | null;
-            vin: string | null;
-            mfgYear: number | null;
-            variantId: string;
-        };
-        customer: {
-            id: string;
-            name: string;
-            email: string | null;
-            mobile: string;
-            createdAt: Date;
-            updatedAt: Date;
-            workshopId: string;
-            address: string | null;
-            gstin: string | null;
-        };
-        complaints: {
-            id: string;
-            complaint: string;
-            remark: string | null;
-            jobCardId: string;
-        }[];
-        inspection: {
-            id: string;
-            jobCardId: string;
-            exterior: Prisma.JsonValue | null;
-            interior: Prisma.JsonValue | null;
-            tyres: Prisma.JsonValue | null;
-            battery: string | null;
-            documents: Prisma.JsonValue | null;
-            photos: string[];
-        } | null;
-        tasks: {
-            id: string;
-            jobCardId: string;
-            description: string;
-            price: number;
-            gstPercent: number;
-            isApproved: boolean;
-            completionStatus: string | null;
-        }[];
-        parts: ({
-            item: {
-                id: string;
-                name: string;
-                createdAt: Date;
-                updatedAt: Date;
-                workshopId: string;
-                brand: string | null;
-                isOem: boolean;
-                hsnCode: string | null;
-                taxPercent: number;
-            };
-        } & {
-            id: string;
-            jobCardId: string;
-            gstPercent: number;
-            isApproved: boolean;
-            quantity: number;
-            unitPrice: number;
-            totalPrice: number;
-            itemId: string;
-            batchId: string | null;
-        })[];
-    } & {
-        id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        workshopId: string;
-        stage: import(".prisma/client").$Enums.JobStage;
-        priority: import(".prisma/client").$Enums.JobPriority;
-        odometer: number | null;
-        fuelLevel: number | null;
-        entryTime: Date;
-        estimatedDeliveryTime: Date | null;
-        actualDeliveryTime: Date | null;
-        advisorId: string | null;
-        technicianId: string | null;
-        vehicleId: string;
-        customerId: string;
-    }>;
+    }[]>;
+    findOne(id: string): Promise<any>;
     updateStage(id: string, stage: JobStage): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         workshopId: string;
-        stage: import(".prisma/client").$Enums.JobStage;
-        priority: import(".prisma/client").$Enums.JobPriority;
-        odometer: number | null;
-        fuelLevel: number | null;
-        entryTime: Date;
-        estimatedDeliveryTime: Date | null;
-        actualDeliveryTime: Date | null;
-        advisorId: string | null;
-        technicianId: string | null;
         vehicleId: string;
         customerId: string;
-    }>;
+        stage: "CREATED" | "INSPECTION" | "ESTIMATE" | "CUSTOMER_APPROVAL" | "WORK_IN_PROGRESS" | "QC" | "BILLING" | "DELIVERY" | "CLOSED";
+        priority: "NORMAL" | "URGENT";
+        odometer: number | null;
+        fuelLevel: number | null;
+        entryTime: string;
+        estimatedDeliveryTime: string | null;
+        actualDeliveryTime: string | null;
+        advisorId: string | null;
+        technicianId: string | null;
+        createdAt: string;
+        updatedAt: string;
+    }[]>;
     saveInspection(jobCardId: string, data: {
         exterior: any;
         interior: any;
@@ -249,16 +97,7 @@ export declare class JobCardService {
         photos: string[];
         fuelLevel?: number;
         odometer?: number;
-    }): Promise<{
-        id: string;
-        jobCardId: string;
-        exterior: Prisma.JsonValue | null;
-        interior: Prisma.JsonValue | null;
-        tyres: Prisma.JsonValue | null;
-        battery: string | null;
-        documents: Prisma.JsonValue | null;
-        photos: string[];
-    }>;
+    }): Promise<any>;
     addTask(jobCardId: string, data: {
         description: string;
         price: number;
@@ -266,57 +105,57 @@ export declare class JobCardService {
     }): Promise<{
         id: string;
         jobCardId: string;
-        description: string;
-        price: number;
         gstPercent: number;
         isApproved: boolean;
+        description: string;
+        price: number;
         completionStatus: string | null;
-    }>;
+    }[]>;
     addPart(jobCardId: string, data: {
         itemId: string;
         quantity: number;
         unitPrice: number;
         gst: number;
     }): Promise<{
-        item: {
+        item: any;
+        id?: string | undefined;
+        jobCardId?: string | undefined;
+        itemId?: string | undefined;
+        batchId?: string | null | undefined;
+        quantity?: number | undefined;
+        unitPrice?: number | undefined;
+        gstPercent?: number | undefined;
+        totalPrice?: number | undefined;
+        isApproved?: boolean | undefined;
+        inventoryItem?: {
             id: string;
             name: string;
-            createdAt: Date;
-            updatedAt: Date;
-            workshopId: string;
             brand: string | null;
+            createdAt: string;
+            updatedAt: string;
+            workshopId: string;
             isOem: boolean;
             hsnCode: string | null;
             taxPercent: number;
-        };
-    } & {
-        id: string;
-        jobCardId: string;
-        gstPercent: number;
-        isApproved: boolean;
-        quantity: number;
-        unitPrice: number;
-        totalPrice: number;
-        itemId: string;
-        batchId: string | null;
+        } | undefined;
     }>;
     assignTechnician(id: string, technicianId: string): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         workshopId: string;
-        stage: import(".prisma/client").$Enums.JobStage;
-        priority: import(".prisma/client").$Enums.JobPriority;
-        odometer: number | null;
-        fuelLevel: number | null;
-        entryTime: Date;
-        estimatedDeliveryTime: Date | null;
-        actualDeliveryTime: Date | null;
-        advisorId: string | null;
-        technicianId: string | null;
         vehicleId: string;
         customerId: string;
-    }>;
+        stage: "CREATED" | "INSPECTION" | "ESTIMATE" | "CUSTOMER_APPROVAL" | "WORK_IN_PROGRESS" | "QC" | "BILLING" | "DELIVERY" | "CLOSED";
+        priority: "NORMAL" | "URGENT";
+        odometer: number | null;
+        fuelLevel: number | null;
+        entryTime: string;
+        estimatedDeliveryTime: string | null;
+        actualDeliveryTime: string | null;
+        advisorId: string | null;
+        technicianId: string | null;
+        createdAt: string;
+        updatedAt: string;
+    }[]>;
     updateTaskStatus(jobCardId: string, taskId: string, status: string): Promise<{
         id: string;
         jobCardId: string;
@@ -325,5 +164,5 @@ export declare class JobCardService {
         gstPercent: number;
         isApproved: boolean;
         completionStatus: string | null;
-    }>;
+    }[]>;
 }

@@ -8,15 +8,14 @@ import {
   Query,
 } from '@nestjs/common';
 import { PurchaseService } from './purchase.service';
-import { Prisma } from '@prisma/client';
 
 @Controller('purchase')
 export class PurchaseController {
-  constructor(private readonly purchaseService: PurchaseService) {}
+  constructor(private readonly purchaseService: PurchaseService) { }
 
   // Suppliers
   @Post('suppliers')
-  async createSupplier(@Body() data: Prisma.SupplierCreateInput) {
+  async createSupplier(@Body() data: any) {
     return this.purchaseService.createSupplier(data);
   }
 

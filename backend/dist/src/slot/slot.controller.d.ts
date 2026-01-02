@@ -1,40 +1,33 @@
 import { SlotService } from './slot.service';
-import { Prisma, BayType } from '@prisma/client';
 export declare class SlotController {
     private readonly slotService;
     constructor(slotService: SlotService);
     createBay(data: {
         workshopId: string;
         name: string;
-        type: BayType;
+        type: 'SERVICE' | 'WASHING' | 'ALIGNMENT' | 'ELECTRICAL' | 'GENERAL';
     }): Promise<{
         id: string;
         name: string;
         workshopId: string;
-        type: import(".prisma/client").$Enums.BayType;
         isActive: boolean;
+        type: "SERVICE" | "WASHING" | "ALIGNMENT" | "ELECTRICAL" | "GENERAL";
     }>;
-    findBays(workshopId: string): Promise<({
-        services: {
-            id: string;
-            bayId: string;
-            serviceId: string;
-        }[];
-    } & {
+    findBays(workshopId: string): Promise<{
         id: string;
         name: string;
         workshopId: string;
-        type: import(".prisma/client").$Enums.BayType;
         isActive: boolean;
-    })[]>;
-    bookSlot(data: Prisma.SlotBookingCreateInput): Promise<{
+        type: "SERVICE" | "WASHING" | "ALIGNMENT" | "ELECTRICAL" | "GENERAL";
+    }[]>;
+    bookSlot(data: any): Promise<{
+        date: string;
         id: string;
-        createdAt: Date;
+        createdAt: string;
         jobCardId: string | null;
-        bayId: string;
-        date: Date;
+        status: "AVAILABLE" | "BOOKED" | "BLOCKED";
         startTime: string;
         endTime: string;
-        status: import(".prisma/client").$Enums.SlotStatus;
+        bayId: string;
     }>;
 }

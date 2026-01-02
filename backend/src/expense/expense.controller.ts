@@ -8,14 +8,13 @@ import {
   Query,
 } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
-import { Prisma } from '@prisma/client';
 
 @Controller('expenses')
 export class ExpenseController {
-  constructor(private readonly expenseService: ExpenseService) {}
+  constructor(private readonly expenseService: ExpenseService) { }
 
   @Post()
-  async create(@Body() data: Prisma.ExpenseCreateInput) {
+  async create(@Body() data: any) {
     return this.expenseService.createExpense(data);
   }
 

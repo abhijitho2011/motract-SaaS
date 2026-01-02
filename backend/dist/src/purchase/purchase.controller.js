@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PurchaseController = void 0;
 const common_1 = require("@nestjs/common");
 const purchase_service_1 = require("./purchase.service");
-const client_1 = require("@prisma/client");
 let PurchaseController = class PurchaseController {
     purchaseService;
     constructor(purchaseService) {

@@ -1,33 +1,32 @@
 import { ExpenseService } from './expense.service';
-import { Prisma } from '@prisma/client';
 export declare class ExpenseController {
     private readonly expenseService;
     constructor(expenseService: ExpenseService);
-    create(data: Prisma.ExpenseCreateInput): Promise<{
+    create(data: any): Promise<{
+        date: string;
         id: string;
-        category: string;
         workshopId: string;
-        date: Date;
         amount: number;
+        category: string;
         notes: string | null;
         attachmentUrl: string | null;
     }>;
     findAll(workshopId: string): Promise<{
+        date: string;
         id: string;
-        category: string;
         workshopId: string;
-        date: Date;
         amount: number;
+        category: string;
         notes: string | null;
         attachmentUrl: string | null;
     }[]>;
     remove(id: string): Promise<{
+        date: string;
         id: string;
-        category: string;
         workshopId: string;
-        date: Date;
         amount: number;
+        category: string;
         notes: string | null;
         attachmentUrl: string | null;
-    }>;
+    }[]>;
 }

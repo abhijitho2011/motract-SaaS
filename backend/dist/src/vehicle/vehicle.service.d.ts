@@ -1,61 +1,58 @@
-import { PrismaService } from '../prisma/prisma.service';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../drizzle/schema';
 export declare class VehicleService {
-    private prisma;
-    constructor(prisma: PrismaService);
-    lookup(regNumber: string): Promise<({
+    private db;
+    constructor(db: NodePgDatabase<typeof schema>);
+    lookup(regNumber: string): Promise<{
+        id: string;
+        regNumber: string;
+        chassisNumber: string | null;
+        engineNumber: string | null;
+        vin: string | null;
+        mfgYear: number | null;
+        variantId: string;
+        createdAt: string;
+        updatedAt: string;
         variant: {
+            id: string;
+            name: string;
+            fuelType: "PETROL" | "DIESEL" | "CNG" | "ELECTRIC" | "HYBRID";
+            modelId: string;
             model: {
+                id: string;
+                name: string;
+                makeId: string;
                 make: {
                     id: string;
                     name: string;
                 };
-            } & {
-                id: string;
-                name: string;
-                makeId: string;
             };
-        } & {
-            id: string;
-            name: string;
-            fuelType: import(".prisma/client").$Enums.FuelType;
-            modelId: string;
         };
-    } & {
-        id: string;
-        createdAt: Date;
-        updatedAt: Date;
-        regNumber: string;
-        chassisNumber: string | null;
-        engineNumber: string | null;
-        vin: string | null;
-        mfgYear: number | null;
-        variantId: string;
-    }) | null>;
+    } | null>;
     register(data: any): Promise<{
         id: string;
-        createdAt: Date;
-        updatedAt: Date;
         regNumber: string;
         chassisNumber: string | null;
         engineNumber: string | null;
         vin: string | null;
         mfgYear: number | null;
         variantId: string;
+        createdAt: string;
+        updatedAt: string;
     }>;
-    findAllModels(): Promise<({
+    findAllModels(): Promise<{
+        id: string;
+        name: string;
+        makeId: string;
+        variants: {
+            id: string;
+            name: string;
+            fuelType: "PETROL" | "DIESEL" | "CNG" | "ELECTRIC" | "HYBRID";
+            modelId: string;
+        }[];
         make: {
             id: string;
             name: string;
         };
-        variants: {
-            id: string;
-            name: string;
-            fuelType: import(".prisma/client").$Enums.FuelType;
-            modelId: string;
-        }[];
-    } & {
-        id: string;
-        name: string;
-        makeId: string;
-    })[]>;
+    }[]>;
 }

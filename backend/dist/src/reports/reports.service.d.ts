@@ -1,7 +1,8 @@
-import { PrismaService } from '../prisma/prisma.service';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../drizzle/schema';
 export declare class ReportsService {
-    private prisma;
-    constructor(prisma: PrismaService);
+    private db;
+    constructor(db: NodePgDatabase<typeof schema>);
     getSalesReport(workshopId: string, startDate: Date, endDate: Date): Promise<{
         summary: {
             totalCount: number;
@@ -10,26 +11,14 @@ export declare class ReportsService {
             partsRevenue: number;
             taxCollected: number;
         };
-        transactions: ({
-            customer: {
-                id: string;
-                name: string;
-                email: string | null;
-                mobile: string;
-                createdAt: Date;
-                updatedAt: Date;
-                workshopId: string;
-                address: string | null;
-                gstin: string | null;
-            };
-        } & {
+        transactions: {
             id: string;
             workshopId: string;
             customerId: string;
             jobCardId: string | null;
+            invoiceDate: string;
             invoiceNumber: string;
-            invoiceDate: Date;
-            type: import(".prisma/client").$Enums.InvoiceType;
+            type: "JOB_CARD" | "COUNTER_SALE";
             totalLabor: number;
             totalParts: number;
             cgst: number;
@@ -39,7 +28,18 @@ export declare class ReportsService {
             grandTotal: number;
             paidAmount: number;
             balance: number;
-        })[];
+            customer: {
+                id: string;
+                name: string;
+                createdAt: string;
+                updatedAt: string;
+                email: string | null;
+                mobile: string;
+                workshopId: string;
+                address: string | null;
+                gstin: string | null;
+            };
+        }[];
     }>;
     getGSTReport(workshopId: string, month: number, year: number): Promise<{
         period: string;

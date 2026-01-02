@@ -1,5 +1,6 @@
 import { pgTable, uniqueIndex, text, foreignKey, integer, timestamp, boolean, doublePrecision, jsonb, pgEnum } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
+import { relations } from "drizzle-orm/relations";
 
 export const approvalStatus = pgEnum("ApprovalStatus", ['PENDING', 'APPROVED', 'REJECTED'])
 export const bayType = pgEnum("BayType", ['SERVICE', 'WASHING', 'ALIGNMENT', 'ELECTRICAL', 'GENERAL'])
@@ -27,10 +28,10 @@ export const models = pgTable("models", {
 }, (table) => [
 	uniqueIndex("models_makeId_name_key").using("btree", table.makeId.asc().nullsLast().op("text_ops"), table.name.asc().nullsLast().op("text_ops")),
 	foreignKey({
-			columns: [table.makeId],
-			foreignColumns: [makes.id],
-			name: "models_makeId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.makeId],
+		foreignColumns: [makes.id],
+		name: "models_makeId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const variants = pgTable("variants", {
@@ -41,10 +42,10 @@ export const variants = pgTable("variants", {
 }, (table) => [
 	uniqueIndex("variants_modelId_name_fuelType_key").using("btree", table.modelId.asc().nullsLast().op("enum_ops"), table.name.asc().nullsLast().op("text_ops"), table.fuelType.asc().nullsLast().op("enum_ops")),
 	foreignKey({
-			columns: [table.modelId],
-			foreignColumns: [models.id],
-			name: "variants_modelId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.modelId],
+		foreignColumns: [models.id],
+		name: "variants_modelId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const vehicles = pgTable("vehicles", {
@@ -60,10 +61,10 @@ export const vehicles = pgTable("vehicles", {
 }, (table) => [
 	uniqueIndex("vehicles_regNumber_key").using("btree", table.regNumber.asc().nullsLast().op("text_ops")),
 	foreignKey({
-			columns: [table.variantId],
-			foreignColumns: [variants.id],
-			name: "vehicles_variantId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.variantId],
+		foreignColumns: [variants.id],
+		name: "vehicles_variantId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const vehicleOwners = pgTable("vehicle_owners", {
@@ -74,15 +75,15 @@ export const vehicleOwners = pgTable("vehicle_owners", {
 }, (table) => [
 	uniqueIndex("vehicle_owners_userId_vehicleId_key").using("btree", table.userId.asc().nullsLast().op("text_ops"), table.vehicleId.asc().nullsLast().op("text_ops")),
 	foreignKey({
-			columns: [table.userId],
-			foreignColumns: [users.id],
-			name: "vehicle_owners_userId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.userId],
+		foreignColumns: [users.id],
+		name: "vehicle_owners_userId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 	foreignKey({
-			columns: [table.vehicleId],
-			foreignColumns: [vehicles.id],
-			name: "vehicle_owners_vehicleId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.vehicleId],
+		foreignColumns: [vehicles.id],
+		name: "vehicle_owners_vehicleId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const customers = pgTable("customers", {
@@ -98,10 +99,10 @@ export const customers = pgTable("customers", {
 }, (table) => [
 	uniqueIndex("customers_workshopId_mobile_key").using("btree", table.workshopId.asc().nullsLast().op("text_ops"), table.mobile.asc().nullsLast().op("text_ops")),
 	foreignKey({
-			columns: [table.workshopId],
-			foreignColumns: [workshops.id],
-			name: "customers_workshopId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "customers_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const jobCards = pgTable("job_cards", {
@@ -122,20 +123,20 @@ export const jobCards = pgTable("job_cards", {
 	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.customerId],
-			foreignColumns: [customers.id],
-			name: "job_cards_customerId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.customerId],
+		foreignColumns: [customers.id],
+		name: "job_cards_customerId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 	foreignKey({
-			columns: [table.vehicleId],
-			foreignColumns: [vehicles.id],
-			name: "job_cards_vehicleId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.vehicleId],
+		foreignColumns: [vehicles.id],
+		name: "job_cards_vehicleId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 	foreignKey({
-			columns: [table.workshopId],
-			foreignColumns: [workshops.id],
-			name: "job_cards_workshopId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "job_cards_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const jobComplaints = pgTable("job_complaints", {
@@ -145,10 +146,10 @@ export const jobComplaints = pgTable("job_complaints", {
 	remark: text(),
 }, (table) => [
 	foreignKey({
-			columns: [table.jobCardId],
-			foreignColumns: [jobCards.id],
-			name: "job_complaints_jobCardId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.jobCardId],
+		foreignColumns: [jobCards.id],
+		name: "job_complaints_jobCardId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const workshops = pgTable("workshops", {
@@ -185,20 +186,20 @@ export const jobParts = pgTable("job_parts", {
 	isApproved: boolean().default(false).notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.batchId],
-			foreignColumns: [inventoryBatches.id],
-			name: "job_parts_batchId_fkey"
-		}).onUpdate("cascade").onDelete("set null"),
+		columns: [table.batchId],
+		foreignColumns: [inventoryBatches.id],
+		name: "job_parts_batchId_fkey"
+	}).onUpdate("cascade").onDelete("set null"),
 	foreignKey({
-			columns: [table.itemId],
-			foreignColumns: [inventoryItems.id],
-			name: "job_parts_itemId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.itemId],
+		foreignColumns: [inventoryItems.id],
+		name: "job_parts_itemId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 	foreignKey({
-			columns: [table.jobCardId],
-			foreignColumns: [jobCards.id],
-			name: "job_parts_jobCardId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.jobCardId],
+		foreignColumns: [jobCards.id],
+		name: "job_parts_jobCardId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const categories = pgTable("categories", {
@@ -218,10 +219,10 @@ export const jobInspections = pgTable("job_inspections", {
 }, (table) => [
 	uniqueIndex("job_inspections_jobCardId_key").using("btree", table.jobCardId.asc().nullsLast().op("text_ops")),
 	foreignKey({
-			columns: [table.jobCardId],
-			foreignColumns: [jobCards.id],
-			name: "job_inspections_jobCardId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.jobCardId],
+		foreignColumns: [jobCards.id],
+		name: "job_inspections_jobCardId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const jobItems = pgTable("job_items", {
@@ -234,10 +235,10 @@ export const jobItems = pgTable("job_items", {
 	completionStatus: text(),
 }, (table) => [
 	foreignKey({
-			columns: [table.jobCardId],
-			foreignColumns: [jobCards.id],
-			name: "job_items_jobCardId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.jobCardId],
+		foreignColumns: [jobCards.id],
+		name: "job_items_jobCardId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const subCategories = pgTable("sub_categories", {
@@ -246,10 +247,10 @@ export const subCategories = pgTable("sub_categories", {
 	name: text().notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.categoryId],
-			foreignColumns: [categories.id],
-			name: "sub_categories_categoryId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.categoryId],
+		foreignColumns: [categories.id],
+		name: "sub_categories_categoryId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const inventoryItems = pgTable("inventory_items", {
@@ -264,10 +265,10 @@ export const inventoryItems = pgTable("inventory_items", {
 	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.workshopId],
-			foreignColumns: [workshops.id],
-			name: "inventory_items_workshopId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "inventory_items_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const inventoryVehicleMapping = pgTable("inventory_vehicle_mapping", {
@@ -277,15 +278,15 @@ export const inventoryVehicleMapping = pgTable("inventory_vehicle_mapping", {
 	variantId: text(),
 }, (table) => [
 	foreignKey({
-			columns: [table.itemId],
-			foreignColumns: [inventoryItems.id],
-			name: "inventory_vehicle_mapping_itemId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.itemId],
+		foreignColumns: [inventoryItems.id],
+		name: "inventory_vehicle_mapping_itemId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 	foreignKey({
-			columns: [table.modelId],
-			foreignColumns: [models.id],
-			name: "inventory_vehicle_mapping_modelId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.modelId],
+		foreignColumns: [models.id],
+		name: "inventory_vehicle_mapping_modelId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const inventoryPartNumbers = pgTable("inventory_part_numbers", {
@@ -295,10 +296,10 @@ export const inventoryPartNumbers = pgTable("inventory_part_numbers", {
 }, (table) => [
 	uniqueIndex("inventory_part_numbers_itemId_skuCode_key").using("btree", table.itemId.asc().nullsLast().op("text_ops"), table.skuCode.asc().nullsLast().op("text_ops")),
 	foreignKey({
-			columns: [table.itemId],
-			foreignColumns: [inventoryItems.id],
-			name: "inventory_part_numbers_itemId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.itemId],
+		foreignColumns: [inventoryItems.id],
+		name: "inventory_part_numbers_itemId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const suppliers = pgTable("suppliers", {
@@ -310,10 +311,10 @@ export const suppliers = pgTable("suppliers", {
 	address: text(),
 }, (table) => [
 	foreignKey({
-			columns: [table.workshopId],
-			foreignColumns: [workshops.id],
-			name: "suppliers_workshopId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "suppliers_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const purchases = pgTable("purchases", {
@@ -327,15 +328,15 @@ export const purchases = pgTable("purchases", {
 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.supplierId],
-			foreignColumns: [suppliers.id],
-			name: "purchases_supplierId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.supplierId],
+		foreignColumns: [suppliers.id],
+		name: "purchases_supplierId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 	foreignKey({
-			columns: [table.workshopId],
-			foreignColumns: [workshops.id],
-			name: "purchases_workshopId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "purchases_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const purchaseItems = pgTable("purchase_items", {
@@ -349,10 +350,10 @@ export const purchaseItems = pgTable("purchase_items", {
 	total: doublePrecision().notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.orderId],
-			foreignColumns: [purchases.id],
-			name: "purchase_items_orderId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.orderId],
+		foreignColumns: [purchases.id],
+		name: "purchase_items_orderId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const invoices = pgTable("invoices", {
@@ -375,20 +376,20 @@ export const invoices = pgTable("invoices", {
 }, (table) => [
 	uniqueIndex("invoices_jobCardId_key").using("btree", table.jobCardId.asc().nullsLast().op("text_ops")),
 	foreignKey({
-			columns: [table.customerId],
-			foreignColumns: [customers.id],
-			name: "invoices_customerId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.customerId],
+		foreignColumns: [customers.id],
+		name: "invoices_customerId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 	foreignKey({
-			columns: [table.jobCardId],
-			foreignColumns: [jobCards.id],
-			name: "invoices_jobCardId_fkey"
-		}).onUpdate("cascade").onDelete("set null"),
+		columns: [table.jobCardId],
+		foreignColumns: [jobCards.id],
+		name: "invoices_jobCardId_fkey"
+	}).onUpdate("cascade").onDelete("set null"),
 	foreignKey({
-			columns: [table.workshopId],
-			foreignColumns: [workshops.id],
-			name: "invoices_workshopId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "invoices_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const payments = pgTable("payments", {
@@ -400,10 +401,10 @@ export const payments = pgTable("payments", {
 	date: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.invoiceId],
-			foreignColumns: [invoices.id],
-			name: "payments_invoiceId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.invoiceId],
+		foreignColumns: [invoices.id],
+		name: "payments_invoiceId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const inventoryBatches = pgTable("inventory_batches", {
@@ -417,10 +418,10 @@ export const inventoryBatches = pgTable("inventory_batches", {
 	purchasedAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.itemId],
-			foreignColumns: [inventoryItems.id],
-			name: "inventory_batches_itemId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.itemId],
+		foreignColumns: [inventoryItems.id],
+		name: "inventory_batches_itemId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const workshopBreaks = pgTable("workshop_breaks", {
@@ -431,10 +432,10 @@ export const workshopBreaks = pgTable("workshop_breaks", {
 	endTime: text().notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.workshopId],
-			foreignColumns: [workshops.id],
-			name: "workshop_breaks_workshopId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "workshop_breaks_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const users = pgTable("users", {
@@ -451,10 +452,10 @@ export const users = pgTable("users", {
 	uniqueIndex("users_email_key").using("btree", table.email.asc().nullsLast().op("text_ops")),
 	uniqueIndex("users_mobile_key").using("btree", table.mobile.asc().nullsLast().op("text_ops")),
 	foreignKey({
-			columns: [table.workshopId],
-			foreignColumns: [workshops.id],
-			name: "users_workshopId_fkey"
-		}).onUpdate("cascade").onDelete("set null"),
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "users_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("set null"),
 ]);
 
 export const expenses = pgTable("expenses", {
@@ -467,10 +468,10 @@ export const expenses = pgTable("expenses", {
 	attachmentUrl: text(),
 }, (table) => [
 	foreignKey({
-			columns: [table.workshopId],
-			foreignColumns: [workshops.id],
-			name: "expenses_workshopId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "expenses_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const bays = pgTable("bays", {
@@ -481,10 +482,10 @@ export const bays = pgTable("bays", {
 	isActive: boolean().default(true).notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.workshopId],
-			foreignColumns: [workshops.id],
-			name: "bays_workshopId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "bays_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const services = pgTable("services", {
@@ -495,10 +496,10 @@ export const services = pgTable("services", {
 	price: doublePrecision(),
 }, (table) => [
 	foreignKey({
-			columns: [table.workshopId],
-			foreignColumns: [workshops.id],
-			name: "services_workshopId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "services_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const serviceBayMapping = pgTable("service_bay_mapping", {
@@ -508,15 +509,15 @@ export const serviceBayMapping = pgTable("service_bay_mapping", {
 }, (table) => [
 	uniqueIndex("service_bay_mapping_serviceId_bayId_key").using("btree", table.serviceId.asc().nullsLast().op("text_ops"), table.bayId.asc().nullsLast().op("text_ops")),
 	foreignKey({
-			columns: [table.bayId],
-			foreignColumns: [bays.id],
-			name: "service_bay_mapping_bayId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.bayId],
+		foreignColumns: [bays.id],
+		name: "service_bay_mapping_bayId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 	foreignKey({
-			columns: [table.serviceId],
-			foreignColumns: [services.id],
-			name: "service_bay_mapping_serviceId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.serviceId],
+		foreignColumns: [services.id],
+		name: "service_bay_mapping_serviceId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
 export const slotBookings = pgTable("slot_bookings", {
@@ -530,8 +531,282 @@ export const slotBookings = pgTable("slot_bookings", {
 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 }, (table) => [
 	foreignKey({
-			columns: [table.bayId],
-			foreignColumns: [bays.id],
-			name: "slot_bookings_bayId_fkey"
-		}).onUpdate("cascade").onDelete("restrict"),
+		columns: [table.bayId],
+		foreignColumns: [bays.id],
+		name: "slot_bookings_bayId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
 ]);
+export const modelsRelations = relations(models, ({one, many}) => ({
+	make: one(makes, {
+		fields: [models.makeId],
+		references: [makes.id]
+	}),
+	variants: many(variants),
+	inventoryVehicleMappings: many(inventoryVehicleMapping),
+}));
+
+export const makesRelations = relations(makes, ({many}) => ({
+	models: many(models),
+}));
+
+export const variantsRelations = relations(variants, ({one, many}) => ({
+	model: one(models, {
+		fields: [variants.modelId],
+		references: [models.id]
+	}),
+	vehicles: many(vehicles),
+}));
+
+export const vehiclesRelations = relations(vehicles, ({one, many}) => ({
+	variant: one(variants, {
+		fields: [vehicles.variantId],
+		references: [variants.id]
+	}),
+	vehicleOwners: many(vehicleOwners),
+	jobCards: many(jobCards),
+}));
+
+export const vehicleOwnersRelations = relations(vehicleOwners, ({one}) => ({
+	user: one(users, {
+		fields: [vehicleOwners.userId],
+		references: [users.id]
+	}),
+	vehicle: one(vehicles, {
+		fields: [vehicleOwners.vehicleId],
+		references: [vehicles.id]
+	}),
+}));
+
+export const usersRelations = relations(users, ({one, many}) => ({
+	vehicleOwners: many(vehicleOwners),
+	workshop: one(workshops, {
+		fields: [users.workshopId],
+		references: [workshops.id]
+	}),
+}));
+
+export const customersRelations = relations(customers, ({one, many}) => ({
+	workshop: one(workshops, {
+		fields: [customers.workshopId],
+		references: [workshops.id]
+	}),
+	jobCards: many(jobCards),
+	invoices: many(invoices),
+}));
+
+export const workshopsRelations = relations(workshops, ({many}) => ({
+	customers: many(customers),
+	jobCards: many(jobCards),
+	inventoryItems: many(inventoryItems),
+	suppliers: many(suppliers),
+	purchases: many(purchases),
+	invoices: many(invoices),
+	workshopBreaks: many(workshopBreaks),
+	users: many(users),
+	expenses: many(expenses),
+	bays: many(bays),
+	services: many(services),
+}));
+
+export const jobCardsRelations = relations(jobCards, ({one, many}) => ({
+	customer: one(customers, {
+		fields: [jobCards.customerId],
+		references: [customers.id]
+	}),
+	vehicle: one(vehicles, {
+		fields: [jobCards.vehicleId],
+		references: [vehicles.id]
+	}),
+	workshop: one(workshops, {
+		fields: [jobCards.workshopId],
+		references: [workshops.id]
+	}),
+	jobComplaints: many(jobComplaints),
+	jobParts: many(jobParts),
+	jobInspections: many(jobInspections),
+	jobItems: many(jobItems),
+	invoices: many(invoices),
+}));
+
+export const jobComplaintsRelations = relations(jobComplaints, ({one}) => ({
+	jobCard: one(jobCards, {
+		fields: [jobComplaints.jobCardId],
+		references: [jobCards.id]
+	}),
+}));
+
+export const jobPartsRelations = relations(jobParts, ({one}) => ({
+	inventoryBatch: one(inventoryBatches, {
+		fields: [jobParts.batchId],
+		references: [inventoryBatches.id]
+	}),
+	inventoryItem: one(inventoryItems, {
+		fields: [jobParts.itemId],
+		references: [inventoryItems.id]
+	}),
+	jobCard: one(jobCards, {
+		fields: [jobParts.jobCardId],
+		references: [jobCards.id]
+	}),
+}));
+
+export const inventoryBatchesRelations = relations(inventoryBatches, ({one, many}) => ({
+	jobParts: many(jobParts),
+	inventoryItem: one(inventoryItems, {
+		fields: [inventoryBatches.itemId],
+		references: [inventoryItems.id]
+	}),
+}));
+
+export const inventoryItemsRelations = relations(inventoryItems, ({one, many}) => ({
+	jobParts: many(jobParts),
+	workshop: one(workshops, {
+		fields: [inventoryItems.workshopId],
+		references: [workshops.id]
+	}),
+	inventoryVehicleMappings: many(inventoryVehicleMapping),
+	inventoryPartNumbers: many(inventoryPartNumbers),
+	inventoryBatches: many(inventoryBatches),
+}));
+
+export const jobInspectionsRelations = relations(jobInspections, ({one}) => ({
+	jobCard: one(jobCards, {
+		fields: [jobInspections.jobCardId],
+		references: [jobCards.id]
+	}),
+}));
+
+export const jobItemsRelations = relations(jobItems, ({one}) => ({
+	jobCard: one(jobCards, {
+		fields: [jobItems.jobCardId],
+		references: [jobCards.id]
+	}),
+}));
+
+export const subCategoriesRelations = relations(subCategories, ({one}) => ({
+	category: one(categories, {
+		fields: [subCategories.categoryId],
+		references: [categories.id]
+	}),
+}));
+
+export const categoriesRelations = relations(categories, ({many}) => ({
+	subCategories: many(subCategories),
+}));
+
+export const inventoryVehicleMappingRelations = relations(inventoryVehicleMapping, ({one}) => ({
+	inventoryItem: one(inventoryItems, {
+		fields: [inventoryVehicleMapping.itemId],
+		references: [inventoryItems.id]
+	}),
+	model: one(models, {
+		fields: [inventoryVehicleMapping.modelId],
+		references: [models.id]
+	}),
+}));
+
+export const inventoryPartNumbersRelations = relations(inventoryPartNumbers, ({one}) => ({
+	inventoryItem: one(inventoryItems, {
+		fields: [inventoryPartNumbers.itemId],
+		references: [inventoryItems.id]
+	}),
+}));
+
+export const suppliersRelations = relations(suppliers, ({one, many}) => ({
+	workshop: one(workshops, {
+		fields: [suppliers.workshopId],
+		references: [workshops.id]
+	}),
+	purchases: many(purchases),
+}));
+
+export const purchasesRelations = relations(purchases, ({one, many}) => ({
+	supplier: one(suppliers, {
+		fields: [purchases.supplierId],
+		references: [suppliers.id]
+	}),
+	workshop: one(workshops, {
+		fields: [purchases.workshopId],
+		references: [workshops.id]
+	}),
+	purchaseItems: many(purchaseItems),
+}));
+
+export const purchaseItemsRelations = relations(purchaseItems, ({one}) => ({
+	purchase: one(purchases, {
+		fields: [purchaseItems.orderId],
+		references: [purchases.id]
+	}),
+}));
+
+export const invoicesRelations = relations(invoices, ({one, many}) => ({
+	customer: one(customers, {
+		fields: [invoices.customerId],
+		references: [customers.id]
+	}),
+	jobCard: one(jobCards, {
+		fields: [invoices.jobCardId],
+		references: [jobCards.id]
+	}),
+	workshop: one(workshops, {
+		fields: [invoices.workshopId],
+		references: [workshops.id]
+	}),
+	payments: many(payments),
+}));
+
+export const paymentsRelations = relations(payments, ({one}) => ({
+	invoice: one(invoices, {
+		fields: [payments.invoiceId],
+		references: [invoices.id]
+	}),
+}));
+
+export const workshopBreaksRelations = relations(workshopBreaks, ({one}) => ({
+	workshop: one(workshops, {
+		fields: [workshopBreaks.workshopId],
+		references: [workshops.id]
+	}),
+}));
+
+export const expensesRelations = relations(expenses, ({one}) => ({
+	workshop: one(workshops, {
+		fields: [expenses.workshopId],
+		references: [workshops.id]
+	}),
+}));
+
+export const baysRelations = relations(bays, ({one, many}) => ({
+	workshop: one(workshops, {
+		fields: [bays.workshopId],
+		references: [workshops.id]
+	}),
+	serviceBayMappings: many(serviceBayMapping),
+	slotBookings: many(slotBookings),
+}));
+
+export const servicesRelations = relations(services, ({one, many}) => ({
+	workshop: one(workshops, {
+		fields: [services.workshopId],
+		references: [workshops.id]
+	}),
+	serviceBayMappings: many(serviceBayMapping),
+}));
+
+export const serviceBayMappingRelations = relations(serviceBayMapping, ({one}) => ({
+	bay: one(bays, {
+		fields: [serviceBayMapping.bayId],
+		references: [bays.id]
+	}),
+	service: one(services, {
+		fields: [serviceBayMapping.serviceId],
+		references: [services.id]
+	}),
+}));
+
+export const slotBookingsRelations = relations(slotBookings, ({one}) => ({
+	bay: one(bays, {
+		fields: [slotBookings.bayId],
+		references: [bays.id]
+	}),
+}));

@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JobCardController = void 0;
 const common_1 = require("@nestjs/common");
 const job_card_service_1 = require("./job-card.service");
-const client_1 = require("@prisma/client");
 let JobCardController = class JobCardController {
     jobCardService;
     constructor(jobCardService) {

@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ExpenseController = void 0;
 const common_1 = require("@nestjs/common");
 const expense_service_1 = require("./expense.service");
-const client_1 = require("@prisma/client");
 let ExpenseController = class ExpenseController {
     expenseService;
     constructor(expenseService) {
