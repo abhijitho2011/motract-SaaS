@@ -22,7 +22,7 @@ export class BillingService {
 
         let partsTotal = 0;
         if (jobCard.parts) {
-            (jobCard.parts as any[]).forEach(part => partsTotal += (part.price * part.quantity));
+            (jobCard.parts as any[]).forEach(part => partsTotal += part.totalPrice);
         }
 
         const totalAmount = laborTotal + partsTotal;
@@ -33,18 +33,20 @@ export class BillingService {
 
         const invoice = await this.prisma.invoice.create({
             data: {
-                invoiceType: InvoiceType.JOB_CARD,
+                type: InvoiceType.JOB_CARD,
+                invoiceNumber: `INV-${Date.now()}`, // TODO: Generate sequential invoice number
                 jobCardId,
                 customerId: jobCard.customerId,
                 workshopId: jobCard.workshopId,
-                totalAmount: finalAmount, // Gross
-                sgst,
+                totalLabor: laborTotal,
+                totalParts: partsTotal,
                 cgst,
+                sgst,
                 igst: 0,
+                grandTotal: finalAmount,
                 paidAmount: 0,
-                balanceAmount: finalAmount,
-                status: 'PENDING',
-            } as any,
+                balance: finalAmount,
+            },
         });
 
         return invoice;
