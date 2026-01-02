@@ -7,7 +7,7 @@ export class SlotController {
     constructor(private readonly slotService: SlotService) { }
 
     @Post('bays')
-    async createBay(@Body() data: Prisma.BayCreateInput) {
+    async createBay(@Body() data: { workshopId: string; name: string; type: Prisma.BayType }) {
         return this.slotService.createBay(data);
     }
 

@@ -6,8 +6,14 @@ import { Prisma, SlotStatus } from '@prisma/client';
 export class SlotService {
     constructor(private prisma: PrismaService) { }
 
-    async createBay(data: Prisma.BayCreateInput) {
-        return this.prisma.bay.create({ data });
+    async createBay(data: { workshopId: string; name: string; type: Prisma.BayType }) {
+        return this.prisma.bay.create({
+            data: {
+                name: data.name,
+                type: data.type,
+                workshop: { connect: { id: data.workshopId } },
+            },
+        });
     }
 
     async findBays(workshopId: string) {
