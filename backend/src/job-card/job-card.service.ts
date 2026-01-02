@@ -8,8 +8,9 @@ export class JobCardService {
 
     async create(data: {
         workshopId: string;
-        vehicleRegNumber: string;
-        customerId: string;
+        vehicleId: string;
+        customerName: string;
+        customerMobile: string;
         advisorId?: string;
         odometer?: number;
         fuelLevel?: number;
@@ -18,19 +19,38 @@ export class JobCardService {
     }) {
         // 1. Find Vehicle
         const vehicle = await this.prisma.vehicle.findUnique({
-            where: { regNumber: data.vehicleRegNumber },
+            where: { id: data.vehicleId },
         });
 
         if (!vehicle) {
-            throw new NotFoundException('Vehicle not found. Please register vehicle first.');
+            throw new NotFoundException('Vehicle not found.');
         }
 
-        // 2. Create Job Card
+        // 2. Find or Create Customer
+        // Note: Using workshopId + mobile as unique constraint based on schema
+        const customer = await this.prisma.customer.upsert({
+            where: {
+                workshopId_mobile: {
+                    workshopId: data.workshopId,
+                    mobile: data.customerMobile
+                }
+            },
+            update: {
+                name: data.customerName, // Update name if exists
+            },
+            create: {
+                workshopId: data.workshopId,
+                name: data.customerName,
+                mobile: data.customerMobile,
+            }
+        });
+
+        // 3. Create Job Card
         return this.prisma.jobCard.create({
             data: {
                 workshopId: data.workshopId,
                 vehicleId: vehicle.id,
-                customerId: data.customerId,
+                customerId: customer.id,
                 advisorId: data.advisorId,
                 odometer: data.odometer,
                 fuelLevel: data.fuelLevel,

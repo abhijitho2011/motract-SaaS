@@ -9,8 +9,9 @@ export class JobCardController {
     @Post()
     async create(@Body() body: {
         workshopId: string;
-        vehicleRegNumber: string;
-        customerId: string;
+        vehicleId: string;
+        customerName: string;
+        customerMobile: string;
         advisorId?: string;
         odometer?: number;
         fuelLevel?: number;
