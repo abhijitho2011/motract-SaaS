@@ -47,4 +47,8 @@ export class PurchaseController {
     async updateStatus(@Param('id') id: string, @Body('status') status: string) {
         return this.purchaseService.updatePurchaseOrderStatus(id, status);
     }
+    @Post('orders/:id/receive')
+    async receiveOrder(@Param('id') id: string) {
+        return this.purchaseService.receivePurchaseOrder(id);
+    }
 }

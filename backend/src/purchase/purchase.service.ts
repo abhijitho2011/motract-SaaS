@@ -113,24 +113,61 @@ export class PurchaseService {
         });
     }
 
-    // Supplier Ledger
-    async getSupplierLedger(supplierId: string) {
-        const orders = await this.prisma.purchaseOrder.findMany({
-            where: { supplierId },
-            orderBy: { invoiceDate: 'desc' },
-            include: {
-                items: true,
-            },
+    // Receive PO and Update Stock
+    async receivePurchaseOrder(id: string) {
+        const po = await this.prisma.purchaseOrder.findUnique({
+            where: { id },
+            include: { items: true },
         });
 
-        const totalPurchases = orders.reduce((sum, order) => sum + order.totalAmount, 0);
-        const pendingOrders = orders.filter((o) => o.status === 'DRAFT').length;
+        if (!po) throw new NotFoundException('PO not found');
+        if (po.status === 'RECEIVED') throw new Error('PO already received');
 
-        return {
-            supplierId,
-            totalPurchases,
-            pendingOrders,
-            orders,
-        };
+        // Update Stock
+        await this.prisma.$transaction(async (tx) => {
+            for (const item of po.items) {
+                // 1. Find or Create Inventory Item
+                let invItem = await tx.inventoryItem.findFirst({
+                    where: {
+                        workshopId: po.workshopId,
+                        name: {
+                            equals: item.itemName,
+                            mode: 'insensitive', // Robust matching
+                        },
+                    },
+                });
+
+                if (!invItem) {
+                    invItem = await tx.inventoryItem.create({
+                        data: {
+                            workshopId: po.workshopId,
+                            name: item.itemName,
+                            brand: 'Generic', // Fallback
+                            hsnCode: '0000',
+                            taxPercent: item.taxPercent,
+                        },
+                    });
+                }
+
+                // 2. Create Batch
+                await tx.inventoryBatch.create({
+                    data: {
+                        itemId: invItem.id,
+                        batchNumber: `PO-${po.invoiceNumber ?? po.id.substring(0, 4)}`,
+                        quantity: item.quantity,
+                        purchasePrice: item.total / item.quantity, // Unit Price (Tax Inc)
+                        salePrice: (item.total / item.quantity) * 1.5, // 50% Margin Default
+                    },
+                });
+            }
+
+            // 3. Update PO Status
+            await tx.purchaseOrder.update({
+                where: { id },
+                data: { status: 'RECEIVED' },
+            });
+        });
+
+        return this.getPurchaseOrder(id);
     }
 }
