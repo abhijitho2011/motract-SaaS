@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:workshop/src/features/dashboard/presentation/dashboard_controller.dart';
+import 'package:workshop/src/core/widgets/app_drawer.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -28,6 +29,7 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ],
       ),
+      drawer: const AppDrawer(),
       body: kpiState.when(
         data: (data) => _DashboardContent(data: data),
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -117,7 +119,7 @@ class _DashboardContent extends StatelessWidget {
               icon: Icons.currency_rupee,
               color: Colors.green,
             ),
-             _KpiCard(
+            _KpiCard(
               title: 'Pending Delivery',
               value: '$pendingDeliveries',
               icon: Icons.schedule,
@@ -129,7 +131,8 @@ class _DashboardContent extends StatelessWidget {
         _SectionHeader(title: 'Job Funnel'),
         _buildFunnel(context),
         const Gap(24),
-        if (data['recentJobs'] != null && (data['recentJobs'] as List).isNotEmpty) ...[
+        if (data['recentJobs'] != null &&
+            (data['recentJobs'] as List).isNotEmpty) ...[
           _SectionHeader(title: 'Recent Activity'),
           _buildRecentActivity(context, data['recentJobs']),
           const Gap(24),
@@ -147,7 +150,7 @@ class _DashboardContent extends StatelessWidget {
     final wip = data['jobsInProgress'] ?? 0; // WIP
     final del = data['pendingDeliveries'] ?? 0; // Billing/Delivery
     final done = data['jobsCompleted'] ?? 0;
-    
+
     // Simple bar visual
     return Card(
       child: Padding(
@@ -158,8 +161,12 @@ class _DashboardContent extends StatelessWidget {
             const Gap(8),
             _FunnelRow(label: 'In Progress', count: wip, color: Colors.orange),
             const Gap(8),
-            _FunnelRow(label: 'Quality Check / Bill', count: del, color: Colors.purple),
-             const Gap(8),
+            _FunnelRow(
+              label: 'Quality Check / Bill',
+              count: del,
+              color: Colors.purple,
+            ),
+            const Gap(8),
             _FunnelRow(label: 'Completed', count: done, color: Colors.green),
           ],
         ),
@@ -198,9 +205,21 @@ class _DashboardContent extends StatelessWidget {
         // Registry
         Row(
           children: [
-            Expanded(child: _ActionCard(icon: Icons.search, title: 'Lookup', onTap: () => context.push('/vehicle/lookup'))),
+            Expanded(
+              child: _ActionCard(
+                icon: Icons.search,
+                title: 'Lookup',
+                onTap: () => context.push('/vehicle/lookup'),
+              ),
+            ),
             const Gap(8),
-             Expanded(child: _ActionCard(icon: Icons.add, title: 'New Job', onTap: () => context.push('/vehicle/lookup'))),
+            Expanded(
+              child: _ActionCard(
+                icon: Icons.add,
+                title: 'New Job',
+                onTap: () => context.push('/vehicle/lookup'),
+              ),
+            ),
           ],
         ),
         const Gap(16),
@@ -213,7 +232,7 @@ class _DashboardContent extends StatelessWidget {
           onTap: () => context.push('/job-cards'),
         ),
         _ActionTile(
-          icon: Icons.local_parking, 
+          icon: Icons.local_parking,
           title: 'Bay Management',
           subtitle: 'Manage bays & slots',
           onTap: () => context.push('/slots'),
@@ -230,7 +249,7 @@ class _DashboardContent extends StatelessWidget {
           subtitle: 'Generate invoices',
           onTap: () => context.push('/billing'),
         ),
-         _ActionTile(
+        _ActionTile(
           icon: Icons.settings,
           title: 'Settings',
           subtitle: 'App configuration',
@@ -246,16 +265,28 @@ class _FunnelRow extends StatelessWidget {
   final int count;
   final Color color;
 
-  const _FunnelRow({required this.label, required this.count, required this.color});
+  const _FunnelRow({
+    required this.label,
+    required this.count,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        SizedBox(width: 100, child: Text(label, style: const TextStyle(fontWeight: FontWeight.w500))),
+        SizedBox(
+          width: 100,
+          child: Text(
+            label,
+            style: const TextStyle(fontWeight: FontWeight.w500),
+          ),
+        ),
         Expanded(
           child: LinearProgressIndicator(
-            value: count > 0 ? 1.0 : 0.0, // Just full bar for existence? Or relative? 
+            value: count > 0
+                ? 1.0
+                : 0.0, // Just full bar for existence? Or relative?
             // Relative is hard without total. Let's make it always look "active" if > 0
             // Actually, let's just use it as a colored bar indicator
             valueColor: AlwaysStoppedAnimation(color),
@@ -272,33 +303,37 @@ class _FunnelRow extends StatelessWidget {
 }
 
 class _ActionCard extends StatelessWidget {
-    final IconData icon;
-    final String title;
-    final VoidCallback onTap;
-    const _ActionCard({required this.icon, required this.title, required this.onTap});
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+  const _ActionCard({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+  });
 
-    @override
-    Widget build(BuildContext context) {
-        return InkWell(
-            onTap: onTap,
-            child: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                    color: Theme.of(context).cardColor,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.withOpacity(0.2)),
-                ),
-                child: Column(
-                    children: [
-                        Icon(icon, size: 24, color: Theme.of(context).primaryColor),
-                        const Gap(8),
-                        Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                    ],
-                ),
-            ),
-        );
-    }
-
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: Colors.grey.withOpacity(0.2)),
+        ),
+        child: Column(
+          children: [
+            Icon(icon, size: 24, color: Theme.of(context).primaryColor),
+            const Gap(8),
+            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class _SectionHeader extends StatelessWidget {
   final String title;

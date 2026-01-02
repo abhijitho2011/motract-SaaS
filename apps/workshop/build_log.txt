@@ -1,0 +1,30 @@
+  0s riverpod_generator on 46 inputs; lib/main.dart
+  0s riverpod_generator on 46 inputs: 1 skipped; lib/src/core/api/api_client.dart
+  32s riverpod_generator on 46 inputs: 2 skipped, 1 same; spent 24s analyzing, 7s resolving, 1s reading; lib/src/core/theme/app_theme.dart
+  33s riverpod_generator on 46 inputs: 43 skipped, 1 same, 2 no-op; spent 24s analyzing, 7s resolving, 1s reading
+  0s retrofit_generator on 46 inputs; lib/main.dart
+  0s retrofit_generator on 46 inputs: 43 skipped, 1 same, 2 no-op
+  0s json_serializable on 46 inputs; lib/main.dart
+  4s json_serializable on 46 inputs: 1 no-op; spent 3s analyzing; lib/src/core/api/api_client.dart
+  4s json_serializable on 46 inputs: 37 skipped, 9 no-op; spent 4s analyzing
+  0s source_gen:combining_builder on 46 inputs; lib/main.dart
+W source_gen:combining_builder on lib/src/features/reports/data/reports_repository.dart:
+  reports_repository.g.dart must be included as a part directive in the input library with:
+      part 'reports_repository.g.dart';
+  0s source_gen:combining_builder on 46 inputs: 43 skipped, 1 same, 2 no-op
+E riverpod_generator on lib/src/features/dashboard/presentation/dashboard_screen.dart:
+  303:1: Classes can't be declared inside other classes.
+  303:22: Expected a class member.
+  303:30: Methods must have an explicit list of parameters.
+  And 16 more.
+E retrofit_generator on lib/src/features/dashboard/presentation/dashboard_screen.dart:
+  303:1: Classes can't be declared inside other classes.
+  303:22: Expected a class member.
+  303:30: Methods must have an explicit list of parameters.
+  And 16 more.
+E json_serializable on lib/src/features/dashboard/presentation/dashboard_screen.dart:
+  303:1: Classes can't be declared inside other classes.
+  303:22: Expected a class member.
+  303:30: Methods must have an explicit list of parameters.
+  And 16 more.
+  Failed to build with build_runner/jit in 41s; wrote 3 outputs.

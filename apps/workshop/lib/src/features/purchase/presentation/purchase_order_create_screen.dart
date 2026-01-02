@@ -77,7 +77,7 @@ class _PurchaseOrderCreateScreenState
   Widget build(BuildContext context) {
     final workshopId = ref.watch(workshopProvider).asData?.value?['id'];
     final suppliersAsync = workshopId != null
-        ? ref.watch(purchaseApiProvider).getSuppliers(workshopId: workshopId)
+        ? ref.watch(purchaseApiProvider).getSuppliers(workshopId)
         : Future.value([]);
 
     return Scaffold(

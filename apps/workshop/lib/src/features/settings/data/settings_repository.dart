@@ -1,14 +1,19 @@
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-part 'settings_repository.g.dart';
+final workshopProvider = FutureProvider<Map<String, dynamic>>((ref) async {
+  final prefs = await SharedPreferences.getInstance();
+  final workshopId = prefs.getString('workshopId');
+  final workshopName = prefs.getString('workshopName') ?? 'Demo Workshop';
 
-@riverpod
-Future<Map<String, dynamic>> workshop(WorkshopRef ref) async {
-  // Mock workshop for now
+  if (workshopId == null) {
+    throw Exception('No workshop found. Please log in again.');
+  }
+
   return {
-    'id': 'test-id',
-    'name': 'Motract Demo Workshop',
+    'id': workshopId,
+    'name': workshopName,
     'address': '123 Auto Street',
     'mobile': '9876543210',
   };
-}
+});

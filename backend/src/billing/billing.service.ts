@@ -1,135 +1,139 @@
-import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import {
+  Injectable,
+  BadRequestException,
+  NotFoundException,
+  Inject,
+} from '@nestjs/common';
+import { DrizzleAsyncProvider } from '../drizzle/drizzle.provider';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../drizzle/schema';
+import { invoices, jobCards } from '../drizzle/schema';
+import { eq } from 'drizzle-orm';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class BillingService {
-    constructor(private prisma: PrismaService) { }
+  constructor(
+    @Inject(DrizzleAsyncProvider)
+    private db: NodePgDatabase<typeof schema>,
+  ) { }
 
-    async generateInvoice(jobCardId: string) {
-        const job = await this.prisma.jobCard.findUnique({
-            where: { id: jobCardId },
-            include: {
-                tasks: true,
-                parts: true,
-                customer: true,
-                vehicle: true,
-                workshop: true,
-                invoice: true,
-            },
-        });
+  async generateInvoice(jobCardId: string) {
+    const job = await this.db.query.jobCards.findFirst({
+      where: eq(jobCards.id, jobCardId),
+      with: {
+        jobItems: true, // tasks
+        jobParts: true, // parts
+        customer: true,
+        vehicle: true,
+        workshop: true,
+        invoices: true, // check if invoice exists (named invoices plural in relations)
+      }
+    });
 
-        if (!job) throw new NotFoundException('Job Card not found');
-        if (job.invoice) throw new BadRequestException('Invoice already generated for this Job Card');
+    if (!job) throw new NotFoundException('Job Card not found');
 
-        // Calculate Totals
-        let totalLabor = 0;
-        job.tasks.forEach((t) => {
-            // Basic logic: if not approved, maybe skip? For now assume all valid tasks are billable
-            // or only 'DONE' tasks. Let's bill all for simplicity in Phase 1
-            totalLabor += t.price;
-        });
+    // Check if any invoice exists for this job card
+    if (job.invoices && job.invoices.length > 0)
+      throw new BadRequestException(
+        'Invoice already generated for this Job Card',
+      );
 
-        let totalParts = 0;
-        job.parts.forEach((p) => {
-            totalParts += p.totalPrice;
-        });
+    // Calculate Totals
+    let totalLabor = 0;
+    job.jobItems.forEach((t) => {
+      // Basic logic: if not approved, maybe skip? For now bill all
+      totalLabor += t.price;
+    });
 
-        // Tax Logic (Simplified: 9% CGST + 9% SGST on total)
-        // In a real app, gstPercent is per item.
-        // Let's iterate and sum up tax amounts accurately if we wanted, 
-        // but for this MVP, we will rely on the totals we have.
-        // Wait, the `JobTask` and `JobPart` have `gstPercent`. 
-        // Let's calculate correctly.
+    let totalParts = 0;
+    job.jobParts.forEach((p) => {
+      totalParts += p.totalPrice; // includes tax already logic from JobCardService
+    });
 
-        // Actually `totalPrice` in JobPart already includes tax? 
-        // Let's check JobCardService.addPart: 
-        // totalPrice: data.quantity * data.unitPrice * (1 + data.gst / 100) -> YES it includes tax.
+    // Tax Logic
+    let laborTax = 0;
+    job.jobItems.forEach((t) => {
+      laborTax += t.price * (t.gstPercent / 100);
+    });
 
-        // For Tasks: price (Labor cost). gstPercent default 18.
-        // So labor tax needs to be added.
-        let laborTax = 0;
-        job.tasks.forEach(t => {
-            laborTax += t.price * (t.gstPercent / 100);
-        });
+    // parts tax included in totalPrice.
+    // part.totalPrice = qty * unit * (1+gst)
+    let partsTax = 0;
+    job.jobParts.forEach((p) => {
+      const basePrice = p.quantity * p.unitPrice;
+      partsTax += p.totalPrice - basePrice;
+    });
 
-        // For Parts: totalPrice includes tax. 
-        // We need to back-calculate basic and tax if we want to show breakdown, 
-        // OR just take the tax component difference.
-        // part.totalPrice = qty * unit * (1+gst)
-        // tax = part.totalPrice - (qty * unit)
-        let partsTax = 0;
-        job.parts.forEach(p => {
-            const basePrice = p.quantity * p.unitPrice;
-            partsTax += (p.totalPrice - basePrice);
-        });
+    const totalTax = laborTax + partsTax;
+    const cgst = totalTax / 2;
+    const sgst = totalTax / 2;
 
-        const totalTax = laborTax + partsTax;
-        const cgst = totalTax / 2;
-        const sgst = totalTax / 2;
+    // Recalculating for precision:
+    let totalLaborBase = 0;
+    job.jobItems.forEach((t) => (totalLaborBase += t.price)); // price is base
 
-        const grandTotal = totalLabor + laborTax + totalParts;
-        // Wait, totalParts already includes tax. totalLabor does NOT (it's base price).
-        // So GrandTotal = TotalLaborBase + LaborTax + TotalParts(inclusive).
+    let totalPartsBase = 0;
+    job.jobParts.forEach((p) => (totalPartsBase += p.quantity * p.unitPrice)); // base
 
-        // Let's refine the schema usage.
-        // Invoice.totalLabor -> usually untaxed or taxed? 
-        // Let's store base amounts in totalLabor/totalParts and taxes separately for clarity?
-        // The Schema says: totalLabor, totalParts, cgst, sgst, grandTotal.
-        // Usually these are base amounts.
+    const finalGrandTotal =
+      totalLaborBase + laborTax + totalPartsBase + partsTax; // Match logic
 
-        // Recalculating for precision:
-        let totalLaborBase = 0;
-        job.tasks.forEach(t => totalLaborBase += t.price);
+    // Create Invoice
+    const [invoice] = await this.db.insert(invoices).values({
+      id: crypto.randomUUID(),
+      workshopId: job.workshopId,
+      customerId: job.customerId,
+      jobCardId: job.id,
+      invoiceNumber: `INV-${Date.now()}`,
+      type: 'JOB_CARD',
+      totalLabor: totalLaborBase,
+      totalParts: totalPartsBase,
+      cgst: cgst,
+      sgst: sgst,
+      igst: 0,
+      grandTotal: finalGrandTotal,
+      balance: finalGrandTotal,
+    }).returning();
 
-        let totalPartsBase = 0;
-        job.parts.forEach(p => totalPartsBase += (p.quantity * p.unitPrice));
+    // Update Job Stage
+    await this.db.update(jobCards)
+      .set({ stage: 'BILLING' })
+      .where(eq(jobCards.id, jobCardId));
 
-        // Re-sum taxes
-        // We already calculated laborTax and partsTax above.
+    return invoice;
+  }
 
-        const finalGrandTotal = totalLaborBase + laborTax + totalPartsBase + partsTax;
+  async getInvoice(id: string) {
+    const invoice = await this.db.query.invoices.findFirst({
+      where: eq(invoices.id, id),
+      with: {
+        customer: true,
+        jobCard: {
+          with: {
+            vehicle: true,
+            jobItems: true, // tasks
+            jobParts: { with: { inventoryItem: true } }, // parts with item
+          }
+        },
+        workshop: true,
+      }
+    });
 
-        // Create Invoice
-        const invoice = await this.prisma.invoice.create({
-            data: {
-                workshopId: job.workshopId,
-                customerId: job.customerId,
-                jobCardId: job.id,
-                invoiceNumber: `INV-${Date.now()}`, // Simple ID
-                type: 'JOB_CARD',
-                totalLabor: totalLaborBase,
-                totalParts: totalPartsBase,
-                cgst: cgst,
-                sgst: sgst,
-                igst: 0,
-                grandTotal: finalGrandTotal,
-                balance: finalGrandTotal, // Unpaid initially
-            },
-        });
+    // Remap relations if needed to match frontend
+    if (!invoice) return null;
 
-        // Update Job Stage
-        await this.prisma.jobCard.update({
-            where: { id: jobCardId },
-            data: { stage: 'BILLING' },
-        });
-
-        return invoice;
+    // Flatten structure if needed? 
+    // Frontend likely uses .jobCard.tasks etc.
+    const res: any = { ...invoice };
+    if (res.jobCard) {
+      res.jobCard.tasks = res.jobCard.jobItems;
+      res.jobCard.parts = res.jobCard.jobParts.map(p => ({
+        ...p,
+        item: p.inventoryItem
+      }));
     }
 
-    async getInvoice(id: string) {
-        return this.prisma.invoice.findUnique({
-            where: { id },
-            include: {
-                customer: true,
-                jobCard: {
-                    include: {
-                        vehicle: true,
-                        tasks: true,
-                        parts: { include: { item: true } }
-                    }
-                },
-                workshop: true
-            }
-        });
-    }
+    return res;
+  }
 }

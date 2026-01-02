@@ -4,6 +4,6 @@ import { JobCardController } from './job-card.controller';
 
 @Module({
   providers: [JobCardService],
-  controllers: [JobCardController]
+  controllers: [JobCardController],
 })
 export class JobCardModule {}

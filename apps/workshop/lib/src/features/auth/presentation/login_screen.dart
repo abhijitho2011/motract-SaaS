@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:gap/gap.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:workshop/src/features/auth/data/auth_repository.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
@@ -29,7 +30,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         'password': _passwordController.text,
       });
 
-      // TODO: Save token using shared_preferences
+      // Save token and workshop info using shared_preferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('access_token', response['access_token'] ?? '');
+
+      // Save workshop ID if available in user data
+      if (response['user'] != null && response['user']['workshopId'] != null) {
+        await prefs.setString('workshopId', response['user']['workshopId']);
+      }
+
       print('Login Success: $response');
 
       if (mounted) {

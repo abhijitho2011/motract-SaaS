@@ -21,7 +21,7 @@ class _SupplierListScreenState extends ConsumerState<SupplierListScreen> {
 
     final suppliersAsync = ref
         .watch(purchaseApiProvider)
-        .getSuppliers(workshopId: workshopId);
+        .getSuppliers(workshopId);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Suppliers')),

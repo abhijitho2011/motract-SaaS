@@ -56,20 +56,6 @@ class SettingsScreen extends ConsumerWidget {
             ),
           ),
           const Divider(),
-          const _SectionHeader(title: 'Workshop'),
-          ListTile(
-            leading: const Icon(Icons.attach_money),
-            title: const Text('Expenses'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.push('/expenses'),
-          ),
-          ListTile(
-            leading: const Icon(Icons.bar_chart),
-            title: const Text('Reports'),
-            trailing: const Icon(Icons.chevron_right),
-            onTap: () => context.push('/reports'),
-          ),
-          const Divider(),
           const _SectionHeader(title: 'About'),
           ListTile(
             leading: const Icon(Icons.info_outline),

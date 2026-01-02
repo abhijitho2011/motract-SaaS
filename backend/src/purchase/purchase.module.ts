@@ -6,4 +6,4 @@ import { PurchaseService } from './purchase.service';
   controllers: [PurchaseController],
   providers: [PurchaseService],
 })
-export class PurchaseModule { }
+export class PurchaseModule {}

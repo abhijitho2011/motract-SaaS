@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:workshop/src/core/api/api_client.dart';
 
@@ -34,8 +33,7 @@ abstract class PurchaseApi {
   Future<dynamic> getOrder(@Path('id') String id);
 }
 
-@riverpod
-PurchaseApi purchaseApi(Ref ref) {
+final purchaseApiProvider = Provider<PurchaseApi>((ref) {
   final dio = ref.watch(dioProvider);
   return PurchaseApi(dio);
-}
+});

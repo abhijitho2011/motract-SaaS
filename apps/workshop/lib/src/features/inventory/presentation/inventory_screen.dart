@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
+import 'package:go_router/go_router.dart';
 import 'package:workshop/src/features/inventory/presentation/inventory_controller.dart';
+import 'package:workshop/src/core/widgets/app_drawer.dart';
 
 class InventoryScreen extends ConsumerWidget {
   const InventoryScreen({super.key});
@@ -18,21 +20,9 @@ class InventoryScreen extends ConsumerWidget {
             icon: const Icon(Icons.refresh),
             onPressed: () => ref.invalidate(inventoryControllerProvider),
           ),
-          PopupMenuButton<String>(
-            onSelected: (val) => context.push(val),
-            itemBuilder: (context) => [
-              const PopupMenuItem(
-                value: '/purchase/suppliers',
-                child: Text('Suppliers'),
-              ),
-              const PopupMenuItem(
-                value: '/purchase/orders',
-                child: Text('Purchase Orders'),
-              ),
-            ],
-          ),
         ],
       ),
+      drawer: const AppDrawer(),
       body: inventoryState.when(
         data: (items) {
           if (items.isEmpty) {

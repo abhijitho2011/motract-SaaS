@@ -4,20 +4,20 @@ import { Prisma } from '@prisma/client';
 
 @Controller('vehicle')
 export class VehicleController {
-    constructor(private readonly vehicleService: VehicleService) { }
+  constructor(private readonly vehicleService: VehicleService) {}
 
-    @Get('lookup/:regNumber')
-    async lookup(@Param('regNumber') regNumber: string) {
-        return this.vehicleService.lookup(regNumber);
-    }
+  @Get('lookup/:regNumber')
+  async lookup(@Param('regNumber') regNumber: string) {
+    return this.vehicleService.lookup(regNumber);
+  }
 
-    @Post('register')
-    async register(@Body() data: Prisma.VehicleCreateInput) {
-        return this.vehicleService.register(data);
-    }
+  @Post('register')
+  async register(@Body() data: Prisma.VehicleCreateInput) {
+    return this.vehicleService.register(data);
+  }
 
-    @Get('masters/models')
-    async getModels() {
-        return this.vehicleService.findAllModels();
-    }
+  @Get('masters/models')
+  async getModels() {
+    return this.vehicleService.findAllModels();
+  }
 }

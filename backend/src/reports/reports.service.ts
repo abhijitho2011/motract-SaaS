@@ -1,173 +1,205 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
+import { Injectable, Inject } from '@nestjs/common';
+import { DrizzleAsyncProvider } from '../drizzle/drizzle.provider';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../drizzle/schema';
+import {
+  invoices,
+  purchases,
+  purchaseItems,
+  jobParts,
+  expenses,
+  jobCards,
+} from '../drizzle/schema';
+import { eq, and, gte, lte, desc, sum, count, isNotNull } from 'drizzle-orm';
 
 @Injectable()
 export class ReportsService {
-    constructor(private prisma: PrismaService) { }
+  constructor(
+    @Inject(DrizzleAsyncProvider)
+    private db: NodePgDatabase<typeof schema>,
+  ) { }
 
-    async getSalesReport(workshopId: string, startDate: Date, endDate: Date) {
-        // Aggregate Invoices
-        const sales = await this.prisma.invoice.findMany({
-            where: {
-                workshopId,
-                invoiceDate: {
-                    gte: startDate,
-                    lte: endDate,
-                },
-            },
-            include: { customer: true },
-            orderBy: { invoiceDate: 'desc' },
-        });
+  async getSalesReport(workshopId: string, startDate: Date, endDate: Date) {
+    const startStr = startDate.toISOString();
+    const endStr = endDate.toISOString();
 
-        const summary = await this.prisma.invoice.aggregate({
-            where: {
-                workshopId,
-                invoiceDate: { gte: startDate, lte: endDate },
-            },
-            _sum: {
-                grandTotal: true,
-                totalLabor: true,
-                totalParts: true,
-                cgst: true,
-                sgst: true,
-                igst: true,
-            },
-            _count: { id: true },
-        });
+    // Aggregate Invoices
+    const sales = await this.db.query.invoices.findMany({
+      where: and(
+        eq(invoices.workshopId, workshopId),
+        gte(invoices.invoiceDate, startStr),
+        lte(invoices.invoiceDate, endStr)
+      ),
+      with: { customer: true },
+      orderBy: [desc(invoices.invoiceDate)],
+    });
 
-        return {
-            summary: {
-                totalCount: summary._count.id,
-                totalRevenue: summary._sum.grandTotal || 0,
-                laborRevenue: summary._sum.totalLabor || 0,
-                partsRevenue: summary._sum.totalParts || 0,
-                taxCollected: (summary._sum.cgst || 0) + (summary._sum.sgst || 0) + (summary._sum.igst || 0),
-            },
-            transactions: sales,
-        };
-    }
+    const summaryRes = await this.db
+      .select({
+        count: count(invoices.id),
+        grandTotal: sum(invoices.grandTotal),
+        totalLabor: sum(invoices.totalLabor),
+        totalParts: sum(invoices.totalParts),
+        cgst: sum(invoices.cgst),
+        sgst: sum(invoices.sgst),
+        igst: sum(invoices.igst),
+      })
+      .from(invoices)
+      .where(
+        and(
+          eq(invoices.workshopId, workshopId),
+          gte(invoices.invoiceDate, startStr),
+          lte(invoices.invoiceDate, endStr)
+        )
+      );
 
-    async getGSTReport(workshopId: string, month: number, year: number) {
-        const startDate = new Date(year, month - 1, 1);
-        const endDate = new Date(year, month, 0, 23, 59, 59);
+    const summary = summaryRes[0];
 
-        // Output Tax (Sales)
-        const sales = await this.prisma.invoice.aggregate({
-            where: {
-                workshopId,
-                invoiceDate: { gte: startDate, lte: endDate },
-            },
-            _sum: {
-                grandTotal: true, // Tacable Value? No, this is total.
-                totalLabor: true,
-                totalParts: true,
-                cgst: true,
-                sgst: true,
-                igst: true,
-            },
-        });
+    return {
+      summary: {
+        totalCount: summary.count || 0,
+        totalRevenue: parseFloat(summary.grandTotal || '0'),
+        laborRevenue: parseFloat(summary.totalLabor || '0'),
+        partsRevenue: parseFloat(summary.totalParts || '0'),
+        taxCollected:
+          parseFloat(summary.cgst || '0') +
+          parseFloat(summary.sgst || '0') +
+          parseFloat(summary.igst || '0'),
+      },
+      transactions: sales,
+    };
+  }
 
-        // Input Tax (Purchases)
-        // Need to sum purchase items tax
-        // PurchaseOrder model has totalAmount, items have taxPercent. Schema says PurchaseItem has `total`, `taxPercent`, `unitCost`.
-        // We lack explicit `taxAmount` on PurchaseItem in schema, but can calculate or if simplistic.
-        // Actually, PurchaseOrder doesn't split tax in schema explicitly in aggregating fields.
-        // Let's iterate purchases for now or aggregate if possible.
-        // Better: PurchaseItem has total. Total usually includes tax? Or Base + Tax?
-        // Schema: unitCost (Float), taxPercent (Float), total (Float).
-        // Assuming total is tax inclusive or exclusive? Usually inclusive for "total".
-        // Let's assume total is final.
+  async getGSTReport(workshopId: string, month: number, year: number) {
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0, 23, 59, 59);
+    const startStr = startDate.toISOString();
+    const endStr = endDate.toISOString();
 
-        const purchases = await this.prisma.purchaseOrder.findMany({
-            where: {
-                workshopId,
-                invoiceDate: { gte: startDate, lte: endDate },
-                status: 'RECEIVED',
-            },
-            include: { items: true },
-        });
+    // Output Tax (Sales)
+    const salesRes = await this.db
+      .select({
+        grandTotal: sum(invoices.grandTotal),
+        totalLabor: sum(invoices.totalLabor),
+        totalParts: sum(invoices.totalParts),
+        cgst: sum(invoices.cgst),
+        sgst: sum(invoices.sgst),
+        igst: sum(invoices.igst),
+      })
+      .from(invoices)
+      .where(
+        and(
+          eq(invoices.workshopId, workshopId),
+          gte(invoices.invoiceDate, startStr),
+          lte(invoices.invoiceDate, endStr)
+        )
+      );
+    const sales = salesRes[0];
 
-        let totalInputTax = 0;
-        let totalPurchaseValue = 0;
+    // Input Tax (Purchases)
+    const purchasesList = await this.db.query.purchases.findMany({
+      where: and(
+        eq(purchases.workshopId, workshopId),
+        gte(purchases.invoiceDate, startStr),
+        lte(purchases.invoiceDate, endStr),
+        eq(purchases.status, 'RECEIVED')
+      ),
+      with: { purchaseItems: true }, // items
+    });
 
-        purchases.forEach(po => {
-            totalPurchaseValue += po.totalAmount;
-            po.items.forEach(item => {
-                // Back calculate tax if total = base * (1 + rate/100)
-                // Tax = Total - (Total / (1 + rate/100))
-                const rate = item.taxPercent || 18;
-                const base = item.total / (1 + rate / 100);
-                const tax = item.total - base;
-                totalInputTax += tax;
-            });
-        });
+    let totalInputTax = 0;
+    let totalPurchaseValue = 0;
 
-        return {
-            period: `${month}/${year}`,
-            outputTax: {
-                cgst: sales._sum.cgst || 0,
-                sgst: sales._sum.sgst || 0,
-                igst: sales._sum.igst || 0,
-                total: (sales._sum.cgst || 0) + (sales._sum.sgst || 0) + (sales._sum.igst || 0),
-                taxableValue: (sales._sum.totalLabor || 0) + (sales._sum.totalParts || 0),
-            },
-            inputTax: {
-                total: totalInputTax,
-                purchaseValue: totalPurchaseValue,
-            },
-            netPayable: ((sales._sum.cgst || 0) + (sales._sum.sgst || 0) + (sales._sum.igst || 0)) - totalInputTax,
-        };
-    }
+    purchasesList.forEach((po) => {
+      totalPurchaseValue += po.totalAmount;
+      po.purchaseItems.forEach((item) => {
+        const rate = item.taxPercent || 18;
+        const base = item.total / (1 + rate / 100);
+        const tax = item.total - base;
+        totalInputTax += tax;
+      });
+    });
 
-    async getProfitLoss(workshopId: string, startDate: Date, endDate: Date) {
-        // 1. Revenue (Invoices)
-        const revenue = await this.prisma.invoice.aggregate({
-            where: { workshopId, invoiceDate: { gte: startDate, lte: endDate } },
-            _sum: { grandTotal: true },
-        });
+    const cgstVal = parseFloat(sales.cgst || '0');
+    const sgstVal = parseFloat(sales.sgst || '0');
+    const igstVal = parseFloat(sales.igst || '0');
+    const totalLaborVal = parseFloat(sales.totalLabor || '0');
+    const totalPartsVal = parseFloat(sales.totalParts || '0');
 
-        // 2. COGS (Parts Cost in Jobs)
-        // We need cost of parts used in Invoiced Jobs.
-        // JobPart has unitPrice (Selling Price).
-        // InventoryBatch has purchasePrice.
-        // Linking JobPart to Batch to get cost is best.
-        // JobPart has batchId.
-        const jobParts = await this.prisma.jobPart.findMany({
-            where: {
-                jobCard: {
-                    workshopId,
-                    invoice: {
-                        invoiceDate: { gte: startDate, lte: endDate }
-                    }
-                },
-                batchId: { not: null }
-            },
-            include: { batch: true }
-        });
+    return {
+      period: `${month}/${year}`,
+      outputTax: {
+        cgst: cgstVal,
+        sgst: sgstVal,
+        igst: igstVal,
+        total: cgstVal + sgstVal + igstVal,
+        taxableValue: totalLaborVal + totalPartsVal,
+      },
+      inputTax: {
+        total: totalInputTax,
+        purchaseValue: totalPurchaseValue,
+      },
+      netPayable: (cgstVal + sgstVal + igstVal) - totalInputTax,
+    };
+  }
 
-        const cogs = jobParts.reduce((sum, part) => {
-            return sum + (part.quantity * (part.batch?.purchasePrice || 0));
-        }, 0);
+  async getProfitLoss(workshopId: string, startDate: Date, endDate: Date) {
+    const startStr = startDate.toISOString();
+    const endStr = endDate.toISOString();
 
+    // 1. Revenue (Invoices)
+    const revenueRes = await this.db.select({ grandTotal: sum(invoices.grandTotal) })
+      .from(invoices)
+      .where(and(
+        eq(invoices.workshopId, workshopId),
+        gte(invoices.invoiceDate, startStr),
+        lte(invoices.invoiceDate, endStr)
+      ));
+    const totalRevenue = parseFloat(revenueRes[0].grandTotal || '0');
 
-        // 3. Expenses (Overheads)
-        const expenses = await this.prisma.expense.aggregate({
-            where: { workshopId, date: { gte: startDate, lte: endDate } },
-            _sum: { amount: true },
-        });
+    // 2. COGS (Parts Cost in Jobs)
+    // JobPart -> jobCard -> Invoice date filter
+    // This requires joining JobPart with JobCard and Invoice.
+    // Drizzle select with inner joins.
+    const jobPartsRes = await this.db.select({
+      quantity: jobParts.quantity,
+      purchasePrice: schema.inventoryBatches.purchasePrice // joined table column
+    })
+      .from(jobParts)
+      .innerJoin(jobCards, eq(jobParts.jobCardId, jobCards.id))
+      .innerJoin(invoices, eq(invoices.jobCardId, jobCards.id))
+      .innerJoin(schema.inventoryBatches, eq(jobParts.batchId, schema.inventoryBatches.id))
+      .where(and(
+        eq(jobCards.workshopId, workshopId),
+        gte(invoices.invoiceDate, startStr),
+        lte(invoices.invoiceDate, endStr),
+        isNotNull(jobParts.batchId)
+      ));
 
-        const totalRevenue = revenue._sum.grandTotal || 0;
-        const totalExpenses = expenses._sum.amount || 0;
-        const grossProfit = totalRevenue - cogs;
-        const netProfit = grossProfit - totalExpenses;
+    const cogs = jobPartsRes.reduce((sum, part) => {
+      return sum + (part.quantity || 0) * (part.purchasePrice || 0);
+    }, 0);
 
-        return {
-            revenue: totalRevenue,
-            cogs,
-            grossProfit,
-            expenses: totalExpenses,
-            netProfit,
-            marginPercent: totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0
-        };
-    }
+    // 3. Expenses (Overheads)
+    const expensesRes = await this.db.select({ amount: sum(expenses.amount) })
+      .from(expenses)
+      .where(and(
+        eq(expenses.workshopId, workshopId),
+        gte(expenses.date, startStr),
+        lte(expenses.date, endStr)
+      ));
+    const totalExpenses = parseFloat(expensesRes[0].amount || '0');
+
+    const grossProfit = totalRevenue - cogs;
+    const netProfit = grossProfit - totalExpenses;
+
+    return {
+      revenue: totalRevenue,
+      cogs,
+      grossProfit,
+      expenses: totalExpenses,
+      netProfit,
+      marginPercent: totalRevenue > 0 ? (netProfit / totalRevenue) * 100 : 0,
+    };
+  }
 }

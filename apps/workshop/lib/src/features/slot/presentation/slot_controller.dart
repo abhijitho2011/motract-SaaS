@@ -1,5 +1,6 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:workshop/src/features/slot/data/slot_repository.dart';
+import 'package:workshop/src/features/settings/data/settings_repository.dart';
 
 part 'slot_controller.g.dart';
 
@@ -7,8 +8,9 @@ part 'slot_controller.g.dart';
 class SlotController extends _$SlotController {
   @override
   FutureOr<List<Map<String, dynamic>>> build() async {
-    // TODO: Get actual workshop ID
-    const workshopId = 'test-id';
+    final workshopId = await ref
+        .watch(workshopProvider.future)
+        .then((w) => w['id'] as String);
     final api = ref.watch(slotApiProvider);
     final response = await api.getBays(workshopId);
     return (response as List).cast<Map<String, dynamic>>();
@@ -18,7 +20,9 @@ class SlotController extends _$SlotController {
     state = const AsyncValue.loading();
     state = await AsyncValue.guard(() async {
       final api = ref.read(slotApiProvider);
-      const workshopId = 'test-id';
+      final workshopId = await ref
+          .read(workshopProvider.future)
+          .then((w) => w['id'] as String);
 
       await api.createBay({
         'workshopId': workshopId,

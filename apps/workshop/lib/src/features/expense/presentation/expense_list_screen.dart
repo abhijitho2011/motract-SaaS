@@ -20,9 +20,7 @@ class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final expensesAsync = ref
-        .watch(expenseApiProvider)
-        .getExpenses(workshopId: workshopId);
+    final expensesAsync = ref.watch(expenseApiProvider).getExpenses(workshopId);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Expenses')),

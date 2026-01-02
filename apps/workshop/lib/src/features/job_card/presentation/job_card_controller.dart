@@ -1,5 +1,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:workshop/src/features/job_card/data/job_card_repository.dart';
+import 'package:workshop/src/features/settings/data/settings_repository.dart';
+import 'package:workshop/src/features/dashboard/presentation/dashboard_controller.dart';
 
 part 'job_card_controller.g.dart';
 
@@ -21,8 +23,10 @@ class JobCardController extends _$JobCardController {
     state = await AsyncValue.guard(() async {
       final api = ref.read(jobCardApiProvider);
 
-      // TODO: Get actual workshop ID and user ID
-      const workshopId = 'test-id';
+      // Get workshop ID from provider
+      final workshopId = await ref
+          .read(workshopProvider.future)
+          .then((w) => w['id'] as String);
       const advisorId = 'advisor-id';
 
       await api.createJobCard({
@@ -38,6 +42,9 @@ class JobCardController extends _$JobCardController {
             .map((c) => c)
             .toList(), // Backend expects string[] now
       });
+
+      // Refresh dashboard to show new stats
+      ref.invalidate(dashboardControllerProvider);
     });
   }
 }

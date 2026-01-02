@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:retrofit/retrofit.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:workshop/src/core/api/api_client.dart';
 
 part 'reports_repository.g.dart';
@@ -28,8 +28,7 @@ abstract class ReportsApi {
   );
 }
 
-@riverpod
-ReportsApi reportsApi(ReportsApiRef ref) {
+final reportsApiProvider = Provider<ReportsApi>((ref) {
   final dio = ref.watch(dioProvider);
   return ReportsApi(dio);
-}
+});

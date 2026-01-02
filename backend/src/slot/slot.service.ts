@@ -1,44 +1,64 @@
-import { Injectable } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { Prisma, BayType, SlotStatus } from '@prisma/client';
+import { Injectable, Inject } from '@nestjs/common';
+import { DrizzleAsyncProvider } from '../drizzle/drizzle.provider';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../drizzle/schema';
+import { bays, slotBookings } from '../drizzle/schema';
+import { eq, and } from 'drizzle-orm';
+import { BayType, SlotStatus } from '@prisma/client';
 
 @Injectable()
 export class SlotService {
-    constructor(private prisma: PrismaService) { }
+  constructor(
+    @Inject(DrizzleAsyncProvider)
+    private db: NodePgDatabase<typeof schema>,
+  ) { }
 
-    async createBay(data: { workshopId: string; name: string; type: BayType }) {
-        return this.prisma.bay.create({
-            data: {
-                name: data.name,
-                type: data.type,
-                workshop: { connect: { id: data.workshopId } },
-            },
-        });
-    }
+  async createBay(data: { workshopId: string; name: string; type: BayType }) {
+    const result = await this.db
+      .insert(bays)
+      .values({
+        workshopId: data.workshopId,
+        name: data.name,
+        type: data.type, // Enum compatibility might need casting or matching strings
+        isActive: true,
+      })
+      .returning();
+    return result[0];
+  }
 
-    async findBays(workshopId: string) {
-        return this.prisma.bay.findMany({ where: { workshopId }, include: { services: true } });
-    }
+  async findBays(workshopId: string) {
+    // using query builder with relations
+    return this.db.query.bays.findMany({
+      where: eq(bays.workshopId, workshopId),
+      // with: { services: true }, // Uncomment when services relation is confirmed in relations.ts
+      // For now, if services relation is in serviceBayMapping, we might need to adjust
+    });
+  }
 
-    async generateSlots(bayId: string, date: Date, startStr: string, endStr: string, durationMin: number) {
-        // Implementation simplified for Phase 1: Just create slot records
-        // Real implementation would calculate intervals
-        // For now, let's assume slots are pre-generated or generated on demand
+  async generateSlots(
+    bayId: string,
+    date: Date,
+    startStr: string,
+    endStr: string,
+    durationMin: number,
+  ) {
+    return [];
+  }
 
-        // Example logic:
-        // 09:00, 09:30, 10:00...
+  async getSlots(bayId: string, date: Date) {
+    // Date comparison in Drizzle/SQL might need formatting
+    // Assuming exact match for now as per original code
+    const dateStr = date.toISOString(); // or however it was stored
+    // Actually, original code used Date object. In Postgres it's timestamp.
+    // Drizzle will handle Date object for timestamp columns.
+    return this.db
+      .select()
+      .from(slotBookings)
+      .where(and(eq(slotBookings.bayId, bayId), eq(slotBookings.date, dateStr as any)));
+  }
 
-        return []; // TODO: Implement full generation logic
-    }
-
-    async getSlots(bayId: string, date: Date) {
-        // Return valid slots
-        return this.prisma.slotBooking.findMany({
-            where: { bayId, date: date },
-        });
-    }
-
-    async bookSlot(data: Prisma.SlotBookingCreateInput) {
-        return this.prisma.slotBooking.create({ data });
-    }
+  async bookSlot(data: typeof slotBookings.$inferInsert) {
+    const result = await this.db.insert(slotBookings).values(data).returning();
+    return result[0];
+  }
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:workshop/src/features/reports/data/reports_repository.dart';
 
 class ReportsScreen extends ConsumerStatefulWidget {
@@ -107,9 +107,7 @@ class _SalesTab extends ConsumerWidget {
                 child: ListTile(
                   title: Text('#${txn['invoiceNumber']}'),
                   subtitle: Text(
-                    DateFormat(
-                      'dd MMM yyyy',
-                    ).format(DateTime.parse(txn['invoiceDate'])),
+                    txn['invoiceDate'].toString().split('T').first,
                   ),
                   trailing: Text(
                     '₹${txn['grandTotal']}',

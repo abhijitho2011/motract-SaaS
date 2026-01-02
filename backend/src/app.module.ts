@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { PrismaModule } from './prisma/prisma.module';
+import { DrizzleModule } from './drizzle/drizzle.module';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { VehicleModule } from './vehicle/vehicle.module';
@@ -16,7 +16,7 @@ import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
-    PrismaModule,
+    DrizzleModule,
     UsersModule,
     AuthModule,
     VehicleModule,

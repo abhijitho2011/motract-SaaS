@@ -14,9 +14,7 @@ class PurchaseOrderListScreen extends ConsumerWidget {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
-    final ordersAsync = ref
-        .watch(purchaseApiProvider)
-        .getOrders(workshopId: workshopId);
+    final ordersAsync = ref.watch(purchaseApiProvider).getOrders(workshopId);
 
     return Scaffold(
       appBar: AppBar(title: const Text('Purchase Orders')),
