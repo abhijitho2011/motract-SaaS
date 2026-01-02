@@ -101,4 +101,49 @@ export class JobCardService {
             data: { stage },
         });
     }
+
+    async saveInspection(jobCardId: string, data: {
+        exterior: any;
+        interior: any;
+        tyres: any;
+        battery?: string;
+        documents?: any;
+        photos: string[];
+        fuelLevel?: number;
+        odometer?: number;
+    }) {
+        // 1. Upsert Inspection
+        const inspection = await this.prisma.jobInspection.upsert({
+            where: { jobCardId },
+            create: {
+                jobCardId,
+                exterior: data.exterior,
+                interior: data.interior,
+                tyres: data.tyres,
+                battery: data.battery,
+                documents: data.documents,
+                photos: data.photos,
+            },
+            update: {
+                exterior: data.exterior,
+                interior: data.interior,
+                tyres: data.tyres,
+                battery: data.battery,
+                documents: data.documents,
+                photos: data.photos,
+            },
+        });
+
+        // 2. Update Job Card Core Fields (Fuel, Odo) & Stage
+        await this.prisma.jobCard.update({
+            where: { id: jobCardId },
+            data: {
+                fuelLevel: data.fuelLevel,
+                odometer: data.odometer,
+                stage: JobStage.INSPECTION_COMPLETED,
+            },
+        });
+
+        return inspection;
+    }
 }
