@@ -88,6 +88,10 @@ enum TxnType {
 // User & Auth
 // -----------------------------------------------------------------------------
 
+// -----------------------------------------------------------------------------
+// User & Auth
+// -----------------------------------------------------------------------------
+
 model User {
   id        String   @id @default(uuid())
   email     String?  @unique
@@ -104,6 +108,8 @@ model User {
 
   // Client Role
   clientVehicles VehicleOwner[]
+
+  @@map("users")
 }
 
 // -----------------------------------------------------------------------------
@@ -130,9 +136,10 @@ model Workshop {
   longitude Float?
 
   // Settings
-  workingStartHour String @default("09:00") // HH:mm
-  workingEndHour   String @default("19:00") // HH:mm
-  slotDurationMin  Int    @default(30)
+  workingStartHour String   @default("09:00") // HH:mm
+  workingEndHour   String   @default("19:00") // HH:mm
+  slotDurationMin  Int      @default(30)
+  workingDays      String[] @default(["MON", "TUE", "WED", "THU", "FRI", "SAT"]) // 13.1 Workshop Working Time
 
   // Relations
   users          User[]
@@ -146,6 +153,8 @@ model Workshop {
   bays           Bay[]
   services       Service[]
   workshopBreaks WorkshopBreak[]
+
+  @@map("workshops")
 }
 
 // -----------------------------------------------------------------------------
@@ -156,6 +165,8 @@ model Make {
   id     String  @id @default(uuid())
   name   String  @unique // e.g., Maruti Suzuki
   models VehicleModel[]
+  
+  @@map("makes")
 }
 
 model VehicleModel {
@@ -167,6 +178,7 @@ model VehicleModel {
   InventoryVehicleMapping InventoryVehicleMapping[]
 
   @@unique([makeId, name])
+  @@map("models")
 }
 
 model Variant {
@@ -178,6 +190,7 @@ model Variant {
   vehicles Vehicle[]
 
   @@unique([modelId, name, fuelType])
+  @@map("variants")
 }
 
 model Vehicle {
@@ -197,6 +210,8 @@ model Vehicle {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("vehicles")
 }
 
 model VehicleOwner {
@@ -208,6 +223,7 @@ model VehicleOwner {
   isPrimary Boolean @default(true)
 
   @@unique([userId, vehicleId])
+  @@map("vehicle_owners")
 }
 
 // -----------------------------------------------------------------------------
@@ -231,6 +247,7 @@ model Customer {
   updatedAt DateTime @updatedAt
 
   @@unique([workshopId, mobile])
+  @@map("customers")
 }
 
 // -----------------------------------------------------------------------------
@@ -264,13 +281,15 @@ model JobCard {
   // Details
   complaints JobComplaint[]
   inspection JobInspection?
-  tasks      JobTask[] // Labor
+  tasks      JobItem[] // Renamed from JobTask to JobItem (14. DATABASE TABLES - job_items)
   parts      JobPart[] // Material
 
   invoice Invoice?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("job_cards")
 }
 
 model JobComplaint {
@@ -279,6 +298,8 @@ model JobComplaint {
   jobCard   JobCard @relation(fields: [jobCardId], references: [id])
   complaint String
   remark    String?
+
+  @@map("job_complaints")
 }
 
 model JobInspection {
@@ -292,9 +313,11 @@ model JobInspection {
   battery   String?
   documents Json? // Checklist
   photos    String[] // URLs
+
+  @@map("job_inspections")
 }
 
-model JobTask {
+model JobItem { // Was JobTask
   id          String  @id @default(uuid())
   jobCardId   String
   jobCard     JobCard @relation(fields: [jobCardId], references: [id])
@@ -304,6 +327,8 @@ model JobTask {
   isApproved  Boolean @default(false)
 
   completionStatus String? // Pending, Done
+  
+  @@map("job_items")
 }
 
 model JobPart {
@@ -323,6 +348,8 @@ model JobPart {
   totalPrice Float
 
   isApproved Boolean @default(false)
+
+  @@map("job_parts")
 }
 
 // -----------------------------------------------------------------------------
@@ -333,6 +360,8 @@ model Category {
   id            String        @id @default(uuid())
   name          String
   subCategories SubCategory[]
+
+  @@map("categories")
 }
 
 model SubCategory {
@@ -340,6 +369,8 @@ model SubCategory {
   categoryId String
   category   Category @relation(fields: [categoryId], references: [id])
   name       String
+
+  @@map("sub_categories")
 }
 
 model InventoryItem {
@@ -349,30 +380,34 @@ model InventoryItem {
 
   name  String
   brand String?
-  isOem Boolean @default(false)
+  isOem Boolean @default(false) // 10.2 OEM / Aftermarket flag
 
-  hsnCode    String?
-  taxPercent Float   @default(18.0)
+  hsnCode    String? // 10.2 HS Code
+  taxPercent Float   @default(18.0) // 10.2 Tax %
 
-  skus    InventorySku[]
-  batches InventoryBatch[]
+  // Relations
+  partNumbers InventoryPartNumber[] // 10.3 Multi-SKU
+  batches     InventoryBatch[]      // 10.5 Batch & Expiry
 
-  // Mapping
+  // 10.4 Vehicle Compatibility Mapping
   compatibleVehicles InventoryVehicleMapping[]
 
   jobParts JobPart[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("inventory_items")
 }
 
-model InventorySku {
+model InventoryPartNumber { // Was InventorySku
   id      String        @id @default(uuid())
   itemId  String
   item    InventoryItem @relation(fields: [itemId], references: [id])
   skuCode String // Part Number
 
   @@unique([itemId, skuCode])
+  @@map("inventory_part_numbers")
 }
 
 model InventoryBatch {
@@ -381,7 +416,7 @@ model InventoryBatch {
   item   InventoryItem @relation(fields: [itemId], references: [id])
 
   batchNumber String?
-  expiryDate  DateTime?
+  expiryDate  DateTime? // 10.5 Expiry alerts
 
   quantity      Float
   purchasePrice Float // Inclusive of tax
@@ -390,6 +425,8 @@ model InventoryBatch {
   purchasedAt DateTime @default(now())
 
   jobParts JobPart[]
+
+  @@map("inventory_batches")
 }
 
 model InventoryVehicleMapping {
@@ -402,6 +439,8 @@ model InventoryVehicleMapping {
 
   // Optional specific variant support
   variantId String?
+
+  @@map("inventory_vehicle_mapping")
 }
 
 // -----------------------------------------------------------------------------
@@ -418,6 +457,8 @@ model Supplier {
   address    String?
 
   orders PurchaseOrder[]
+
+  @@map("suppliers")
 }
 
 model PurchaseOrder {
@@ -436,6 +477,8 @@ model PurchaseOrder {
   items PurchaseItem[]
 
   createdAt DateTime @default(now())
+
+  @@map("purchases") // 14. purchases
 }
 
 model PurchaseItem {
@@ -450,6 +493,8 @@ model PurchaseItem {
   unitCost   Float // Unit price
   taxPercent Float
   total      Float
+
+  @@map("purchase_items")
 }
 
 // -----------------------------------------------------------------------------
@@ -487,6 +532,8 @@ model Invoice {
   balance    Float @default(0)
 
   payments Payment[]
+
+  @@map("invoices")
 }
 
 model Payment {
@@ -498,6 +545,8 @@ model Payment {
   mode      PaymentMode
   reference String? // Transaction ID
   date      DateTime    @default(now())
+
+  @@map("payments")
 }
 
 model Expense {
@@ -510,6 +559,8 @@ model Expense {
   date          DateTime
   notes         String?
   attachmentUrl String?
+
+  @@map("expenses")
 }
 
 // -----------------------------------------------------------------------------
@@ -526,6 +577,8 @@ model Bay {
 
   services ServiceBayMapping[]
   bookings SlotBooking[]
+
+  @@map("bays")
 }
 
 model Service {
@@ -537,6 +590,8 @@ model Service {
   price       Float?
 
   allowedBays ServiceBayMapping[]
+
+  @@map("services")
 }
 
 model ServiceBayMapping {
@@ -547,6 +602,7 @@ model ServiceBayMapping {
   bay       Bay     @relation(fields: [bayId], references: [id])
 
   @@unique([serviceId, bayId])
+  @@map("service_bay_mapping")
 }
 
 model SlotBooking {
@@ -563,6 +619,8 @@ model SlotBooking {
   jobCardId String?
 
   createdAt DateTime @default(now())
+
+  @@map("slot_bookings")
 }
 
 model WorkshopBreak {
@@ -572,4 +630,6 @@ model WorkshopBreak {
   title      String // Lunch, Tea
   startTime  String // HH:mm
   endTime    String // HH:mm
+
+  @@map("workshop_breaks")
 }

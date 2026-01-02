@@ -9,12 +9,13 @@ export class InventoryService {
     async createItem(data: Prisma.InventoryItemCreateInput) {
         return this.prisma.inventoryItem.create({
             data,
-            include: { skus: true, batches: true },
+            include: { partNumbers: true, batches: true },
         });
     }
 
     async addSku(itemId: string, skuCode: string) {
-        return this.prisma.inventorySku.create({
+        // kept method name addSku for API compatibility, but uses partNumber internally
+        return this.prisma.inventoryPartNumber.create({
             data: { itemId, skuCode },
         });
     }
@@ -37,14 +38,14 @@ export class InventoryService {
     async findAll(workshopId: string) {
         return this.prisma.inventoryItem.findMany({
             where: { workshopId },
-            include: { skus: true, batches: true },
+            include: { partNumbers: true, batches: true },
         });
     }
 
     async findOne(id: string) {
         const item = await this.prisma.inventoryItem.findUnique({
             where: { id },
-            include: { skus: true, batches: true, compatibleVehicles: { include: { model: true } } },
+            include: { partNumbers: true, batches: true, compatibleVehicles: { include: { model: true } } },
         });
         if (!item) throw new NotFoundException('Item not found');
         return item;

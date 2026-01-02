@@ -151,7 +151,7 @@ export class JobCardService {
         price: number;
         gst: number;
     }) {
-        return this.prisma.jobTask.create({
+        return this.prisma.jobItem.create({
             data: {
                 jobCardId,
                 description: data.description,
@@ -191,7 +191,7 @@ export class JobCardService {
 
     async updateTaskStatus(jobCardId: string, taskId: string, status: string) {
         // status: 'PENDING' | 'DONE'
-        return this.prisma.jobTask.update({
+        return this.prisma.jobItem.update({
             where: { id: taskId },
             data: { completionStatus: status },
         });

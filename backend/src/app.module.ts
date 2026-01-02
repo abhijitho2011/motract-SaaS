@@ -12,6 +12,7 @@ import { SlotModule } from './slot/slot.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { PurchaseModule } from './purchase/purchase.module';
 import { ExpenseModule } from './expense/expense.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { ExpenseModule } from './expense/expense.module';
     DashboardModule,
     PurchaseModule,
     ExpenseModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

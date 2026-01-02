@@ -162,8 +162,8 @@ export class DashboardService {
     }
 
     async getTopServices(workshopId: string, limit: number = 5) {
-        // Aggregate task descriptions from job cards
-        const tasks = await this.prisma.jobTask.groupBy({
+        // Aggregate task descriptions from job items
+        const tasks = await this.prisma.jobItem.groupBy({
             by: ['description'],
             where: {
                 jobCard: {
