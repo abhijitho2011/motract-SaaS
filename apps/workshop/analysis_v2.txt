@@ -1,0 +1,18 @@
+﻿Analyzing workshop...                                           
+
+   info - The import of 'package:flutter_riverpod/flutter_riverpod.dart' is unnecessary because all of the used elements are also provided by the import of 'package:riverpod_annotation/riverpod_annotation.dart' - lib\src\core\api\api_client.dart:3:8 - unnecessary_import
+   info - The import of 'package:flutter_riverpod/flutter_riverpod.dart' is unnecessary because all of the used elements are also provided by the import of 'package:riverpod_annotation/riverpod_annotation.dart' - lib\src\core\router\router.dart:3:8 - unnecessary_import
+warning - Unused import: 'package:flutter/material.dart' - lib\src\core\router\router.dart:4:8 - unused_import
+   info - The import of 'package:flutter_riverpod/flutter_riverpod.dart' is unnecessary because all of the used elements are also provided by the import of 'package:riverpod_annotation/riverpod_annotation.dart' - lib\src\features\auth\data\auth_repository.dart:4:8 - unnecessary_import
+   info - Don't invoke 'print' in production code - lib\src\features\auth\presentation\login_screen.dart:33:7 - avoid_print
+   info - The import of 'package:flutter_riverpod/flutter_riverpod.dart' is unnecessary because all of the used elements are also provided by the import of 'package:riverpod_annotation/riverpod_annotation.dart' - lib\src\features\billing\data\billing_repository.dart:4:8 - unnecessary_import
+   info - The import of 'package:flutter_riverpod/flutter_riverpod.dart' is unnecessary because all of the used elements are also provided by the import of 'package:riverpod_annotation/riverpod_annotation.dart' - lib\src\features\dashboard\data\dashboard_repository.dart:4:8 - unnecessary_import
+   info - The import of 'package:flutter_riverpod/flutter_riverpod.dart' is unnecessary because all of the used elements are also provided by the import of 'package:riverpod_annotation/riverpod_annotation.dart' - lib\src\features\inventory\data\inventory_repository.dart:4:8 - unnecessary_import
+   info - The import of 'package:flutter_riverpod/flutter_riverpod.dart' is unnecessary because all of the used elements are also provided by the import of 'package:riverpod_annotation/riverpod_annotation.dart' - lib\src\features\job_card\data\job_card_repository.dart:4:8 - unnecessary_import
+   info - Unnecessary use of multiple underscores - lib\src\features\job_card\presentation\job_card_list_screen.dart:22:39 - unnecessary_underscores
+   info - The 'child' argument should be last in widget constructor invocations - lib\src\features\job_card\presentation\job_card_list_screen.dart:61:9 - sort_child_properties_last
+warning - Unused import: 'package:gap/gap.dart' - lib\src\features\settings\presentation\settings_screen.dart:3:8 - unused_import
+   info - The import of 'package:flutter_riverpod/flutter_riverpod.dart' is unnecessary because all of the used elements are also provided by the import of 'package:riverpod_annotation/riverpod_annotation.dart' - lib\src\features\slot\data\slot_repository.dart:4:8 - unnecessary_import
+   info - Unnecessary use of multiple underscores - lib\src\features\slot\presentation\slot_screen.dart:21:39 - unnecessary_underscores
+   info - The import of 'package:flutter_riverpod/flutter_riverpod.dart' is unnecessary because all of the used elements are also provided by the import of 'package:riverpod_annotation/riverpod_annotation.dart' - lib\src\features\vehicle\data\vehicle_repository.dart:4:8 - unnecessary_import
+

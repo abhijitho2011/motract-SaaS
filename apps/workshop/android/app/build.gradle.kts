@@ -30,11 +30,30 @@ android {
         versionName = flutter.versionName
     }
 
+    signingConfigs {
+        create("release") {
+            val isCI = System.getenv("CI") == "true"
+            if (isCI || System.getenv("KEY_ALIAS") != null) {
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
+                storeFile = if (System.getenv("STORE_FILE") != null) file(System.getenv("STORE_FILE")) else null
+                storePassword = System.getenv("STORE_PASSWORD")
+            } else {
+                // Local fallback to debug keys if envs missing, to allow build completion
+                println("Release Env Vars missing, falling back to debug signing for testing")
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+                storeFile = file("debug.keystore") // This might fail if not present, but usually default exists
+                storePassword = "android"
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName("release")
+            isMinifyEnabled = true 
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
         }
     }
 }
