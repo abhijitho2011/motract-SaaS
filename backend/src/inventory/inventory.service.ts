@@ -44,9 +44,29 @@ export class InventoryService {
     async findOne(id: string) {
         const item = await this.prisma.inventoryItem.findUnique({
             where: { id },
-            include: { skus: true, batches: true },
+            include: { skus: true, batches: true, compatibleVehicles: { include: { model: true } } },
         });
         if (!item) throw new NotFoundException('Item not found');
         return item;
+    }
+
+    async addCompatibility(itemId: string, modelId: string, variantId?: string) {
+        // Check if mapping exists
+        const existing = await this.prisma.inventoryVehicleMapping.findFirst({
+            where: { itemId, modelId, variantId },
+        });
+        if (existing) throw new BadRequestException('Mapping already exists');
+
+        return this.prisma.inventoryVehicleMapping.create({
+            data: { itemId, modelId, variantId },
+            include: { model: true },
+        });
+    }
+
+    async getCompatibility(itemId: string) {
+        return this.prisma.inventoryVehicleMapping.findMany({
+            where: { itemId },
+            include: { model: true },
+        });
     }
 }

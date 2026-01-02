@@ -181,4 +181,19 @@ export class JobCardService {
             include: { item: true },
         });
     }
+
+    async assignTechnician(id: string, technicianId: string) {
+        return this.prisma.jobCard.update({
+            where: { id },
+            data: { technicianId },
+        });
+    }
+
+    async updateTaskStatus(jobCardId: string, taskId: string, status: string) {
+        // status: 'PENDING' | 'DONE'
+        return this.prisma.jobTask.update({
+            where: { id: taskId },
+            data: { completionStatus: status },
+        });
+    }
 }

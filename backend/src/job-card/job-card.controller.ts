@@ -70,4 +70,19 @@ export class JobCardController {
     }) {
         return this.jobCardService.addPart(id, body);
     }
+
+    @Patch(':id/technician')
+    async assignTechnician(@Param('id') id: string, @Body() body: { technicianId: string }) {
+        return this.jobCardService.assignTechnician(id, body.technicianId);
+    }
+
+    @Patch(':id/tasks/:taskId/status')
+    async updateTaskStatus(
+        @Param('id') id: string,
+        @Param('taskId') taskId: string,
+        @Body() body: { status: string }
+    ) {
+        return this.jobCardService.updateTaskStatus(id, taskId, body.status);
+    }
+
 }

@@ -31,4 +31,18 @@ export class InventoryController {
     async findOne(@Param('id') id: string) {
         return this.inventoryService.findOne(id);
     }
+
+    @Post('items/:id/compatibility')
+    async addCompatibility(
+        @Param('id') id: string,
+        @Body('modelId') modelId: string,
+        @Body('variantId') variantId?: string,
+    ) {
+        return this.inventoryService.addCompatibility(id, modelId, variantId);
+    }
+
+    @Get('items/:id/compatibility')
+    async getCompatibility(@Param('id') id: string) {
+        return this.inventoryService.getCompatibility(id);
+    }
 }
