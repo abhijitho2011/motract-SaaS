@@ -58,6 +58,7 @@ export const vehicles = pgTable("vehicles", {
 	vin: text(),
 	mfgYear: integer(),
 	variantId: text().notNull(),
+	workshopId: text(), // Optional for now to support legacy data
 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
 }, (table) => [
@@ -67,6 +68,11 @@ export const vehicles = pgTable("vehicles", {
 		foreignColumns: [variants.id],
 		name: "vehicles_variantId_fkey"
 	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "vehicles_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("set null"),
 ]);
 
 export const vehicleOwners = pgTable("vehicle_owners", {

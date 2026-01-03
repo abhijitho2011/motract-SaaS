@@ -43,7 +43,18 @@ export class VehicleController {
   }
 
   @Post('register')
-  async register(@Body() data: any) {
-    return this.vehicleService.register(data);
+  async register(@Request() req: any, @Body() data: any) {
+    return this.vehicleService.register({
+      ...data,
+      workshopId: req.user?.workshopId, // Inject Workshop ID from token
+    });
+  }
+
+  @Get('all')
+  async getAllVehicles(
+    @Query('workshopId') workshopId?: string,
+    @Query('regNumber') regNumber?: string,
+  ) {
+    return this.vehicleService.findAllVehicles({ workshopId, regNumber });
   }
 }

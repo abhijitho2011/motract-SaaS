@@ -128,10 +128,29 @@ export class VehicleService {
       vin,
       mfgYear: year,
       variantId: variantId,
-      updatedAt: new Date().toISOString(), // Drizzle timestamp string mode
+      workshopId: data.workshopId, // Save workshopId
+      updatedAt: new Date().toISOString(),
     }).returning();
 
     return vehicle;
+  }
+
+  // Super Admin: Get All Vehicles with Filters
+  async findAllVehicles(filters?: { workshopId?: string; regNumber?: string }) {
+    const whereClause = [];
+    if (filters?.workshopId) whereClause.push(eq(vehicles.workshopId, filters.workshopId));
+    if (filters?.regNumber) whereClause.push(eq(vehicles.regNumber, filters.regNumber));
+
+    return this.db.query.vehicles.findMany({
+      where: whereClause.length ? and(...whereClause) : undefined,
+      with: {
+        workshop: true, // Need to define relation in schema (in relations section) or manually join
+        variant: {
+          with: { model: { with: { make: true } } }
+        }
+      },
+      orderBy: [schema.vehicles.updatedAt],
+    });
   }
 
   // Masters
