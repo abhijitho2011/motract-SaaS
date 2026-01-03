@@ -69,6 +69,11 @@ export class AuthService {
       data.id = crypto.randomBytes(16).toString('hex');
     }
 
+    // Set updatedAt
+    if (!data.updatedAt) {
+      data.updatedAt = new Date().toISOString();
+    }
+
     // Hash password
     if (data.password) {
       data.password = await bcrypt.hash(data.password, 10);
