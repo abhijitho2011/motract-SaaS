@@ -16,12 +16,11 @@ import {
     jobItems,
     jobParts,
     invoices,
-    quotations,
     customers,
     vehicles,
     inventoryItems,
     inventoryBatches,
-    inventorySkus,
+    inventoryPartNumbers,
 } from '../drizzle/schema';
 import { eq, and, desc, asc, ne } from 'drizzle-orm';
 import * as crypto from 'crypto';
@@ -361,13 +360,12 @@ export class SuperAdminService {
 
         // 2. Billing
         await this.db.delete(invoices);
-        await this.db.delete(quotations);
 
         // 3. Core Transaction
         await this.db.delete(jobCards);
 
         // 4. Inventory
-        await this.db.delete(inventorySkus);
+        await this.db.delete(inventoryPartNumbers);
         await this.db.delete(inventoryBatches);
         await this.db.delete(inventoryItems);
 
