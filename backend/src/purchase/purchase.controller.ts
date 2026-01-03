@@ -6,22 +6,29 @@ import {
   Param,
   Patch,
   Query,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { PurchaseService } from './purchase.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('purchase')
+@UseGuards(JwtAuthGuard)
 export class PurchaseController {
   constructor(private readonly purchaseService: PurchaseService) { }
 
   // Suppliers
   @Post('suppliers')
-  async createSupplier(@Body() data: any) {
-    return this.purchaseService.createSupplier(data);
+  async createSupplier(@Request() req: any, @Body() data: any) {
+    return this.purchaseService.createSupplier({
+      ...data,
+      workshopId: req.user.workshopId,
+    });
   }
 
   @Get('suppliers')
-  async getSuppliers(@Query('workshopId') workshopId: string) {
-    return this.purchaseService.getSuppliers(workshopId);
+  async getSuppliers(@Request() req: any) {
+    return this.purchaseService.getSuppliers(req.user.workshopId);
   }
 
   @Get('suppliers/:id')
@@ -36,13 +43,16 @@ export class PurchaseController {
 
   // Purchase Orders
   @Post('orders')
-  async createPurchaseOrder(@Body() data: any) {
-    return this.purchaseService.createPurchaseOrder(data);
+  async createPurchaseOrder(@Request() req: any, @Body() data: any) {
+    return this.purchaseService.createPurchaseOrder({
+      ...data,
+      workshopId: req.user.workshopId,
+    });
   }
 
   @Get('orders')
-  async getPurchaseOrders(@Query('workshopId') workshopId: string) {
-    return this.purchaseService.getPurchaseOrders(workshopId);
+  async getPurchaseOrders(@Request() req: any) {
+    return this.purchaseService.getPurchaseOrders(req.user.workshopId);
   }
 
   @Get('orders/:id')

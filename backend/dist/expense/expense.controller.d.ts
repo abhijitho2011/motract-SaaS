@@ -2,7 +2,7 @@ import { ExpenseService } from './expense.service';
 export declare class ExpenseController {
     private readonly expenseService;
     constructor(expenseService: ExpenseService);
-    create(data: any): Promise<{
+    create(req: any, data: any): Promise<{
         date: string;
         id: string;
         workshopId: string;
@@ -11,7 +11,7 @@ export declare class ExpenseController {
         category: string;
         attachmentUrl: string | null;
     }>;
-    findAll(workshopId: string): Promise<{
+    findAll(req: any): Promise<{
         date: string;
         id: string;
         workshopId: string;

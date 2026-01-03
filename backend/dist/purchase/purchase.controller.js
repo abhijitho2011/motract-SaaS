@@ -15,16 +15,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.PurchaseController = void 0;
 const common_1 = require("@nestjs/common");
 const purchase_service_1 = require("./purchase.service");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 let PurchaseController = class PurchaseController {
     purchaseService;
     constructor(purchaseService) {
         this.purchaseService = purchaseService;
     }
-    async createSupplier(data) {
-        return this.purchaseService.createSupplier(data);
+    async createSupplier(req, data) {
+        return this.purchaseService.createSupplier({
+            ...data,
+            workshopId: req.user.workshopId,
+        });
     }
-    async getSuppliers(workshopId) {
-        return this.purchaseService.getSuppliers(workshopId);
+    async getSuppliers(req) {
+        return this.purchaseService.getSuppliers(req.user.workshopId);
     }
     async getSupplier(id) {
         return this.purchaseService.getSupplier(id);
@@ -32,11 +36,14 @@ let PurchaseController = class PurchaseController {
     async getSupplierLedger(id) {
         return this.purchaseService.getSupplierLedger(id);
     }
-    async createPurchaseOrder(data) {
-        return this.purchaseService.createPurchaseOrder(data);
+    async createPurchaseOrder(req, data) {
+        return this.purchaseService.createPurchaseOrder({
+            ...data,
+            workshopId: req.user.workshopId,
+        });
     }
-    async getPurchaseOrders(workshopId) {
-        return this.purchaseService.getPurchaseOrders(workshopId);
+    async getPurchaseOrders(req) {
+        return this.purchaseService.getPurchaseOrders(req.user.workshopId);
     }
     async getPurchaseOrder(id) {
         return this.purchaseService.getPurchaseOrder(id);
@@ -51,16 +58,17 @@ let PurchaseController = class PurchaseController {
 exports.PurchaseController = PurchaseController;
 __decorate([
     (0, common_1.Post)('suppliers'),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], PurchaseController.prototype, "createSupplier", null);
 __decorate([
     (0, common_1.Get)('suppliers'),
-    __param(0, (0, common_1.Query)('workshopId')),
+    __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], PurchaseController.prototype, "getSuppliers", null);
 __decorate([
@@ -79,16 +87,17 @@ __decorate([
 ], PurchaseController.prototype, "getSupplierLedger", null);
 __decorate([
     (0, common_1.Post)('orders'),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], PurchaseController.prototype, "createPurchaseOrder", null);
 __decorate([
     (0, common_1.Get)('orders'),
-    __param(0, (0, common_1.Query)('workshopId')),
+    __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], PurchaseController.prototype, "getPurchaseOrders", null);
 __decorate([
@@ -115,6 +124,7 @@ __decorate([
 ], PurchaseController.prototype, "receiveOrder", null);
 exports.PurchaseController = PurchaseController = __decorate([
     (0, common_1.Controller)('purchase'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [purchase_service_1.PurchaseService])
 ], PurchaseController);
 //# sourceMappingURL=purchase.controller.js.map

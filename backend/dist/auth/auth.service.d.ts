@@ -1,10 +1,13 @@
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { users } from '../drizzle/schema';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
+import * as schema from '../drizzle/schema';
 export declare class AuthService {
     private usersService;
     private jwtService;
-    constructor(usersService: UsersService, jwtService: JwtService);
+    private db;
+    constructor(usersService: UsersService, jwtService: JwtService, db: NodePgDatabase<typeof schema>);
     validateUser(mobile: string, pass: string): Promise<any>;
     login(user: any): Promise<{
         access_token: string;

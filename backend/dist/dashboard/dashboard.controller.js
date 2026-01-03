@@ -15,59 +15,77 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.DashboardController = void 0;
 const common_1 = require("@nestjs/common");
 const dashboard_service_1 = require("./dashboard.service");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 let DashboardController = class DashboardController {
     dashboardService;
     constructor(dashboardService) {
         this.dashboardService = dashboardService;
     }
-    async getKPIs(workshopId) {
-        return this.dashboardService.getKPIs(workshopId);
+    async getKPIs(req, queryWorkshopId) {
+        if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
+            return this.dashboardService.getKPIs(queryWorkshopId);
+        }
+        return this.dashboardService.getKPIs(req.user.workshopId);
     }
-    async getJobStatusFunnel(workshopId) {
-        return this.dashboardService.getJobStatusFunnel(workshopId);
+    async getJobStatusFunnel(req, queryWorkshopId) {
+        if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
+            return this.dashboardService.getJobStatusFunnel(queryWorkshopId);
+        }
+        return this.dashboardService.getJobStatusFunnel(req.user.workshopId);
     }
-    async getRevenueGraph(workshopId, days) {
+    async getRevenueGraph(req, queryWorkshopId, days) {
         const daysNum = days ? parseInt(days, 10) : 7;
-        return this.dashboardService.getRevenueGraph(workshopId, daysNum);
+        if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
+            return this.dashboardService.getRevenueGraph(queryWorkshopId, daysNum);
+        }
+        return this.dashboardService.getRevenueGraph(req.user.workshopId, daysNum);
     }
-    async getTopServices(workshopId, limit) {
+    async getTopServices(req, queryWorkshopId, limit) {
         const limitNum = limit ? parseInt(limit, 10) : 5;
-        return this.dashboardService.getTopServices(workshopId, limitNum);
+        if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
+            return this.dashboardService.getTopServices(queryWorkshopId, limitNum);
+        }
+        return this.dashboardService.getTopServices(req.user.workshopId, limitNum);
     }
 };
 exports.DashboardController = DashboardController;
 __decorate([
     (0, common_1.Get)('kpis'),
-    __param(0, (0, common_1.Query)('workshopId')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('workshopId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getKPIs", null);
 __decorate([
     (0, common_1.Get)('job-funnel'),
-    __param(0, (0, common_1.Query)('workshopId')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('workshopId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getJobStatusFunnel", null);
 __decorate([
     (0, common_1.Get)('revenue-graph'),
-    __param(0, (0, common_1.Query)('workshopId')),
-    __param(1, (0, common_1.Query)('days')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('workshopId')),
+    __param(2, (0, common_1.Query)('days')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [Object, String, String]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getRevenueGraph", null);
 __decorate([
     (0, common_1.Get)('top-services'),
-    __param(0, (0, common_1.Query)('workshopId')),
-    __param(1, (0, common_1.Query)('limit')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('workshopId')),
+    __param(2, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
+    __metadata("design:paramtypes", [Object, String, String]),
     __metadata("design:returntype", Promise)
 ], DashboardController.prototype, "getTopServices", null);
 exports.DashboardController = DashboardController = __decorate([
     (0, common_1.Controller)('dashboard'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [dashboard_service_1.DashboardService])
 ], DashboardController);
 //# sourceMappingURL=dashboard.controller.js.map

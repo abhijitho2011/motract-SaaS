@@ -291,4 +291,7 @@ export declare class SuperAdminService {
             completed: number;
         };
     }>;
+    resetDatabase(): Promise<{
+        message: string;
+    }>;
 }

@@ -2,7 +2,7 @@ import { PurchaseService } from './purchase.service';
 export declare class PurchaseController {
     private readonly purchaseService;
     constructor(purchaseService: PurchaseService);
-    createSupplier(data: any): Promise<{
+    createSupplier(req: any, data: any): Promise<{
         id: string;
         name: string;
         mobile: string;
@@ -10,7 +10,7 @@ export declare class PurchaseController {
         address: string | null;
         gstin: string | null;
     }>;
-    getSuppliers(workshopId: string): Promise<{
+    getSuppliers(req: any): Promise<{
         id: string;
         name: string;
         mobile: string;
@@ -30,8 +30,8 @@ export declare class PurchaseController {
     }[]>;
     getSupplier(id: string): Promise<any>;
     getSupplierLedger(id: string): Promise<any[]>;
-    createPurchaseOrder(data: any): Promise<any>;
-    getPurchaseOrders(workshopId: string): Promise<any[]>;
+    createPurchaseOrder(req: any, data: any): Promise<any>;
+    getPurchaseOrders(req: any): Promise<any[]>;
     getPurchaseOrder(id: string): Promise<any>;
     updateStatus(id: string, status: string): Promise<{
         id: string;

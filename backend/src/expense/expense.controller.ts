@@ -6,21 +6,28 @@ import {
   Body,
   Param,
   Query,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { ExpenseService } from './expense.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('expenses')
+@UseGuards(JwtAuthGuard)
 export class ExpenseController {
   constructor(private readonly expenseService: ExpenseService) { }
 
   @Post()
-  async create(@Body() data: any) {
-    return this.expenseService.createExpense(data);
+  async create(@Request() req: any, @Body() data: any) {
+    return this.expenseService.createExpense({
+      ...data,
+      workshopId: req.user.workshopId,
+    });
   }
 
   @Get()
-  async findAll(@Query('workshopId') workshopId: string) {
-    return this.expenseService.getExpenses(workshopId);
+  async findAll(@Request() req: any) {
+    return this.expenseService.getExpenses(req.user.workshopId);
   }
 
   @Delete(':id')

@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BillingController = void 0;
 const common_1 = require("@nestjs/common");
 const billing_service_1 = require("./billing.service");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 let BillingController = class BillingController {
     billingService;
     constructor(billingService) {
@@ -44,6 +45,7 @@ __decorate([
 ], BillingController.prototype, "getInvoice", null);
 exports.BillingController = BillingController = __decorate([
     (0, common_1.Controller)('billing'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [billing_service_1.BillingService])
 ], BillingController);
 //# sourceMappingURL=billing.controller.js.map

@@ -1,20 +1,26 @@
-import { Controller, Post, Body, Get, Query, Put, Delete, Param } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Put, Delete, Param, UseGuards, Request } from '@nestjs/common';
 import { SlotService } from './slot.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('slots')
+@UseGuards(JwtAuthGuard)
 export class SlotController {
     constructor(private readonly slotService: SlotService) { }
 
     @Post('bays')
     async createBay(
-        @Body() data: { workshopId: string; name: string; type: 'SERVICE' | 'WASHING' | 'ALIGNMENT' | 'ELECTRICAL' | 'GENERAL' },
+        @Request() req: any,
+        @Body() data: { name: string; type: 'SERVICE' | 'WASHING' | 'ALIGNMENT' | 'ELECTRICAL' | 'GENERAL' },
     ) {
-        return this.slotService.createBay(data as any);
+        return this.slotService.createBay({
+            ...data,
+            workshopId: req.user.workshopId,
+        } as any);
     }
 
     @Get('bays')
-    async findBays(@Query('workshopId') workshopId: string) {
-        return this.slotService.findBays(workshopId);
+    async findBays(@Request() req: any) {
+        return this.slotService.findBays(req.user.workshopId);
     }
 
     @Post('book')

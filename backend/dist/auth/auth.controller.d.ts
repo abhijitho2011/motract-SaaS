@@ -5,8 +5,6 @@ export declare class AuthController {
     login(body: any): Promise<{
         access_token: string;
         user: any;
-    } | {
-        message: string;
     }>;
     register(userData: any): Promise<{
         id: string;

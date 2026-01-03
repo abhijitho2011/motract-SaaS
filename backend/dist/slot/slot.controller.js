@@ -15,16 +15,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.SlotController = void 0;
 const common_1 = require("@nestjs/common");
 const slot_service_1 = require("./slot.service");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 let SlotController = class SlotController {
     slotService;
     constructor(slotService) {
         this.slotService = slotService;
     }
-    async createBay(data) {
-        return this.slotService.createBay(data);
+    async createBay(req, data) {
+        return this.slotService.createBay({
+            ...data,
+            workshopId: req.user.workshopId,
+        });
     }
-    async findBays(workshopId) {
-        return this.slotService.findBays(workshopId);
+    async findBays(req) {
+        return this.slotService.findBays(req.user.workshopId);
     }
     async bookSlot(data) {
         return this.slotService.bookSlot(data);
@@ -39,16 +43,17 @@ let SlotController = class SlotController {
 exports.SlotController = SlotController;
 __decorate([
     (0, common_1.Post)('bays'),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], SlotController.prototype, "createBay", null);
 __decorate([
     (0, common_1.Get)('bays'),
-    __param(0, (0, common_1.Query)('workshopId')),
+    __param(0, (0, common_1.Request)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], SlotController.prototype, "findBays", null);
 __decorate([
@@ -75,6 +80,7 @@ __decorate([
 ], SlotController.prototype, "deleteBay", null);
 exports.SlotController = SlotController = __decorate([
     (0, common_1.Controller)('slots'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [slot_service_1.SlotService])
 ], SlotController);
 //# sourceMappingURL=slot.controller.js.map

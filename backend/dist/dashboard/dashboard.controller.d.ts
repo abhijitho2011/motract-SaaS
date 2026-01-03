@@ -2,7 +2,7 @@ import { DashboardService } from './dashboard.service';
 export declare class DashboardController {
     private readonly dashboardService;
     constructor(dashboardService: DashboardService);
-    getKPIs(workshopId: string): Promise<{
+    getKPIs(req: any, queryWorkshopId?: string): Promise<{
         vehiclesIn: number;
         jobsInProgress: number;
         jobsCompleted: number;
@@ -59,15 +59,15 @@ export declare class DashboardController {
             };
         }[];
     }>;
-    getJobStatusFunnel(workshopId: string): Promise<{
+    getJobStatusFunnel(req: any, queryWorkshopId?: string): Promise<{
         stage: import("../drizzle/types").JobStage;
         count: number;
     }[]>;
-    getRevenueGraph(workshopId: string, days?: string): Promise<{
+    getRevenueGraph(req: any, queryWorkshopId?: string, days?: string): Promise<{
         date: string;
         revenue: number;
     }[]>;
-    getTopServices(workshopId: string, limit?: string): Promise<{
+    getTopServices(req: any, queryWorkshopId?: string, limit?: string): Promise<{
         service: string;
         count: number;
         revenue: number;

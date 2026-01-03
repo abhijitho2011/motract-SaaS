@@ -15,16 +15,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.JobCardController = void 0;
 const common_1 = require("@nestjs/common");
 const job_card_service_1 = require("./job-card.service");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 let JobCardController = class JobCardController {
     jobCardService;
     constructor(jobCardService) {
         this.jobCardService = jobCardService;
     }
-    async create(body) {
-        return this.jobCardService.create(body);
+    async create(req, body) {
+        return this.jobCardService.create({
+            ...body,
+            workshopId: req.user.workshopId,
+        });
     }
-    async findAll(workshopId) {
-        return this.jobCardService.findAll(workshopId);
+    async findAll(req, queryWorkshopId) {
+        if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
+            return this.jobCardService.findAll(queryWorkshopId);
+        }
+        return this.jobCardService.findAll(req.user.workshopId);
     }
     async findOne(id) {
         return this.jobCardService.findOne(id);
@@ -51,16 +58,18 @@ let JobCardController = class JobCardController {
 exports.JobCardController = JobCardController;
 __decorate([
     (0, common_1.Post)(),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], JobCardController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
-    __param(0, (0, common_1.Query)('workshopId')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('workshopId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], JobCardController.prototype, "findAll", null);
 __decorate([
@@ -121,6 +130,7 @@ __decorate([
 ], JobCardController.prototype, "updateTaskStatus", null);
 exports.JobCardController = JobCardController = __decorate([
     (0, common_1.Controller)('job-cards'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [job_card_service_1.JobCardService])
 ], JobCardController);
 //# sourceMappingURL=job-card.controller.js.map

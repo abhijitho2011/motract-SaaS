@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.InventoryController = void 0;
 const common_1 = require("@nestjs/common");
 const inventory_service_1 = require("./inventory.service");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 let InventoryController = class InventoryController {
     inventoryService;
     constructor(inventoryService) {
@@ -38,8 +39,8 @@ let InventoryController = class InventoryController {
     async createSubCategory(body) {
         return this.inventoryService.createSubCategory(body.categoryId, body.name);
     }
-    async createItem(data) {
-        return this.inventoryService.createItem(data);
+    async createItem(req, data) {
+        return this.inventoryService.createItem({ ...data, workshopId: req.user.workshopId });
     }
     async addSku(id, skuCode) {
         return this.inventoryService.addSku(id, skuCode);
@@ -47,8 +48,11 @@ let InventoryController = class InventoryController {
     async addBatch(id, body) {
         return this.inventoryService.addBatch(id, body);
     }
-    async findAll(workshopId) {
-        return this.inventoryService.findAll(workshopId);
+    async findAll(req, queryWorkshopId) {
+        if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
+            return this.inventoryService.findAll(queryWorkshopId);
+        }
+        return this.inventoryService.findAll(req.user.workshopId);
     }
     async findOne(id) {
         return this.inventoryService.findOne(id);
@@ -106,9 +110,10 @@ __decorate([
 ], InventoryController.prototype, "createSubCategory", null);
 __decorate([
     (0, common_1.Post)('items'),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "createItem", null);
 __decorate([
@@ -129,9 +134,10 @@ __decorate([
 ], InventoryController.prototype, "addBatch", null);
 __decorate([
     (0, common_1.Get)('items'),
-    __param(0, (0, common_1.Query)('workshopId')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Query)('workshopId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "findAll", null);
 __decorate([
@@ -168,6 +174,7 @@ __decorate([
 ], InventoryController.prototype, "adjustStock", null);
 exports.InventoryController = InventoryController = __decorate([
     (0, common_1.Controller)('inventory'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [inventory_service_1.InventoryService])
 ], InventoryController);
 //# sourceMappingURL=inventory.controller.js.map

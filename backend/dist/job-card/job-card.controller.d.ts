@@ -3,8 +3,7 @@ import type { JobStage, JobPriority } from '../drizzle/types';
 export declare class JobCardController {
     private readonly jobCardService;
     constructor(jobCardService: JobCardService);
-    create(body: {
-        workshopId: string;
+    create(req: any, body: {
         vehicleId: string;
         customerName: string;
         customerMobile: string;
@@ -14,7 +13,7 @@ export declare class JobCardController {
         complaints?: string[];
         priority?: JobPriority;
     }): Promise<any>;
-    findAll(workshopId: string): Promise<{
+    findAll(req: any, queryWorkshopId?: string): Promise<{
         id: string;
         createdAt: string;
         updatedAt: string;

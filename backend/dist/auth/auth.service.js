@@ -41,22 +41,45 @@ var __importStar = (this && this.__importStar) || (function () {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var __param = (this && this.__param) || function (paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const users_service_1 = require("../users/users.service");
 const jwt_1 = require("@nestjs/jwt");
 const bcrypt = __importStar(require("bcrypt"));
+const schema_1 = require("../drizzle/schema");
+const drizzle_provider_1 = require("../drizzle/drizzle.provider");
+const node_postgres_1 = require("drizzle-orm/node-postgres");
+const drizzle_orm_1 = require("drizzle-orm");
 let AuthService = class AuthService {
     usersService;
     jwtService;
-    constructor(usersService, jwtService) {
+    db;
+    constructor(usersService, jwtService, db) {
         this.usersService = usersService;
         this.jwtService = jwtService;
+        this.db = db;
     }
     async validateUser(mobile, pass) {
         const user = await this.usersService.findOne(mobile);
         if (user && user.password && (await bcrypt.compare(pass, user.password))) {
+            if (user.role !== 'SUPER_ADMIN') {
+                if (!user.workshopId) {
+                    return null;
+                }
+                const org = await this.db.query.organizations.findFirst({
+                    where: (0, drizzle_orm_1.eq)(schema_1.organizations.id, user.workshopId),
+                });
+                if (!org) {
+                    return null;
+                }
+                if (org.accountType !== 'WORKSHOP') {
+                    return null;
+                }
+            }
             const { password, ...result } = user;
             return result;
         }
@@ -84,7 +107,9 @@ let AuthService = class AuthService {
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
     (0, common_1.Injectable)(),
+    __param(2, (0, common_1.Inject)(drizzle_provider_1.DrizzleAsyncProvider)),
     __metadata("design:paramtypes", [users_service_1.UsersService,
-        jwt_1.JwtService])
+        jwt_1.JwtService,
+        node_postgres_1.NodePgDatabase])
 ], AuthService);
 //# sourceMappingURL=auth.service.js.map

@@ -59,40 +59,60 @@ let SuperAdminService = class SuperAdminService {
         this.db = db;
     }
     async createOrganization(data) {
-        const isAuthorized = data.accountType === 'RSA' ? true : (data.isAuthorized || false);
-        const [organization] = await this.db.insert(schema_1.organizations).values({
-            id: crypto.randomUUID(),
-            accountType: data.accountType,
-            subCategory: data.subCategory,
-            businessName: data.businessName,
-            name: data.businessName,
-            email: data.email,
-            phone: data.phone,
-            address: data.address,
-            city: data.city,
-            state: data.state,
-            pincode: data.pincode,
-            gstin: data.gstin,
-            latitude: data.latitude,
-            longitude: data.longitude,
-            isAuthorized,
-            isActive: true,
-            createdBy: data.createdBy,
-            updatedAt: new Date().toISOString(),
-        }).returning();
-        const hashedPassword = await bcrypt.hash(data.adminUser.password, 10);
-        const [adminUser] = await this.db.insert(schema_1.users).values({
-            id: crypto.randomUUID(),
-            email: data.adminUser.email,
-            mobile: data.phone,
-            password: hashedPassword,
-            name: data.adminUser.name,
-            role: data.accountType === 'WORKSHOP' ? 'WORKSHOP_ADMIN' :
-                data.accountType === 'RSA' ? 'RSA_PROVIDER' : 'SUPPLIER',
-            workshopId: organization.id,
-            updatedAt: new Date().toISOString(),
-        }).returning();
-        return { organization, adminUser: { ...adminUser, password: undefined } };
+        try {
+            const isAuthorized = data.accountType === 'RSA' ? true : (data.isAuthorized !== undefined ? data.isAuthorized : false);
+            const [organization] = await this.db.insert(schema_1.organizations).values({
+                id: crypto.randomUUID(),
+                accountType: data.accountType,
+                subCategory: data.subCategory,
+                businessName: data.businessName,
+                name: data.businessName,
+                email: data.email,
+                phone: data.phone,
+                address: data.address,
+                city: data.city,
+                state: data.state,
+                pincode: data.pincode,
+                gstin: data.gstin,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                isAuthorized,
+                isActive: true,
+                createdBy: data.createdBy,
+                updatedAt: new Date().toISOString(),
+            }).returning();
+            await this.db.insert(schema_1.workshops).values({
+                id: organization.id,
+                name: data.businessName,
+                mobile: data.phone,
+                email: data.email,
+                address: data.address,
+                city: data.city,
+                state: data.state,
+                pincode: data.pincode,
+                gstin: data.gstin,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                isActive: true,
+                updatedAt: new Date().toISOString(),
+            });
+            const hashedPassword = await bcrypt.hash(data.adminUser.password, 10);
+            const [adminUser] = await this.db.insert(schema_1.users).values({
+                id: crypto.randomUUID(),
+                email: data.adminUser.email,
+                mobile: data.phone,
+                password: hashedPassword,
+                name: data.adminUser.name,
+                role: data.accountType === 'WORKSHOP' ? 'WORKSHOP_ADMIN' :
+                    data.accountType === 'RSA' ? 'RSA_PROVIDER' : 'SUPPLIER',
+                workshopId: organization.id,
+                updatedAt: new Date().toISOString(),
+            }).returning();
+            return { organization, adminUser: { ...adminUser, password: undefined } };
+        }
+        catch (error) {
+            throw new common_1.BadRequestException(`Creation failed: ${error.message}`);
+        }
     }
     async getAllOrganizations(filters) {
         const allOrgs = await this.db.query.organizations.findMany({
@@ -134,6 +154,8 @@ let SuperAdminService = class SuperAdminService {
         return updated;
     }
     async deleteOrganization(id) {
+        await this.db.delete(schema_1.users).where((0, drizzle_orm_1.eq)(schema_1.users.workshopId, id));
+        await this.db.delete(schema_1.workshops).where((0, drizzle_orm_1.eq)(schema_1.workshops.id, id));
         const [deleted] = await this.db.delete(schema_1.organizations)
             .where((0, drizzle_orm_1.eq)(schema_1.organizations.id, id))
             .returning();
@@ -245,6 +267,23 @@ let SuperAdminService = class SuperAdminService {
             },
         };
         return stats;
+    }
+    async resetDatabase() {
+        await this.db.delete(schema_1.jobParts);
+        await this.db.delete(schema_1.jobItems);
+        await this.db.delete(schema_1.jobInspections);
+        await this.db.delete(schema_1.jobComplaints);
+        await this.db.delete(schema_1.invoices);
+        await this.db.delete(schema_1.jobCards);
+        await this.db.delete(schema_1.inventoryPartNumbers);
+        await this.db.delete(schema_1.inventoryBatches);
+        await this.db.delete(schema_1.inventoryItems);
+        await this.db.delete(schema_1.vehicles);
+        await this.db.delete(schema_1.customers);
+        await this.db.delete(schema_1.users).where((0, drizzle_orm_1.ne)(schema_1.users.role, 'SUPER_ADMIN'));
+        await this.db.delete(schema_1.workshops);
+        await this.db.delete(schema_1.organizations);
+        return { message: 'Database reset successfully. Super Admin preserved.' };
     }
 };
 exports.SuperAdminService = SuperAdminService;

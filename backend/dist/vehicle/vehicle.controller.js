@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.VehicleController = void 0;
 const common_1 = require("@nestjs/common");
 const vehicle_service_1 = require("./vehicle.service");
+const jwt_auth_guard_1 = require("../auth/jwt-auth.guard");
 let VehicleController = class VehicleController {
     vehicleService;
     constructor(vehicleService) {
@@ -103,6 +104,7 @@ __decorate([
 ], VehicleController.prototype, "register", null);
 exports.VehicleController = VehicleController = __decorate([
     (0, common_1.Controller)('vehicle'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
     __metadata("design:paramtypes", [vehicle_service_1.VehicleService])
 ], VehicleController);
 //# sourceMappingURL=vehicle.controller.js.map

@@ -2,8 +2,7 @@ import { SlotService } from './slot.service';
 export declare class SlotController {
     private readonly slotService;
     constructor(slotService: SlotService);
-    createBay(data: {
-        workshopId: string;
+    createBay(req: any, data: {
         name: string;
         type: 'SERVICE' | 'WASHING' | 'ALIGNMENT' | 'ELECTRICAL' | 'GENERAL';
     }): Promise<{
@@ -13,7 +12,7 @@ export declare class SlotController {
         isActive: boolean;
         type: "SERVICE" | "WASHING" | "ALIGNMENT" | "ELECTRICAL" | "GENERAL";
     }>;
-    findBays(workshopId: string): Promise<{
+    findBays(req: any): Promise<{
         id: string;
         name: string;
         workshopId: string;

@@ -234,4 +234,7 @@ export declare class SuperAdminController {
         status: "PENDING" | "CONFIRMED" | "COMPLETED" | "CANCELLED";
         notes: string | null;
     }[]>;
+    resetDatabase(key: string): Promise<{
+        message: string;
+    }>;
 }

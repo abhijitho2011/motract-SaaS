@@ -35,7 +35,7 @@ export declare class InventoryController {
         name: string;
         categoryId: string;
     }>;
-    createItem(data: any): Promise<any>;
+    createItem(req: any, data: any): Promise<any>;
     addSku(id: string, skuCode: string): Promise<{
         id: string;
         itemId: string;
@@ -51,7 +51,7 @@ export declare class InventoryController {
         salePrice: number;
         purchasedAt: string;
     }[]>;
-    findAll(workshopId: string): Promise<{
+    findAll(req: any, queryWorkshopId?: string): Promise<{
         id: string;
         name: string;
         brand: string | null;
