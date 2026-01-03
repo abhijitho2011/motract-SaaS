@@ -465,4 +465,22 @@ export class SuperAdminService {
             };
         }
     }
+
+    // Vehicles
+    async getAllVehicles(filters?: { workshopId?: string; regNumber?: string }) {
+        const whereClause = [];
+        if (filters?.workshopId) whereClause.push(eq(vehicles.workshopId, filters.workshopId));
+        if (filters?.regNumber) whereClause.push(eq(vehicles.regNumber, filters.regNumber));
+
+        return this.db.query.vehicles.findMany({
+            where: whereClause.length ? and(...whereClause) : undefined,
+            with: {
+                workshop: true,
+                variant: {
+                    with: { model: { with: { make: true } } }
+                }
+            },
+            orderBy: [desc(vehicles.updatedAt)],
+        });
+    }
 }

@@ -128,6 +128,15 @@ export class SuperAdminController {
         return this.superAdminService.testMapConnection(data.apiToken);
     }
 
+    // Vehicles
+    @Get('vehicles')
+    async getAllVehicles(
+        @Query('workshopId') workshopId?: string,
+        @Query('regNumber') regNumber?: string,
+    ) {
+        return this.superAdminService.getAllVehicles({ workshopId, regNumber });
+    }
+
     // SECURITY: Reset endpoint removed - use direct database access for data cleanup
     // @Delete('reset-database')
     // async resetDatabase(@Query('key') key: string) {
