@@ -29,6 +29,12 @@ let SlotController = class SlotController {
     async bookSlot(data) {
         return this.slotService.bookSlot(data);
     }
+    async updateBay(id, data) {
+        return this.slotService.updateBay(id, data);
+    }
+    async deleteBay(id) {
+        return this.slotService.deleteBay(id);
+    }
 };
 exports.SlotController = SlotController;
 __decorate([
@@ -52,6 +58,21 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], SlotController.prototype, "bookSlot", null);
+__decorate([
+    (0, common_1.Put)('bays/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], SlotController.prototype, "updateBay", null);
+__decorate([
+    (0, common_1.Delete)('bays/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], SlotController.prototype, "deleteBay", null);
 exports.SlotController = SlotController = __decorate([
     (0, common_1.Controller)('slots'),
     __metadata("design:paramtypes", [slot_service_1.SlotService])

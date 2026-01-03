@@ -43,4 +43,21 @@ export class SlotService {
         }).returning();
         return booking;
     }
+
+    async updateBay(id: string, data: { name?: string; type?: string; isActive?: boolean }) {
+        const [updated] = await this.db.update(bays)
+            .set({
+                name: data.name,
+                type: data.type as any,
+                isActive: data.isActive,
+            })
+            .where(eq(bays.id, id))
+            .returning();
+        return updated;
+    }
+
+    async deleteBay(id: string) {
+        await this.db.delete(bays).where(eq(bays.id, id));
+        return { success: true };
+    }
 }

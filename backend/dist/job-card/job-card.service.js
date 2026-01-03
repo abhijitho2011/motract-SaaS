@@ -84,6 +84,15 @@ let JobCardService = class JobCardService {
             }).returning();
             customer = created;
         }
+        const lastJobCard = await this.db.query.jobCards.findFirst({
+            where: (0, drizzle_orm_1.eq)(schema_1.jobCards.workshopId, data.workshopId),
+            orderBy: [(0, drizzle_orm_1.desc)(schema_1.jobCards.createdAt)],
+        });
+        const year = new Date().getFullYear();
+        const lastNumber = lastJobCard?.jobCardNumber
+            ? parseInt(lastJobCard.jobCardNumber.split('-').pop() || '0')
+            : 0;
+        const jobCardNumber = `JC-${year}-${String(lastNumber + 1).padStart(4, '0')}`;
         const jobCardId = crypto.randomUUID();
         const [jobCard] = await this.db.insert(schema_1.jobCards).values({
             id: jobCardId,
@@ -91,6 +100,7 @@ let JobCardService = class JobCardService {
             vehicleId: vehicle.id,
             customerId: customer.id,
             advisorId: data.advisorId || null,
+            jobCardNumber: jobCardNumber,
             odometer: data.odometer,
             fuelLevel: data.fuelLevel,
             priority: data.priority || 'NORMAL',

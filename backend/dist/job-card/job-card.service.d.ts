@@ -22,6 +22,7 @@ export declare class JobCardService {
         updatedAt: string;
         vehicleId: string;
         workshopId: string;
+        jobCardNumber: string | null;
         customerId: string;
         stage: "CREATED" | "INSPECTION" | "ESTIMATE" | "CUSTOMER_APPROVAL" | "WORK_IN_PROGRESS" | "QC" | "BILLING" | "DELIVERY" | "CLOSED";
         priority: "NORMAL" | "URGENT";
@@ -73,6 +74,7 @@ export declare class JobCardService {
     findOne(id: string): Promise<any>;
     updateStage(id: string, stage: JobStage): Promise<{
         id: string;
+        jobCardNumber: string | null;
         workshopId: string;
         vehicleId: string;
         customerId: string;
@@ -145,6 +147,7 @@ export declare class JobCardService {
     }>;
     assignTechnician(id: string, technicianId: string): Promise<{
         id: string;
+        jobCardNumber: string | null;
         workshopId: string;
         vehicleId: string;
         customerId: string;

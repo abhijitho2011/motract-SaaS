@@ -78,7 +78,19 @@ export class JobCardService {
       customer = created;
     }
 
-    // 3. Create Job Card
+    // 3. Generate Job Card Number
+    const lastJobCard = await this.db.query.jobCards.findFirst({
+      where: eq(jobCards.workshopId, data.workshopId),
+      orderBy: [desc(jobCards.createdAt)],
+    });
+
+    const year = new Date().getFullYear();
+    const lastNumber = lastJobCard?.jobCardNumber
+      ? parseInt(lastJobCard.jobCardNumber.split('-').pop() || '0')
+      : 0;
+    const jobCardNumber = `JC-${year}-${String(lastNumber + 1).padStart(4, '0')}`;
+
+    // 4. Create Job Card
     const jobCardId = crypto.randomUUID();
     const [jobCard] = await this.db.insert(jobCards).values({
       id: jobCardId,
@@ -86,6 +98,7 @@ export class JobCardService {
       vehicleId: vehicle.id,
       customerId: customer.id,
       advisorId: data.advisorId || null,
+      jobCardNumber: jobCardNumber,
       odometer: data.odometer,
       fuelLevel: data.fuelLevel,
       priority: data.priority || 'NORMAL',
@@ -94,7 +107,7 @@ export class JobCardService {
       updatedAt: new Date().toISOString(),
     }).returning();
 
-    // 4. Create Complaints
+    // 5. Create Complaints
     if (data.complaints && data.complaints.length > 0) {
       await this.db.insert(jobComplaints).values(
         data.complaints.map(c => ({

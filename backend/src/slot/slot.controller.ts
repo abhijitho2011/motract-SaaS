@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common';
+import { Controller, Post, Body, Get, Query, Put, Delete, Param } from '@nestjs/common';
 import { SlotService } from './slot.service';
 
 @Controller('slots')
@@ -20,5 +20,15 @@ export class SlotController {
     @Post('book')
     async bookSlot(@Body() data: any) {
         return this.slotService.bookSlot(data);
+    }
+
+    @Put('bays/:id')
+    async updateBay(@Param('id') id: string, @Body() data: any) {
+        return this.slotService.updateBay(id, data);
+    }
+
+    @Delete('bays/:id')
+    async deleteBay(@Param('id') id: string) {
+        return this.slotService.deleteBay(id);
     }
 }

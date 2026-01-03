@@ -102,6 +102,7 @@ exports.customers = (0, pg_core_1.pgTable)("customers", {
 ]);
 exports.jobCards = (0, pg_core_1.pgTable)("job_cards", {
     id: (0, pg_core_1.text)().primaryKey().notNull(),
+    jobCardNumber: (0, pg_core_1.text)(),
     workshopId: (0, pg_core_1.text)().notNull(),
     vehicleId: (0, pg_core_1.text)().notNull(),
     customerId: (0, pg_core_1.text)().notNull(),

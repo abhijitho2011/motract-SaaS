@@ -85,6 +85,21 @@ let SlotService = class SlotService {
         }).returning();
         return booking;
     }
+    async updateBay(id, data) {
+        const [updated] = await this.db.update(schema_1.bays)
+            .set({
+            name: data.name,
+            type: data.type,
+            isActive: data.isActive,
+        })
+            .where((0, drizzle_orm_1.eq)(schema_1.bays.id, id))
+            .returning();
+        return updated;
+    }
+    async deleteBay(id) {
+        await this.db.delete(schema_1.bays).where((0, drizzle_orm_1.eq)(schema_1.bays.id, id));
+        return { success: true };
+    }
 };
 exports.SlotService = SlotService;
 exports.SlotService = SlotService = __decorate([

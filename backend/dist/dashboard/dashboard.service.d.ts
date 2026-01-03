@@ -26,6 +26,7 @@ export declare class DashboardService {
             updatedAt: string;
             vehicleId: string;
             workshopId: string;
+            jobCardNumber: string | null;
             customerId: string;
             stage: "CREATED" | "INSPECTION" | "ESTIMATE" | "CUSTOMER_APPROVAL" | "WORK_IN_PROGRESS" | "QC" | "BILLING" | "DELIVERY" | "CLOSED";
             priority: "NORMAL" | "URGENT";

@@ -598,6 +598,23 @@ export declare const jobCards: import("drizzle-orm/pg-core").PgTableWithColumns<
             identity: undefined;
             generated: undefined;
         }, {}, {}>;
+        jobCardNumber: import("drizzle-orm/pg-core").PgColumn<{
+            name: "jobCardNumber";
+            tableName: "job_cards";
+            dataType: "string";
+            columnType: "PgText";
+            data: string;
+            driverParam: string;
+            notNull: false;
+            hasDefault: false;
+            isPrimaryKey: false;
+            isAutoincrement: false;
+            hasRuntimeDefault: false;
+            enumValues: [string, ...string[]];
+            baseColumn: never;
+            identity: undefined;
+            generated: undefined;
+        }, {}, {}>;
         workshopId: import("drizzle-orm/pg-core").PgColumn<{
             name: "workshopId";
             tableName: "job_cards";

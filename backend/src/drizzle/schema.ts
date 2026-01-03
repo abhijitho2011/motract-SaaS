@@ -107,6 +107,7 @@ export const customers = pgTable("customers", {
 
 export const jobCards = pgTable("job_cards", {
 	id: text().primaryKey().notNull(),
+	jobCardNumber: text(),
 	workshopId: text().notNull(),
 	vehicleId: text().notNull(),
 	customerId: text().notNull(),
