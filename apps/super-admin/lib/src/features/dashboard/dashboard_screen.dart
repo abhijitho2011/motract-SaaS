@@ -5,6 +5,7 @@ import '../partners/partners_screen.dart';
 import '../vehicle/vehicle_database_screen.dart';
 import '../map/map_view_screen.dart';
 import '../settings/partner_settings_screen.dart';
+import '../settings/settings_screen.dart';
 import '../bookings/bookings_screen.dart';
 import '../../core/theme/theme_controller.dart';
 
@@ -150,6 +151,19 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   context,
                   MaterialPageRoute(
                     builder: (context) => const BookingsScreen(),
+                  ),
+                );
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.settings),
+              title: const Text('Settings'),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SettingsScreen(),
                   ),
                 );
               },
