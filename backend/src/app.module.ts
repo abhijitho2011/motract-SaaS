@@ -18,8 +18,13 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { MapModule } from './map/map.module';
 
 
+import { ConfigModule } from '@nestjs/config';
+
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     // Security: Rate limiting
     ThrottlerModule.forRoot([{
       ttl: Number(process.env.THROTTLE_TTL) || 60000,
