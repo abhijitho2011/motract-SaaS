@@ -3,10 +3,27 @@ import * as schema from '../drizzle/schema';
 export declare class InventoryService {
     private db;
     constructor(db: NodePgDatabase<typeof schema>);
+    getBrands(): Promise<{
+        id: string;
+        name: string;
+    }[]>;
+    createBrand(name: string): Promise<{
+        id: string;
+        name: string;
+    }>;
+    getCategories(): Promise<{
+        id: string;
+        name: string;
+    }[]>;
     createCategory(name: string): Promise<{
         id: string;
         name: string;
     }>;
+    getSubCategories(categoryId?: string): Promise<{
+        id: string;
+        name: string;
+        categoryId: string;
+    }[]>;
     createSubCategory(categoryId: string, name: string): Promise<{
         id: string;
         name: string;

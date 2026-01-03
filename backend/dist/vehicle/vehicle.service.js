@@ -137,12 +137,29 @@ let VehicleService = class VehicleService {
         }).returning();
         return vehicle;
     }
+    async getMakes() {
+        return this.db.query.makes.findMany({
+            orderBy: [(0, drizzle_orm_1.asc)(schema.makes.name)],
+        });
+    }
     async createMake(name) {
         const [make] = await this.db.insert(schema.makes).values({
             id: crypto.randomUUID(),
             name,
         }).returning();
         return make;
+    }
+    async getModels(makeId) {
+        if (makeId) {
+            return this.db.query.models.findMany({
+                where: (0, drizzle_orm_1.eq)(schema.models.makeId, makeId),
+                orderBy: [(0, drizzle_orm_1.asc)(schema.models.name)],
+            });
+        }
+        return this.db.query.models.findMany({
+            orderBy: [(0, drizzle_orm_1.asc)(schema.models.name)],
+            with: { make: true },
+        });
     }
     async createModel(makeId, name) {
         const [model] = await this.db.insert(schema.models).values({
@@ -151,6 +168,18 @@ let VehicleService = class VehicleService {
             name,
         }).returning();
         return model;
+    }
+    async getVariants(modelId) {
+        if (modelId) {
+            return this.db.query.variants.findMany({
+                where: (0, drizzle_orm_1.eq)(schema.variants.modelId, modelId),
+                orderBy: [(0, drizzle_orm_1.asc)(schema.variants.name)],
+            });
+        }
+        return this.db.query.variants.findMany({
+            orderBy: [(0, drizzle_orm_1.asc)(schema.variants.name)],
+            with: { model: { with: { make: true } } },
+        });
     }
     async createVariant(modelId, name, fuelType) {
         const [variant] = await this.db.insert(schema.variants).values({

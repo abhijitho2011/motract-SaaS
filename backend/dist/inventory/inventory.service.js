@@ -57,12 +57,40 @@ let InventoryService = class InventoryService {
     constructor(db) {
         this.db = db;
     }
+    async getBrands() {
+        return this.db.query.brands.findMany({
+            orderBy: [(0, drizzle_orm_1.asc)(schema_1.brands.name)],
+        });
+    }
+    async createBrand(name) {
+        const [brand] = await this.db.insert(schema_1.brands).values({
+            id: crypto.randomUUID(),
+            name,
+        }).returning();
+        return brand;
+    }
+    async getCategories() {
+        return this.db.query.categories.findMany({
+            orderBy: [(0, drizzle_orm_1.asc)(schema_1.categories.name)],
+        });
+    }
     async createCategory(name) {
         const [category] = await this.db.insert(schema_1.categories).values({
             id: crypto.randomUUID(),
             name,
         }).returning();
         return category;
+    }
+    async getSubCategories(categoryId) {
+        if (categoryId) {
+            return this.db.query.subCategories.findMany({
+                where: (0, drizzle_orm_1.eq)(schema_1.subCategories.categoryId, categoryId),
+                orderBy: [(0, drizzle_orm_1.asc)(schema_1.subCategories.name)],
+            });
+        }
+        return this.db.query.subCategories.findMany({
+            orderBy: [(0, drizzle_orm_1.asc)(schema_1.subCategories.name)],
+        });
     }
     async createSubCategory(categoryId, name) {
         const [sub] = await this.db.insert(schema_1.subCategories).values({

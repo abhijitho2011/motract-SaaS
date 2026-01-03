@@ -5,9 +5,29 @@ import { InventoryService } from './inventory.service';
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) { }
 
+  @Get('masters/brands')
+  async getBrands() {
+    return this.inventoryService.getBrands();
+  }
+
+  @Post('masters/brands')
+  async createBrand(@Body() body: { name: string }) {
+    return this.inventoryService.createBrand(body.name);
+  }
+
+  @Get('masters/categories')
+  async getCategories() {
+    return this.inventoryService.getCategories();
+  }
+
   @Post('masters/categories')
   async createCategory(@Body() body: { name: string }) {
     return this.inventoryService.createCategory(body.name);
+  }
+
+  @Get('masters/sub-categories')
+  async getSubCategories(@Query('categoryId') categoryId?: string) {
+    return this.inventoryService.getSubCategories(categoryId);
   }
 
   @Post('masters/sub-categories')

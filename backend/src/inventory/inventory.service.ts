@@ -14,6 +14,7 @@ import {
   inventoryVehicleMapping,
   categories,
   subCategories,
+  brands,
 } from '../drizzle/schema';
 import { eq, gt, asc, and } from 'drizzle-orm';
 import * as crypto from 'crypto';
@@ -25,12 +26,44 @@ export class InventoryService {
     private db: NodePgDatabase<typeof schema>,
   ) { }
 
+  async getBrands() {
+    return this.db.query.brands.findMany({
+      orderBy: [asc(brands.name)],
+    });
+  }
+
+  async createBrand(name: string) {
+    const [brand] = await this.db.insert(brands).values({
+      id: crypto.randomUUID(),
+      name,
+    }).returning();
+    return brand;
+  }
+
+  async getCategories() {
+    return this.db.query.categories.findMany({
+      orderBy: [asc(categories.name)],
+    });
+  }
+
   async createCategory(name: string) {
     const [category] = await this.db.insert(categories).values({
       id: crypto.randomUUID(),
       name,
     }).returning();
     return category;
+  }
+
+  async getSubCategories(categoryId?: string) {
+    if (categoryId) {
+      return this.db.query.subCategories.findMany({
+        where: eq(subCategories.categoryId, categoryId),
+        orderBy: [asc(subCategories.name)],
+      });
+    }
+    return this.db.query.subCategories.findMany({
+      orderBy: [asc(subCategories.name)],
+    });
   }
 
   async createSubCategory(categoryId: string, name: string) {

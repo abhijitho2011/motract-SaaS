@@ -2,12 +2,31 @@ import { InventoryService } from './inventory.service';
 export declare class InventoryController {
     private readonly inventoryService;
     constructor(inventoryService: InventoryService);
+    getBrands(): Promise<{
+        id: string;
+        name: string;
+    }[]>;
+    createBrand(body: {
+        name: string;
+    }): Promise<{
+        id: string;
+        name: string;
+    }>;
+    getCategories(): Promise<{
+        id: string;
+        name: string;
+    }[]>;
     createCategory(body: {
         name: string;
     }): Promise<{
         id: string;
         name: string;
     }>;
+    getSubCategories(categoryId?: string): Promise<{
+        id: string;
+        name: string;
+        categoryId: string;
+    }[]>;
     createSubCategory(body: {
         categoryId: string;
         name: string;

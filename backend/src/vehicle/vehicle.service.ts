@@ -8,7 +8,7 @@ import {
   variants,
   vehicles,
 } from '../drizzle/schema'; // Note: check precise export name for models/vehicle_models
-import { eq, and } from 'drizzle-orm';
+import { eq, and, asc } from 'drizzle-orm';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -135,12 +135,31 @@ export class VehicleService {
   }
 
   // Masters
+  async getMakes() {
+    return this.db.query.makes.findMany({
+      orderBy: [asc(schema.makes.name)],
+    });
+  }
+
   async createMake(name: string) {
     const [make] = await this.db.insert(schema.makes).values({
       id: crypto.randomUUID(),
       name,
     }).returning();
     return make;
+  }
+
+  async getModels(makeId?: string) {
+    if (makeId) {
+      return this.db.query.models.findMany({
+        where: eq(schema.models.makeId, makeId),
+        orderBy: [asc(schema.models.name)],
+      });
+    }
+    return this.db.query.models.findMany({
+      orderBy: [asc(schema.models.name)],
+      with: { make: true },
+    });
   }
 
   async createModel(makeId: string, name: string) {
@@ -150,6 +169,19 @@ export class VehicleService {
       name,
     }).returning();
     return model;
+  }
+
+  async getVariants(modelId?: string) {
+    if (modelId) {
+      return this.db.query.variants.findMany({
+        where: eq(schema.variants.modelId, modelId),
+        orderBy: [asc(schema.variants.name)],
+      });
+    }
+    return this.db.query.variants.findMany({
+      orderBy: [asc(schema.variants.name)],
+      with: { model: { with: { make: true } } },
+    });
   }
 
   async createVariant(modelId: string, name: string, fuelType: 'PETROL' | 'DIESEL' | 'CNG' | 'ELECTRIC' | 'HYBRID') {

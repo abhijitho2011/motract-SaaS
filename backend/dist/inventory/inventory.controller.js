@@ -20,8 +20,20 @@ let InventoryController = class InventoryController {
     constructor(inventoryService) {
         this.inventoryService = inventoryService;
     }
+    async getBrands() {
+        return this.inventoryService.getBrands();
+    }
+    async createBrand(body) {
+        return this.inventoryService.createBrand(body.name);
+    }
+    async getCategories() {
+        return this.inventoryService.getCategories();
+    }
     async createCategory(body) {
         return this.inventoryService.createCategory(body.name);
+    }
+    async getSubCategories(categoryId) {
+        return this.inventoryService.getSubCategories(categoryId);
     }
     async createSubCategory(body) {
         return this.inventoryService.createSubCategory(body.categoryId, body.name);
@@ -53,12 +65,38 @@ let InventoryController = class InventoryController {
 };
 exports.InventoryController = InventoryController;
 __decorate([
+    (0, common_1.Get)('masters/brands'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "getBrands", null);
+__decorate([
+    (0, common_1.Post)('masters/brands'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "createBrand", null);
+__decorate([
+    (0, common_1.Get)('masters/categories'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "getCategories", null);
+__decorate([
     (0, common_1.Post)('masters/categories'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "createCategory", null);
+__decorate([
+    (0, common_1.Get)('masters/sub-categories'),
+    __param(0, (0, common_1.Query)('categoryId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "getSubCategories", null);
 __decorate([
     (0, common_1.Post)('masters/sub-categories'),
     __param(0, (0, common_1.Body)()),

@@ -208,6 +208,11 @@ export const categories = pgTable("categories", {
 	name: text().notNull(),
 });
 
+export const brands = pgTable("brands", {
+	id: text().primaryKey().notNull(),
+	name: text().notNull(),
+});
+
 export const jobInspections = pgTable("job_inspections", {
 	id: text().primaryKey().notNull(),
 	jobCardId: text().notNull(),

@@ -10,14 +10,29 @@ export class VehicleController {
     return this.vehicleService.lookup(regNumber);
   }
 
+  @Get('masters/makes')
+  async getMakes() {
+    return this.vehicleService.getMakes();
+  }
+
   @Post('masters/makes')
   async createMake(@Body() body: { name: string }) {
     return this.vehicleService.createMake(body.name);
   }
 
+  @Get('masters/models')
+  async getModels(@Query('makeId') makeId?: string) {
+    return this.vehicleService.getModels(makeId);
+  }
+
   @Post('masters/models')
   async createModel(@Body() body: { makeId: string; name: string }) {
     return this.vehicleService.createModel(body.makeId, body.name);
+  }
+
+  @Get('masters/variants')
+  async getVariants(@Query('modelId') modelId?: string) {
+    return this.vehicleService.getVariants(modelId);
   }
 
   @Post('masters/variants')
@@ -28,10 +43,5 @@ export class VehicleController {
   @Post('register')
   async register(@Body() data: any) {
     return this.vehicleService.register(data);
-  }
-
-  @Get('masters/models')
-  async getModels() {
-    return this.vehicleService.findAllModels();
   }
 }

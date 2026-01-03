@@ -23,20 +23,26 @@ let VehicleController = class VehicleController {
     async lookup(regNumber) {
         return this.vehicleService.lookup(regNumber);
     }
+    async getMakes() {
+        return this.vehicleService.getMakes();
+    }
     async createMake(body) {
         return this.vehicleService.createMake(body.name);
     }
+    async getModels(makeId) {
+        return this.vehicleService.getModels(makeId);
+    }
     async createModel(body) {
         return this.vehicleService.createModel(body.makeId, body.name);
+    }
+    async getVariants(modelId) {
+        return this.vehicleService.getVariants(modelId);
     }
     async createVariant(body) {
         return this.vehicleService.createVariant(body.modelId, body.name, body.fuelType);
     }
     async register(data) {
         return this.vehicleService.register(data);
-    }
-    async getModels() {
-        return this.vehicleService.findAllModels();
     }
 };
 exports.VehicleController = VehicleController;
@@ -48,6 +54,12 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], VehicleController.prototype, "lookup", null);
 __decorate([
+    (0, common_1.Get)('masters/makes'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], VehicleController.prototype, "getMakes", null);
+__decorate([
     (0, common_1.Post)('masters/makes'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -55,12 +67,26 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], VehicleController.prototype, "createMake", null);
 __decorate([
+    (0, common_1.Get)('masters/models'),
+    __param(0, (0, common_1.Query)('makeId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], VehicleController.prototype, "getModels", null);
+__decorate([
     (0, common_1.Post)('masters/models'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], VehicleController.prototype, "createModel", null);
+__decorate([
+    (0, common_1.Get)('masters/variants'),
+    __param(0, (0, common_1.Query)('modelId')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], VehicleController.prototype, "getVariants", null);
 __decorate([
     (0, common_1.Post)('masters/variants'),
     __param(0, (0, common_1.Body)()),
@@ -75,12 +101,6 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], VehicleController.prototype, "register", null);
-__decorate([
-    (0, common_1.Get)('masters/models'),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", []),
-    __metadata("design:returntype", Promise)
-], VehicleController.prototype, "getModels", null);
 exports.VehicleController = VehicleController = __decorate([
     (0, common_1.Controller)('vehicle'),
     __metadata("design:paramtypes", [vehicle_service_1.VehicleService])
