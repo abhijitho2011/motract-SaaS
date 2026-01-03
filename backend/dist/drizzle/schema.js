@@ -15,7 +15,7 @@ exports.paymentMode = (0, pg_core_1.pgEnum)("PaymentMode", ['CASH', 'UPI', 'CARD
 exports.role = (0, pg_core_1.pgEnum)("Role", ['SUPER_ADMIN', 'WORKSHOP_ADMIN', 'WORKSHOP_MANAGER', 'TECHNICIAN', 'CLIENT', 'RSA_PROVIDER', 'SUPPLIER']);
 exports.slotStatus = (0, pg_core_1.pgEnum)("SlotStatus", ['AVAILABLE', 'BOOKED', 'BLOCKED']);
 exports.txnType = (0, pg_core_1.pgEnum)("TxnType", ['CREDIT', 'DEBIT']);
-exports.accountType = (0, pg_core_1.pgEnum)("AccountType", ['WORKSHOP', 'WHEEL_ALIGNMENT', 'WATERWASH', 'RSA', 'BATTERY_SERVICE', 'SUPPLIER', 'REBUILD_CENTER']);
+exports.accountType = (0, pg_core_1.pgEnum)("AccountType", ['WORKSHOP', 'SUPPLIER', 'RSA', 'REBUILD_CENTER']);
 exports.bookingStatus = (0, pg_core_1.pgEnum)("BookingStatus", ['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED']);
 exports.makes = (0, pg_core_1.pgTable)("makes", {
     id: (0, pg_core_1.text)().primaryKey().notNull(),

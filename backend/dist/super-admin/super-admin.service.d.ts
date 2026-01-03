@@ -4,7 +4,7 @@ export declare class SuperAdminService {
     private db;
     constructor(db: NodePgDatabase<typeof schema>);
     createOrganization(data: {
-        accountType: 'WORKSHOP' | 'WHEEL_ALIGNMENT' | 'WATERWASH' | 'RSA' | 'BATTERY_SERVICE' | 'SUPPLIER' | 'REBUILD_CENTER';
+        accountType: 'WORKSHOP' | 'SUPPLIER' | 'RSA' | 'REBUILD_CENTER';
         subCategory?: string;
         businessName: string;
         email: string;
@@ -38,7 +38,7 @@ export declare class SuperAdminService {
             isActive: boolean;
             latitude: number | null;
             longitude: number | null;
-            accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+            accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
             subCategory: string | null;
             businessName: string;
             phone: string;
@@ -75,7 +75,7 @@ export declare class SuperAdminService {
         isActive: boolean;
         latitude: number | null;
         longitude: number | null;
-        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
         subCategory: string | null;
         businessName: string;
         phone: string;
@@ -96,7 +96,7 @@ export declare class SuperAdminService {
         isActive: boolean;
         latitude: number | null;
         longitude: number | null;
-        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
         subCategory: string | null;
         businessName: string;
         phone: string;
@@ -119,7 +119,7 @@ export declare class SuperAdminService {
         isActive?: boolean;
     }): Promise<{
         id: string;
-        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
         subCategory: string | null;
         businessName: string;
         name: string;
@@ -157,7 +157,7 @@ export declare class SuperAdminService {
         isActive: boolean;
         latitude: number | null;
         longitude: number | null;
-        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
         subCategory: string | null;
         businessName: string;
         phone: string;
@@ -227,7 +227,7 @@ export declare class SuperAdminService {
         isActive: boolean;
         latitude: number | null;
         longitude: number | null;
-        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
         subCategory: string | null;
         businessName: string;
         phone: string;
@@ -248,7 +248,7 @@ export declare class SuperAdminService {
         isActive: boolean;
         latitude: number | null;
         longitude: number | null;
-        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
         subCategory: string | null;
         businessName: string;
         phone: string;
@@ -278,11 +278,8 @@ export declare class SuperAdminService {
         totalOrganizations: number;
         byType: {
             workshop: number;
-            wheelAlignment: number;
-            waterwash: number;
-            rsa: number;
-            batteryService: number;
             supplier: number;
+            rsa: number;
             rebuildCenter: number;
         };
         authorized: number;

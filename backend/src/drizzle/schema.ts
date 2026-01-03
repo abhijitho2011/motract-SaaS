@@ -12,7 +12,7 @@ export const paymentMode = pgEnum("PaymentMode", ['CASH', 'UPI', 'CARD', 'BANK_T
 export const role = pgEnum("Role", ['SUPER_ADMIN', 'WORKSHOP_ADMIN', 'WORKSHOP_MANAGER', 'TECHNICIAN', 'CLIENT', 'RSA_PROVIDER', 'SUPPLIER'])
 export const slotStatus = pgEnum("SlotStatus", ['AVAILABLE', 'BOOKED', 'BLOCKED'])
 export const txnType = pgEnum("TxnType", ['CREDIT', 'DEBIT'])
-export const accountType = pgEnum("AccountType", ['WORKSHOP', 'WHEEL_ALIGNMENT', 'WATERWASH', 'RSA', 'BATTERY_SERVICE', 'SUPPLIER', 'REBUILD_CENTER'])
+export const accountType = pgEnum("AccountType", ['WORKSHOP', 'SUPPLIER', 'RSA', 'REBUILD_CENTER'])
 export const bookingStatus = pgEnum("BookingStatus", ['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'])
 
 

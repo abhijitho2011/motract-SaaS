@@ -23,8 +23,8 @@ export class SuperAdminService {
 
     // Account Management
     async createOrganization(data: {
-        accountType: 'WORKSHOP' | 'WHEEL_ALIGNMENT' | 'WATERWASH' | 'RSA' | 'BATTERY_SERVICE' | 'SUPPLIER' | 'REBUILD_CENTER';
-        subCategory?: string; // For RSA
+        accountType: 'WORKSHOP' | 'SUPPLIER' | 'RSA' | 'REBUILD_CENTER';
+        subCategory?: string; // Dynamic sub-category from serviceSubCategories
         businessName: string;
         email: string;
         phone: string;
@@ -288,11 +288,8 @@ export class SuperAdminService {
             totalOrganizations: allOrgs.length,
             byType: {
                 workshop: allOrgs.filter(o => o.accountType === 'WORKSHOP').length,
-                wheelAlignment: allOrgs.filter(o => o.accountType === 'WHEEL_ALIGNMENT').length,
-                waterwash: allOrgs.filter(o => o.accountType === 'WATERWASH').length,
-                rsa: allOrgs.filter(o => o.accountType === 'RSA').length,
-                batteryService: allOrgs.filter(o => o.accountType === 'BATTERY_SERVICE').length,
                 supplier: allOrgs.filter(o => o.accountType === 'SUPPLIER').length,
+                rsa: allOrgs.filter(o => o.accountType === 'RSA').length,
                 rebuildCenter: allOrgs.filter(o => o.accountType === 'REBUILD_CENTER').length,
             },
             authorized: allOrgs.filter(o => o.isAuthorized).length,

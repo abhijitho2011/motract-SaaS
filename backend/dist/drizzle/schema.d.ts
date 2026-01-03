@@ -8,7 +8,7 @@ export declare const paymentMode: import("drizzle-orm/pg-core").PgEnum<["CASH", 
 export declare const role: import("drizzle-orm/pg-core").PgEnum<["SUPER_ADMIN", "WORKSHOP_ADMIN", "WORKSHOP_MANAGER", "TECHNICIAN", "CLIENT", "RSA_PROVIDER", "SUPPLIER"]>;
 export declare const slotStatus: import("drizzle-orm/pg-core").PgEnum<["AVAILABLE", "BOOKED", "BLOCKED"]>;
 export declare const txnType: import("drizzle-orm/pg-core").PgEnum<["CREDIT", "DEBIT"]>;
-export declare const accountType: import("drizzle-orm/pg-core").PgEnum<["WORKSHOP", "WHEEL_ALIGNMENT", "WATERWASH", "RSA", "BATTERY_SERVICE", "SUPPLIER", "REBUILD_CENTER"]>;
+export declare const accountType: import("drizzle-orm/pg-core").PgEnum<["WORKSHOP", "SUPPLIER", "RSA", "REBUILD_CENTER"]>;
 export declare const bookingStatus: import("drizzle-orm/pg-core").PgEnum<["PENDING", "CONFIRMED", "COMPLETED", "CANCELLED"]>;
 export declare const makes: import("drizzle-orm/pg-core").PgTableWithColumns<{
     name: "makes";
@@ -1315,14 +1315,14 @@ export declare const accountTypes: import("drizzle-orm/pg-core").PgTableWithColu
             tableName: "account_types";
             dataType: "string";
             columnType: "PgEnumColumn";
-            data: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+            data: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
             driverParam: string;
             notNull: true;
             hasDefault: false;
             isPrimaryKey: false;
             isAutoincrement: false;
             hasRuntimeDefault: false;
-            enumValues: ["WORKSHOP", "WHEEL_ALIGNMENT", "WATERWASH", "RSA", "BATTERY_SERVICE", "SUPPLIER", "REBUILD_CENTER"];
+            enumValues: ["WORKSHOP", "SUPPLIER", "RSA", "REBUILD_CENTER"];
             baseColumn: never;
             identity: undefined;
             generated: undefined;
@@ -1373,14 +1373,14 @@ export declare const organizations: import("drizzle-orm/pg-core").PgTableWithCol
             tableName: "organizations";
             dataType: "string";
             columnType: "PgEnumColumn";
-            data: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+            data: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
             driverParam: string;
             notNull: true;
             hasDefault: false;
             isPrimaryKey: false;
             isAutoincrement: false;
             hasRuntimeDefault: false;
-            enumValues: ["WORKSHOP", "WHEEL_ALIGNMENT", "WATERWASH", "RSA", "BATTERY_SERVICE", "SUPPLIER", "REBUILD_CENTER"];
+            enumValues: ["WORKSHOP", "SUPPLIER", "RSA", "REBUILD_CENTER"];
             baseColumn: never;
             identity: undefined;
             generated: undefined;

@@ -6,11 +6,8 @@ export declare class SuperAdminController {
         totalOrganizations: number;
         byType: {
             workshop: number;
-            wheelAlignment: number;
-            waterwash: number;
-            rsa: number;
-            batteryService: number;
             supplier: number;
+            rsa: number;
             rebuildCenter: number;
         };
         authorized: number;
@@ -37,7 +34,7 @@ export declare class SuperAdminController {
             isActive: boolean;
             latitude: number | null;
             longitude: number | null;
-            accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+            accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
             subCategory: string | null;
             businessName: string;
             phone: string;
@@ -70,7 +67,7 @@ export declare class SuperAdminController {
         isActive: boolean;
         latitude: number | null;
         longitude: number | null;
-        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
         subCategory: string | null;
         businessName: string;
         phone: string;
@@ -91,7 +88,7 @@ export declare class SuperAdminController {
         isActive: boolean;
         latitude: number | null;
         longitude: number | null;
-        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
         subCategory: string | null;
         businessName: string;
         phone: string;
@@ -112,7 +109,7 @@ export declare class SuperAdminController {
         isActive: boolean;
         latitude: number | null;
         longitude: number | null;
-        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
         subCategory: string | null;
         businessName: string;
         phone: string;
@@ -121,7 +118,7 @@ export declare class SuperAdminController {
     }>;
     updateOrganization(id: string, data: any): Promise<{
         id: string;
-        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
         subCategory: string | null;
         businessName: string;
         name: string;
@@ -195,7 +192,7 @@ export declare class SuperAdminController {
         isActive: boolean;
         latitude: number | null;
         longitude: number | null;
-        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
         subCategory: string | null;
         businessName: string;
         phone: string;
@@ -216,7 +213,7 @@ export declare class SuperAdminController {
         isActive: boolean;
         latitude: number | null;
         longitude: number | null;
-        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
         subCategory: string | null;
         businessName: string;
         phone: string;
