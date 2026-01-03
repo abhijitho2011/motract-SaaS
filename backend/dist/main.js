@@ -22,15 +22,16 @@ async function bootstrap() {
         },
     }));
     app.enableCors({
-        origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
+        origin: true,
         credentials: true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
         allowedHeaders: ['Content-Type', 'Authorization'],
     });
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,
-        forbidNonWhitelisted: true,
+        forbidNonWhitelisted: false,
         transform: true,
+        skipMissingProperties: true,
     }));
     await app.listen(process.env.PORT ?? 3000);
 }

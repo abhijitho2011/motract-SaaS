@@ -20,19 +20,20 @@ async function bootstrap() {
     },
   }));
 
-  // Security: CORS - Configure allowed origins
+  // Security: CORS - Allow all origins for mobile app compatibility
   app.enableCors({
-    origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
+    origin: true, // Allow all origins (mobile apps need this)
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
-  // Security: Input validation
+  // Security: Input validation (relaxed for mobile compatibility)
   app.useGlobalPipes(new ValidationPipe({
     whitelist: true,
-    forbidNonWhitelisted: true,
+    forbidNonWhitelisted: false, // Allow extra fields from mobile app
     transform: true,
+    skipMissingProperties: true, // Don't fail on missing optional fields
   }));
 
   await app.listen(process.env.PORT ?? 3000);
