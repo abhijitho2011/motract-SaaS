@@ -1,0 +1,30 @@
+Attempting Create Partner at https://motract-backend-5sct.onrender.com/super-admin/organizations...
+{
+  "accountType": "WORKSHOP",
+  "subCategory": "General Service, Oil Change",
+  "businessName": "Test Workshop 7609",
+  "email": "test_workshop_7609_9876547609@motract.com",
+  "phone": "9876547609",
+  "address": "123 Test St",
+  "city": "Bangalore",
+  "state": "Karnataka",
+  "pincode": "560001",
+  "gstin": null,
+  "latitude": 12.9716,
+  "longitude": 77.5946,
+  "isAuthorized": false,
+  "createdBy": "debug-script",
+  "adminUser": {
+    "name": "Test Workshop 7609",
+    "email": "test_workshop_7609_9876547609@motract.com",
+    "password": "password123"
+  }
+}
+Status Code: 400
+
+FULL RESPONSE:
+{
+  "message": "Creation failed: Failed query: insert into \"users\" (\"id\", \"email\", \"mobile\", \"password\", \"role\", \"name\", \"createdAt\", \"updatedAt\", \"workshopId\") values ($1, $2, $3, $4, $5, $6, default, $7, $8) returning \"id\", \"email\", \"mobile\", \"password\", \"role\", \"name\", \"createdAt\", \"updatedAt\", \"workshopId\"\nparams: d1e3485b-00b3-40a9-a442-594180e92b36,test_workshop_7609_9876547609@motract.com,9876547609,$2b$10$LkeqmukR/U6BioWQzntxSeGxhKV8BP.YTPiUohqd8dNX2jNhDKuMC,WORKSHOP_ADMIN,Test Workshop 7609,2026-01-03T15:38:48.813Z,ea1c9ce6-0fd9-42d4-824c-359cd34ca9db",
+  "error": "Bad Request",
+  "statusCode": 400
+}

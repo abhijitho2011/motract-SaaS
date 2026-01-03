@@ -9,6 +9,7 @@ import {
     users,
     serviceCategories,
     serviceSubCategories,
+    workshops,
 } from '../drizzle/schema';
 import { eq, and, desc, asc } from 'drizzle-orm';
 import * as crypto from 'crypto';
@@ -68,6 +69,25 @@ export class SuperAdminService {
                 createdBy: data.createdBy,
                 updatedAt: new Date().toISOString(),
             }).returning();
+
+            // Create corresponding workshop record (Required for FK constraints in users table and Mobile App)
+            // We use the SAME ID for 1-to-1 mapping
+            await this.db.insert(workshops).values({
+                id: organization.id,
+                name: data.businessName,
+                mobile: data.phone,
+                email: data.email,
+                address: data.address,
+                city: data.city,
+                state: data.state,
+                pincode: data.pincode,
+                gstin: data.gstin,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                isActive: true,
+                updatedAt: new Date().toISOString(),
+                // Defaults for required fields if any (schema says defaults exist)
+            });
 
             // Create admin user for the organization
             const hashedPassword = await bcrypt.hash(data.adminUser.password, 10);
@@ -159,9 +179,13 @@ export class SuperAdminService {
     }
 
     async deleteOrganization(id: string) {
-        // Delete users associated with this organization first
+        // First delete associated users to prevent zombies
         await this.db.delete(users).where(eq(users.workshopId, id));
 
+        // Delete from workshops table (Legacy/Core)
+        await this.db.delete(workshops).where(eq(workshops.id, id));
+
+        // Finally delete the organization
         const [deleted] = await this.db.delete(organizations)
             .where(eq(organizations.id, id))
             .returning();

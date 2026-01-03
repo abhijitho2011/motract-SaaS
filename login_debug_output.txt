@@ -1,14 +1,4 @@
 Attempting login to https://motract-backend-5sct.onrender.com/auth/login...
-Login Status: 201
+Login Status: 401
 
-FULL RESPONSE:
-{
-  "message": "Invalid credentials"
-}
-
-LOGIN SUCCESSFUL (Unexpected)
-User Details:
-{}
-
-Role: None
-WorkshopID: None
+Login Failed. Response: {"message":"Invalid credentials","error":"Unauthorized","statusCode":401}
