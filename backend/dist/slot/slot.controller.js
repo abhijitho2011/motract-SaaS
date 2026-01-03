@@ -20,53 +20,17 @@ let SlotController = class SlotController {
     constructor(slotService) {
         this.slotService = slotService;
     }
-    async setWorkingHours(body) {
-        return this.slotService.setWorkingHours(body.workshopId, body.hours);
-    }
-    async getWorkingHours(workshopId) {
-        return this.slotService.getWorkingHours(workshopId);
-    }
-    async setBreaks(body) {
-        return this.slotService.setBreaks(body.workshopId, body.breaks);
-    }
     async createBay(data) {
         return this.slotService.createBay(data);
     }
     async findBays(workshopId) {
         return this.slotService.findBays(workshopId);
     }
-    async mapService(bayId, serviceId) {
-        return this.slotService.mapServiceToBay(bayId, serviceId);
-    }
-    async getAvailableSlots(workshopId, date, serviceId) {
-        return this.slotService.getAvailableSlots(workshopId, date, serviceId);
-    }
     async bookSlot(data) {
         return this.slotService.bookSlot(data);
     }
 };
 exports.SlotController = SlotController;
-__decorate([
-    (0, common_1.Post)('config/working-hours'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], SlotController.prototype, "setWorkingHours", null);
-__decorate([
-    (0, common_1.Get)('config/working-hours'),
-    __param(0, (0, common_1.Query)('workshopId')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], SlotController.prototype, "getWorkingHours", null);
-__decorate([
-    (0, common_1.Post)('config/breaks'),
-    __param(0, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
-    __metadata("design:returntype", Promise)
-], SlotController.prototype, "setBreaks", null);
 __decorate([
     (0, common_1.Post)('bays'),
     __param(0, (0, common_1.Body)()),
@@ -81,23 +45,6 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], SlotController.prototype, "findBays", null);
-__decorate([
-    (0, common_1.Post)('bays/:bayId/assign-service'),
-    __param(0, (0, common_1.Param)('bayId')),
-    __param(1, (0, common_1.Body)('serviceId')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String]),
-    __metadata("design:returntype", Promise)
-], SlotController.prototype, "mapService", null);
-__decorate([
-    (0, common_1.Get)('available'),
-    __param(0, (0, common_1.Query)('workshopId')),
-    __param(1, (0, common_1.Query)('date')),
-    __param(2, (0, common_1.Query)('serviceId')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, String, String]),
-    __metadata("design:returntype", Promise)
-], SlotController.prototype, "getAvailableSlots", null);
 __decorate([
     (0, common_1.Post)('book'),
     __param(0, (0, common_1.Body)()),

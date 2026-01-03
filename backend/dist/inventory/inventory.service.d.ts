@@ -1,27 +1,18 @@
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../drizzle/schema';
-import { inventoryItems } from '../drizzle/schema';
 export declare class InventoryService {
     private db;
     constructor(db: NodePgDatabase<typeof schema>);
-    createItem(data: typeof inventoryItems.$inferInsert): Promise<{
-        partNumbers: never[];
-        batches: never[];
+    createCategory(name: string): Promise<{
         id: string;
         name: string;
-        brand: string | null;
-        createdAt: string;
-        updatedAt: string;
-        workshopId: string;
-        isOem: boolean;
-        hsnCode: string | null;
-        taxPercent: number;
-        reorderLevel: number | null;
-        description: string | null;
-        brandId: string | null;
-        categoryId: string | null;
-        subCategoryId: string | null;
     }>;
+    createSubCategory(categoryId: string, name: string): Promise<{
+        id: string;
+        name: string;
+        categoryId: string;
+    }>;
+    createItem(data: any): Promise<any>;
     addSku(itemId: string, skuCode: string): Promise<{
         id: string;
         itemId: string;
@@ -53,11 +44,10 @@ export declare class InventoryService {
         isOem: boolean;
         hsnCode: string | null;
         taxPercent: number;
-        reorderLevel: number | null;
-        description: string | null;
-        brandId: string | null;
-        categoryId: string | null;
+        reorderLevel: number;
+        categoryId: string;
         subCategoryId: string | null;
+        description: string | null;
         inventoryPartNumbers: {
             id: string;
             itemId: string;
@@ -98,32 +88,4 @@ export declare class InventoryService {
         };
     }[]>;
     adjustStock(itemId: string, quantity: number, reason: string): Promise<any>;
-    getExpiringBatches(workshopId: string, daysThreshold?: number): Promise<{
-        batch: {
-            id: string;
-            itemId: string;
-            batchNumber: string | null;
-            expiryDate: string | null;
-            quantity: number;
-            purchasePrice: number;
-            salePrice: number;
-            purchasedAt: string;
-        };
-        item: {
-            id: string;
-            workshopId: string;
-            name: string;
-            brand: string | null;
-            isOem: boolean;
-            hsnCode: string | null;
-            taxPercent: number;
-            reorderLevel: number | null;
-            description: string | null;
-            brandId: string | null;
-            categoryId: string | null;
-            subCategoryId: string | null;
-            createdAt: string;
-            updatedAt: string;
-        };
-    }[]>;
 }

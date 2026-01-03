@@ -20,6 +20,12 @@ let InventoryController = class InventoryController {
     constructor(inventoryService) {
         this.inventoryService = inventoryService;
     }
+    async createCategory(body) {
+        return this.inventoryService.createCategory(body.name);
+    }
+    async createSubCategory(body) {
+        return this.inventoryService.createSubCategory(body.categoryId, body.name);
+    }
     async createItem(data) {
         return this.inventoryService.createItem(data);
     }
@@ -44,11 +50,22 @@ let InventoryController = class InventoryController {
     async adjustStock(id, quantity, reason) {
         return this.inventoryService.adjustStock(id, quantity, reason);
     }
-    async getExpiringBatches(workshopId) {
-        return this.inventoryService.getExpiringBatches(workshopId);
-    }
 };
 exports.InventoryController = InventoryController;
+__decorate([
+    (0, common_1.Post)('masters/categories'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "createCategory", null);
+__decorate([
+    (0, common_1.Post)('masters/sub-categories'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], InventoryController.prototype, "createSubCategory", null);
 __decorate([
     (0, common_1.Post)('items'),
     __param(0, (0, common_1.Body)()),
@@ -111,13 +128,6 @@ __decorate([
     __metadata("design:paramtypes", [String, Number, String]),
     __metadata("design:returntype", Promise)
 ], InventoryController.prototype, "adjustStock", null);
-__decorate([
-    (0, common_1.Get)('alerts/expiring'),
-    __param(0, (0, common_1.Query)('workshopId')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], InventoryController.prototype, "getExpiringBatches", null);
 exports.InventoryController = InventoryController = __decorate([
     (0, common_1.Controller)('inventory'),
     __metadata("design:paramtypes", [inventory_service_1.InventoryService])

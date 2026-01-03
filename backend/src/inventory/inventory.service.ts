@@ -12,6 +12,8 @@ import {
   inventoryPartNumbers,
   inventoryBatches,
   inventoryVehicleMapping,
+  categories,
+  subCategories,
 } from '../drizzle/schema';
 import { eq, gt, asc, and } from 'drizzle-orm';
 import * as crypto from 'crypto';
@@ -24,7 +26,7 @@ export class InventoryService {
   ) { }
 
   async createCategory(name: string) {
-    const [category] = await this.db.insert(schema.categories).values({
+    const [category] = await this.db.insert(categories).values({
       id: crypto.randomUUID(),
       name,
     }).returning();
@@ -32,7 +34,7 @@ export class InventoryService {
   }
 
   async createSubCategory(categoryId: string, name: string) {
-    const [sub] = await this.db.insert(schema.subCategories).values({
+    const [sub] = await this.db.insert(subCategories).values({
       id: crypto.randomUUID(),
       categoryId,
       name,
@@ -54,6 +56,7 @@ export class InventoryService {
       categoryId: data.categoryId,
       subCategoryId: data.subCategoryId,
       description: data.description,
+      updatedAt: new Date().toISOString(),
     }).returning();
 
     // 2. Add Part Numbers (SKUs)

@@ -137,11 +137,10 @@ export declare class JobCardService {
             isOem: boolean;
             hsnCode: string | null;
             taxPercent: number;
-            reorderLevel: number | null;
-            description: string | null;
-            brandId: string | null;
-            categoryId: string | null;
+            reorderLevel: number;
+            categoryId: string;
             subCategoryId: string | null;
+            description: string | null;
         } | undefined;
     }>;
     assignTechnician(id: string, technicianId: string): Promise<{

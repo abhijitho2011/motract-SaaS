@@ -100,49 +100,9 @@ let PurchaseService = class PurchaseService {
         const orders = await this.db.query.purchases.findMany({
             where: (0, drizzle_orm_1.eq)(schema_1.purchases.supplierId, id),
             orderBy: [(0, drizzle_orm_1.desc)(schema_1.purchases.createdAt)],
-            with: {
-                purchaseItems: true,
-                payments: true,
-            },
+            with: { purchaseItems: true },
         });
-        let totalPurchases = 0;
-        let totalPaid = 0;
-        const transactions = orders.map((o) => {
-            const orderTotal = o.totalAmount;
-            const orderPaid = o.payments.reduce((sum, p) => sum + p.amount, 0);
-            totalPurchases += orderTotal;
-            totalPaid += orderPaid;
-            return {
-                ...o,
-                items: o.purchaseItems,
-                paid: orderPaid,
-                balance: orderTotal - orderPaid,
-                status: orderTotal === orderPaid ? 'PAID' : (orderPaid > 0 ? 'PARTIAL' : o.status)
-            };
-        });
-        return {
-            supplierId: id,
-            totalPurchases,
-            totalPaid,
-            outstandingBalance: totalPurchases - totalPaid,
-            transactions,
-        };
-    }
-    async recordPayment(data) {
-        const order = await this.db.query.purchases.findFirst({
-            where: (0, drizzle_orm_1.eq)(schema_1.purchases.id, data.purchaseId),
-        });
-        if (!order)
-            throw new common_1.NotFoundException('Purchase Order not found');
-        const [payment] = await this.db.insert(schema_1.purchasePayments).values({
-            id: crypto.randomUUID(),
-            purchaseId: data.purchaseId,
-            amount: data.amount,
-            mode: data.mode,
-            reference: data.reference,
-            date: new Date().toISOString(),
-        }).returning();
-        return payment;
+        return orders.map((o) => ({ ...o, items: o.purchaseItems }));
     }
     async createPurchaseOrder(data) {
         const totalAmount = data.items.reduce((sum, item) => {
@@ -225,6 +185,15 @@ let PurchaseService = class PurchaseService {
             throw new Error('PO already received');
         await this.db.transaction(async (tx) => {
             for (const item of po.purchaseItems) {
+                let category = await tx.query.categories.findFirst({
+                    where: (0, drizzle_orm_1.ilike)(schema_1.categories.name, 'General')
+                });
+                if (!category) {
+                    [category] = await tx.insert(schema_1.categories).values({
+                        id: crypto.randomUUID(),
+                        name: 'General'
+                    }).returning();
+                }
                 let invItem = await tx.query.inventoryItems.findFirst({
                     where: (0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(schema_1.inventoryItems.workshopId, po.workshopId), (0, drizzle_orm_1.ilike)(schema_1.inventoryItems.name, item.itemName)),
                 });
@@ -236,6 +205,8 @@ let PurchaseService = class PurchaseService {
                         brand: 'Generic',
                         hsnCode: '0000',
                         taxPercent: item.taxPercent,
+                        reorderLevel: 0,
+                        categoryId: category.id,
                         updatedAt: new Date().toISOString(),
                     }).returning();
                     invItem = created;

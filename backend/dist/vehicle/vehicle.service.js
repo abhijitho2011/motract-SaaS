@@ -49,6 +49,7 @@ exports.VehicleService = void 0;
 const common_1 = require("@nestjs/common");
 const drizzle_provider_1 = require("../drizzle/drizzle.provider");
 const node_postgres_1 = require("drizzle-orm/node-postgres");
+const schema = __importStar(require("../drizzle/schema"));
 const schema_1 = require("../drizzle/schema");
 const drizzle_orm_1 = require("drizzle-orm");
 const crypto = __importStar(require("crypto"));
@@ -136,22 +137,34 @@ let VehicleService = class VehicleService {
         }).returning();
         return vehicle;
     }
+    async createMake(name) {
+        const [make] = await this.db.insert(schema.makes).values({
+            id: crypto.randomUUID(),
+            name,
+        }).returning();
+        return make;
+    }
+    async createModel(makeId, name) {
+        const [model] = await this.db.insert(schema.models).values({
+            id: crypto.randomUUID(),
+            makeId,
+            name,
+        }).returning();
+        return model;
+    }
+    async createVariant(modelId, name, fuelType) {
+        const [variant] = await this.db.insert(schema.variants).values({
+            id: crypto.randomUUID(),
+            modelId,
+            name,
+            fuelType,
+        }).returning();
+        return variant;
+    }
     async findAllModels() {
         return this.db.query.models.findMany({
             with: { make: true, variants: true },
         });
-    }
-    async getMakes() {
-        return this.db.select().from(schema_1.makes);
-    }
-    async getModels(makeId) {
-        return this.db.query.models.findMany({
-            where: (0, drizzle_orm_1.eq)(schema_1.models.makeId, makeId),
-            with: { variants: true },
-        });
-    }
-    async getVariants(modelId) {
-        return this.db.select().from(schema_1.variants).where((0, drizzle_orm_1.eq)(schema_1.variants.modelId, modelId));
     }
 };
 exports.VehicleService = VehicleService;

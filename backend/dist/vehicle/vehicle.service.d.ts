@@ -40,6 +40,21 @@ export declare class VehicleService {
         createdAt: string;
         updatedAt: string;
     }>;
+    createMake(name: string): Promise<{
+        id: string;
+        name: string;
+    }>;
+    createModel(makeId: string, name: string): Promise<{
+        id: string;
+        name: string;
+        makeId: string;
+    }>;
+    createVariant(modelId: string, name: string, fuelType: 'PETROL' | 'DIESEL' | 'CNG' | 'ELECTRIC' | 'HYBRID'): Promise<{
+        id: string;
+        name: string;
+        fuelType: "PETROL" | "DIESEL" | "CNG" | "ELECTRIC" | "HYBRID";
+        modelId: string;
+    }>;
     findAllModels(): Promise<{
         id: string;
         name: string;
@@ -54,26 +69,5 @@ export declare class VehicleService {
             id: string;
             name: string;
         };
-    }[]>;
-    getMakes(): Promise<{
-        id: string;
-        name: string;
-    }[]>;
-    getModels(makeId: string): Promise<{
-        id: string;
-        name: string;
-        makeId: string;
-        variants: {
-            id: string;
-            name: string;
-            fuelType: "PETROL" | "DIESEL" | "CNG" | "ELECTRIC" | "HYBRID";
-            modelId: string;
-        }[];
-    }[]>;
-    getVariants(modelId: string): Promise<{
-        id: string;
-        name: string;
-        fuelType: "PETROL" | "DIESEL" | "CNG" | "ELECTRIC" | "HYBRID";
-        modelId: string;
     }[]>;
 }

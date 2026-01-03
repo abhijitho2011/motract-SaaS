@@ -57,9 +57,60 @@ let InventoryService = class InventoryService {
     constructor(db) {
         this.db = db;
     }
+    async createCategory(name) {
+        const [category] = await this.db.insert(schema_1.categories).values({
+            id: crypto.randomUUID(),
+            name,
+        }).returning();
+        return category;
+    }
+    async createSubCategory(categoryId, name) {
+        const [sub] = await this.db.insert(schema_1.subCategories).values({
+            id: crypto.randomUUID(),
+            categoryId,
+            name,
+        }).returning();
+        return sub;
+    }
     async createItem(data) {
-        const [item] = await this.db.insert(schema_1.inventoryItems).values(data).returning();
-        return { ...item, partNumbers: [], batches: [] };
+        const [item] = await this.db.insert(schema_1.inventoryItems).values({
+            id: crypto.randomUUID(),
+            workshopId: data.workshopId,
+            name: data.name,
+            brand: data.brand,
+            isOem: data.isOem,
+            hsnCode: data.hsnCode,
+            taxPercent: data.taxPercent,
+            reorderLevel: data.reorderLevel,
+            categoryId: data.categoryId,
+            subCategoryId: data.subCategoryId,
+            description: data.description,
+            updatedAt: new Date().toISOString(),
+        }).returning();
+        if (data.partNumbers && data.partNumbers.length > 0) {
+            await this.db.insert(schema_1.inventoryPartNumbers).values(data.partNumbers.map((sku) => ({
+                id: crypto.randomUUID(),
+                itemId: item.id,
+                skuCode: sku,
+            })));
+        }
+        if (data.compatibleVehicles && data.compatibleVehicles.length > 0) {
+            await this.db.insert(schema_1.inventoryVehicleMapping).values(data.compatibleVehicles.map((v) => ({
+                id: crypto.randomUUID(),
+                itemId: item.id,
+                modelId: v.modelId,
+                variantId: v.variantId || null,
+            })));
+        }
+        if (data.initialStock) {
+            await this.addBatch(item.id, {
+                quantity: data.initialStock.quantity,
+                purchasePrice: data.initialStock.purchasePrice,
+                salePrice: data.initialStock.salePrice,
+                batchNumber: 'INITIAL',
+            });
+        }
+        return this.findOne(item.id);
     }
     async addSku(itemId, skuCode) {
         return this.db.insert(schema_1.inventoryPartNumbers).values({
@@ -142,7 +193,7 @@ let InventoryService = class InventoryService {
             let remaining = deduction;
             const batches = await this.db.query.inventoryBatches.findMany({
                 where: (0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(schema_1.inventoryBatches.itemId, itemId), (0, drizzle_orm_1.gt)(schema_1.inventoryBatches.quantity, 0)),
-                orderBy: [(0, drizzle_orm_1.asc)(schema_1.inventoryBatches.expiryDate), (0, drizzle_orm_1.asc)(schema_1.inventoryBatches.purchasedAt)],
+                orderBy: [(0, drizzle_orm_1.asc)(schema_1.inventoryBatches.purchasedAt)],
             });
             for (const batch of batches) {
                 if (remaining <= 0)
@@ -159,20 +210,6 @@ let InventoryService = class InventoryService {
             }
         }
         return this.findOne(itemId);
-    }
-    async getExpiringBatches(workshopId, daysThreshold = 30) {
-        const thresholdDate = new Date();
-        thresholdDate.setDate(thresholdDate.getDate() + daysThreshold);
-        const thresholdStr = thresholdDate.toISOString();
-        const todayStr = new Date().toISOString();
-        const res = await this.db.select({
-            batch: schema_1.inventoryBatches,
-            item: schema_1.inventoryItems
-        })
-            .from(schema_1.inventoryBatches)
-            .innerJoin(schema_1.inventoryItems, (0, drizzle_orm_1.eq)(schema_1.inventoryBatches.itemId, schema_1.inventoryItems.id))
-            .where((0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(schema_1.inventoryItems.workshopId, workshopId), (0, drizzle_orm_1.gt)(schema_1.inventoryBatches.quantity, 0), (0, drizzle_orm_1.lte)(schema_1.inventoryBatches.expiryDate, thresholdStr), (0, drizzle_orm_1.gte)(schema_1.inventoryBatches.expiryDate, todayStr)));
-        return res;
     }
 };
 exports.InventoryService = InventoryService;

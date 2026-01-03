@@ -8,6 +8,7 @@ import {
   purchaseItems,
   inventoryItems,
   inventoryBatches,
+  categories,
 } from '../drizzle/schema';
 import { eq, desc, ilike, and } from 'drizzle-orm';
 import * as crypto from 'crypto';
@@ -187,10 +188,21 @@ export class PurchaseService {
     await this.db.transaction(async (tx) => {
       for (const item of po.purchaseItems) {
         // 1. Find or Create Inventory Item
+        // 0. Ensure Category exists
+        let category = await tx.query.categories.findFirst({
+          where: ilike(categories.name, 'General')
+        });
+        if (!category) {
+          [category] = await tx.insert(categories).values({
+            id: crypto.randomUUID(),
+            name: 'General'
+          }).returning();
+        }
+
         let invItem = await tx.query.inventoryItems.findFirst({
           where: and(
             eq(inventoryItems.workshopId, po.workshopId),
-            ilike(inventoryItems.name, item.itemName) // insensitive like
+            ilike(inventoryItems.name, item.itemName)
           ),
         });
 
@@ -202,6 +214,8 @@ export class PurchaseService {
             brand: 'Generic',
             hsnCode: '0000',
             taxPercent: item.taxPercent,
+            reorderLevel: 0,
+            categoryId: category.id,
             updatedAt: new Date().toISOString(),
           }).returning();
           invItem = created;

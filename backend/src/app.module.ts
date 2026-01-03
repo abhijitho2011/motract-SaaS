@@ -13,8 +13,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { PurchaseModule } from './purchase/purchase.module';
 import { ExpenseModule } from './expense/expense.module';
 import { ReportsModule } from './reports/reports.module';
-import { MasterDataModule } from './master-data/master-data.module';
-import { ReportModule } from './report/report.module';
+
 
 @Module({
   imports: [
@@ -30,8 +29,6 @@ import { ReportModule } from './report/report.module';
     PurchaseModule,
     ExpenseModule,
     ReportsModule,
-    MasterDataModule,
-    ReportModule,
   ],
   controllers: [AppController],
   providers: [AppService],
