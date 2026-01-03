@@ -1,9 +1,0 @@
-export type JobStage = 'CREATED' | 'INSPECTION' | 'ESTIMATE' | 'CUSTOMER_APPROVAL' | 'WORK_IN_PROGRESS' | 'QC' | 'BILLING' | 'DELIVERY' | 'CLOSED';
-export type JobPriority = 'NORMAL' | 'URGENT';
-export type PaymentMode = 'CASH' | 'UPI' | 'CARD' | 'BANK_TRANSFER' | 'CREDIT';
-export type ApprovalStatus = 'PENDING' | 'APPROVED' | 'REJECTED';
-export type Role = 'SUPER_ADMIN' | 'WORKSHOP_ADMIN' | 'WORKSHOP_MANAGER' | 'TECHNICIAN' | 'CLIENT' | 'RSA_PROVIDER' | 'SUPPLIER';
-export type BayType = 'SERVICE' | 'WASHING' | 'ALIGNMENT' | 'ELECTRICAL' | 'GENERAL';
-export type FuelType = 'PETROL' | 'DIESEL' | 'CNG' | 'ELECTRIC' | 'HYBRID';
-export type InvoiceType = 'JOB_CARD' | 'COUNTER_SALE';
-export type SlotStatus = 'AVAILABLE' | 'BOOKED' | 'BLOCKED';

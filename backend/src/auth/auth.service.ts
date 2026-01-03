@@ -7,6 +7,7 @@ import { DrizzleAsyncProvider } from '../drizzle/drizzle.provider';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../drizzle/schema';
 import { eq } from 'drizzle-orm';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthService {
