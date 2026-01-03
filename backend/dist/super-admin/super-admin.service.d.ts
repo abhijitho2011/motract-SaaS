@@ -294,4 +294,39 @@ export declare class SuperAdminService {
     resetDatabase(): Promise<{
         message: string;
     }>;
+    getMapSettings(): Promise<{
+        provider: string;
+        apiToken: null;
+        isActive: boolean;
+        expiresAt: null;
+    } | {
+        apiToken: string | null;
+        fullToken: string;
+        id: string;
+        createdAt: string;
+        updatedAt: string;
+        isActive: boolean;
+        provider: string;
+        expiresAt: string | null;
+    }>;
+    updateMapSettings(data: {
+        apiToken: string;
+        expiresAt?: string;
+    }): Promise<{
+        message: string;
+        settings: {
+            id: string;
+            createdAt: string;
+            updatedAt: string;
+            isActive: boolean;
+            provider: string;
+            apiToken: string;
+            expiresAt: string | null;
+        };
+    }>;
+    testMapConnection(token: string): Promise<{
+        success: boolean;
+        status: number;
+        message: string;
+    }>;
 }

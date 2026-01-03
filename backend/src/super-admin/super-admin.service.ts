@@ -21,6 +21,7 @@ import {
     inventoryItems,
     inventoryBatches,
     inventoryPartNumbers,
+    mapSettings,
 } from '../drizzle/schema';
 import { eq, and, desc, asc, ne } from 'drizzle-orm';
 import * as crypto from 'crypto';
@@ -383,5 +384,85 @@ export class SuperAdminService {
         await this.db.delete(organizations);
 
         return { message: 'Database reset successfully. Super Admin preserved.' };
+    }
+
+    // Map Settings
+    async getMapSettings() {
+        const settings = await this.db.query.mapSettings.findFirst({
+            where: eq(mapSettings.isActive, true),
+        });
+
+        if (!settings) {
+            return {
+                provider: 'bhuvan',
+                apiToken: null,
+                isActive: false,
+                expiresAt: null,
+            };
+        }
+
+        // Mask the token for security (show only last 4 characters)
+        const maskedToken = settings.apiToken
+            ? `${'*'.repeat(settings.apiToken.length - 4)}${settings.apiToken.slice(-4)}`
+            : null;
+
+        return {
+            ...settings,
+            apiToken: maskedToken,
+            fullToken: settings.apiToken, // Include full token for editing
+        };
+    }
+
+    async updateMapSettings(data: { apiToken: string; expiresAt?: string }) {
+        // Deactivate all existing settings
+        const existingSettings = await this.db.query.mapSettings.findMany();
+        for (const setting of existingSettings) {
+            await this.db
+                .update(mapSettings)
+                .set({ isActive: false })
+                .where(eq(mapSettings.id, setting.id));
+        }
+
+        // Create new active setting
+        const newSetting = await this.db.insert(mapSettings).values({
+            id: crypto.randomUUID(),
+            provider: 'bhuvan',
+            apiToken: data.apiToken,
+            isActive: true,
+            expiresAt: data.expiresAt || null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        }).returning();
+
+        return {
+            message: 'Map settings updated successfully',
+            settings: newSetting[0],
+        };
+    }
+
+    async testMapConnection(token: string) {
+        // Test with a sample route (Delhi coordinates)
+        const testUrl = `https://bhuvan-app1.nrsc.gov.in/api/routing/curl_routing_state.php?lat1=28.6139&lon1=77.2090&lat2=28.7041&lon2=77.1025&token=${token}`;
+
+        try {
+            const response = await fetch(testUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            });
+
+            return {
+                success: response.ok,
+                status: response.status,
+                message: response.ok ? 'Connection successful! Token is valid.' : 'Connection failed. Please check your token.',
+            };
+        } catch (error) {
+            return {
+                success: false,
+                status: 500,
+                message: 'Failed to connect to Bhuvan API. Please check your internet connection.',
+            };
+        }
     }
 }

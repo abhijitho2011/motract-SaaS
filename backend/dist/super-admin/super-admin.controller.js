@@ -87,6 +87,15 @@ let SuperAdminController = class SuperAdminController {
             filters.endDate = endDate;
         return this.superAdminService.getAllBookings(filters);
     }
+    async getMapSettings() {
+        return this.superAdminService.getMapSettings();
+    }
+    async updateMapSettings(data) {
+        return this.superAdminService.updateMapSettings(data);
+    }
+    async testMapConnection(data) {
+        return this.superAdminService.testMapConnection(data.apiToken);
+    }
 };
 exports.SuperAdminController = SuperAdminController;
 __decorate([
@@ -205,6 +214,26 @@ __decorate([
     __metadata("design:paramtypes", [String, String, String, String]),
     __metadata("design:returntype", Promise)
 ], SuperAdminController.prototype, "getOnlineBookings", null);
+__decorate([
+    (0, common_1.Get)('map-settings'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], SuperAdminController.prototype, "getMapSettings", null);
+__decorate([
+    (0, common_1.Post)('map-settings'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], SuperAdminController.prototype, "updateMapSettings", null);
+__decorate([
+    (0, common_1.Post)('map-settings/test'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], SuperAdminController.prototype, "testMapConnection", null);
 exports.SuperAdminController = SuperAdminController = __decorate([
     (0, common_1.Controller)('super-admin'),
     __metadata("design:paramtypes", [super_admin_service_1.SuperAdminService])

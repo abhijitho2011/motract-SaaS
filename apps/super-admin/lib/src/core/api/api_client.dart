@@ -158,4 +158,32 @@ class ApiClient {
     );
     return response.data;
   }
+
+  // Map Settings
+  static Future<Map<String, dynamic>> getMapSettings() async {
+    final response = await dio.get('/super-admin/map-settings');
+    return response.data;
+  }
+
+  static Future<Map<String, dynamic>> updateMapSettings(
+    String apiToken,
+    String? expiresAt,
+  ) async {
+    final response = await dio.post(
+      '/super-admin/map-settings',
+      data: {
+        'apiToken': apiToken,
+        if (expiresAt != null) 'expiresAt': expiresAt,
+      },
+    );
+    return response.data;
+  }
+
+  static Future<Map<String, dynamic>> testMapConnection(String apiToken) async {
+    final response = await dio.post(
+      '/super-admin/map-settings/test',
+      data: {'apiToken': apiToken},
+    );
+    return response.data;
+  }
 }

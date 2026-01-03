@@ -933,3 +933,14 @@ export const slotBookingsRelations = relations(slotBookings, ({ one }) => ({
 		references: [bays.id]
 	}),
 }));
+
+// Map Settings for Bhuvan API
+export const mapSettings = pgTable("map_settings", {
+	id: text().primaryKey().notNull(),
+	provider: text().notNull().default('bhuvan'), // 'bhuvan' | 'google'
+	apiToken: text('api_token').notNull(),
+	isActive: boolean('is_active').default(true).notNull(),
+	expiresAt: timestamp('expires_at', { mode: 'string' }),
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+});

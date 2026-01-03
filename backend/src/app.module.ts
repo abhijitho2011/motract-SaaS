@@ -15,6 +15,7 @@ import { ExpenseModule } from './expense/expense.module';
 import { ReportsModule } from './reports/reports.module';
 import { SuperAdminModule } from './super-admin/super-admin.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { MapModule } from './map/map.module';
 
 
 @Module({
@@ -37,6 +38,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     ExpenseModule,
     ReportsModule,
     SuperAdminModule,
+    MapModule,
   ],
   controllers: [AppController],
   providers: [AppService],

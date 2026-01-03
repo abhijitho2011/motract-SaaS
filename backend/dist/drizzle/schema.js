@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.modelsRelations = exports.slotBookings = exports.serviceBayMapping = exports.services = exports.bays = exports.expenses = exports.users = exports.workshopBreaks = exports.inventoryBatches = exports.payments = exports.invoices = exports.purchaseItems = exports.purchases = exports.suppliers = exports.inventoryPartNumbers = exports.inventoryVehicleMapping = exports.inventoryItems = exports.subCategories = exports.jobItems = exports.jobInspections = exports.brands = exports.categories = exports.jobParts = exports.onlineBookings = exports.superAdmins = exports.serviceSubCategories = exports.serviceCategories = exports.organizations = exports.accountTypes = exports.workshops = exports.jobComplaints = exports.jobCards = exports.customers = exports.vehicleOwners = exports.vehicles = exports.variants = exports.models = exports.makes = exports.bookingStatus = exports.accountType = exports.txnType = exports.slotStatus = exports.role = exports.paymentMode = exports.jobStage = exports.jobPriority = exports.invoiceType = exports.fuelType = exports.bayType = exports.approvalStatus = void 0;
-exports.slotBookingsRelations = exports.serviceBayMappingRelations = exports.servicesRelations = exports.baysRelations = exports.expensesRelations = exports.workshopBreaksRelations = exports.paymentsRelations = exports.invoicesRelations = exports.purchaseItemsRelations = exports.purchasesRelations = exports.suppliersRelations = exports.inventoryPartNumbersRelations = exports.inventoryVehicleMappingRelations = exports.categoriesRelations = exports.subCategoriesRelations = exports.jobItemsRelations = exports.jobInspectionsRelations = exports.inventoryItemsRelations = exports.inventoryBatchesRelations = exports.jobPartsRelations = exports.jobComplaintsRelations = exports.jobCardsRelations = exports.workshopsRelations = exports.customersRelations = exports.usersRelations = exports.vehicleOwnersRelations = exports.vehiclesRelations = exports.variantsRelations = exports.makesRelations = void 0;
+exports.mapSettings = exports.slotBookingsRelations = exports.serviceBayMappingRelations = exports.servicesRelations = exports.baysRelations = exports.expensesRelations = exports.workshopBreaksRelations = exports.paymentsRelations = exports.invoicesRelations = exports.purchaseItemsRelations = exports.purchasesRelations = exports.suppliersRelations = exports.inventoryPartNumbersRelations = exports.inventoryVehicleMappingRelations = exports.categoriesRelations = exports.subCategoriesRelations = exports.jobItemsRelations = exports.jobInspectionsRelations = exports.inventoryItemsRelations = exports.inventoryBatchesRelations = exports.jobPartsRelations = exports.jobComplaintsRelations = exports.jobCardsRelations = exports.workshopsRelations = exports.customersRelations = exports.usersRelations = exports.vehicleOwnersRelations = exports.vehiclesRelations = exports.variantsRelations = exports.makesRelations = void 0;
 const pg_core_1 = require("drizzle-orm/pg-core");
 const drizzle_orm_1 = require("drizzle-orm");
 const relations_1 = require("drizzle-orm/relations");
@@ -868,4 +868,13 @@ exports.slotBookingsRelations = (0, relations_1.relations)(exports.slotBookings,
         references: [exports.bays.id]
     }),
 }));
+exports.mapSettings = (0, pg_core_1.pgTable)("map_settings", {
+    id: (0, pg_core_1.text)().primaryKey().notNull(),
+    provider: (0, pg_core_1.text)().notNull().default('bhuvan'),
+    apiToken: (0, pg_core_1.text)('api_token').notNull(),
+    isActive: (0, pg_core_1.boolean)('is_active').default(true).notNull(),
+    expiresAt: (0, pg_core_1.timestamp)('expires_at', { mode: 'string' }),
+    createdAt: (0, pg_core_1.timestamp)('created_at', { mode: 'string' }).defaultNow().notNull(),
+    updatedAt: (0, pg_core_1.timestamp)('updated_at', { mode: 'string' }).defaultNow().notNull(),
+});
 //# sourceMappingURL=schema.js.map

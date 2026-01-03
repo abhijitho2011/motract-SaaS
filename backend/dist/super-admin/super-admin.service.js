@@ -286,6 +286,72 @@ let SuperAdminService = class SuperAdminService {
         await this.db.delete(schema_1.organizations);
         return { message: 'Database reset successfully. Super Admin preserved.' };
     }
+    async getMapSettings() {
+        const settings = await this.db.query.mapSettings.findFirst({
+            where: (0, drizzle_orm_1.eq)(schema_1.mapSettings.isActive, true),
+        });
+        if (!settings) {
+            return {
+                provider: 'bhuvan',
+                apiToken: null,
+                isActive: false,
+                expiresAt: null,
+            };
+        }
+        const maskedToken = settings.apiToken
+            ? `${'*'.repeat(settings.apiToken.length - 4)}${settings.apiToken.slice(-4)}`
+            : null;
+        return {
+            ...settings,
+            apiToken: maskedToken,
+            fullToken: settings.apiToken,
+        };
+    }
+    async updateMapSettings(data) {
+        const existingSettings = await this.db.query.mapSettings.findMany();
+        for (const setting of existingSettings) {
+            await this.db
+                .update(schema_1.mapSettings)
+                .set({ isActive: false })
+                .where((0, drizzle_orm_1.eq)(schema_1.mapSettings.id, setting.id));
+        }
+        const newSetting = await this.db.insert(schema_1.mapSettings).values({
+            id: crypto.randomUUID(),
+            provider: 'bhuvan',
+            apiToken: data.apiToken,
+            isActive: true,
+            expiresAt: data.expiresAt || null,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+        }).returning();
+        return {
+            message: 'Map settings updated successfully',
+            settings: newSetting[0],
+        };
+    }
+    async testMapConnection(token) {
+        const testUrl = `https://bhuvan-app1.nrsc.gov.in/api/routing/curl_routing_state.php?lat1=28.6139&lon1=77.2090&lat2=28.7041&lon2=77.1025&token=${token}`;
+        try {
+            const response = await fetch(testUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            });
+            return {
+                success: response.ok,
+                status: response.status,
+                message: response.ok ? 'Connection successful! Token is valid.' : 'Connection failed. Please check your token.',
+            };
+        }
+        catch (error) {
+            return {
+                success: false,
+                status: 500,
+                message: 'Failed to connect to Bhuvan API. Please check your internet connection.',
+            };
+        }
+    }
 };
 exports.SuperAdminService = SuperAdminService;
 exports.SuperAdminService = SuperAdminService = __decorate([

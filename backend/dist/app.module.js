@@ -24,6 +24,7 @@ const expense_module_1 = require("./expense/expense.module");
 const reports_module_1 = require("./reports/reports.module");
 const super_admin_module_1 = require("./super-admin/super-admin.module");
 const throttler_1 = require("@nestjs/throttler");
+const map_module_1 = require("./map/map.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -47,6 +48,7 @@ exports.AppModule = AppModule = __decorate([
             expense_module_1.ExpenseModule,
             reports_module_1.ReportsModule,
             super_admin_module_1.SuperAdminModule,
+            map_module_1.MapModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

@@ -111,6 +111,23 @@ export class SuperAdminController {
 
         return this.superAdminService.getAllBookings(filters);
     }
+
+    // Map Settings
+    @Get('map-settings')
+    async getMapSettings() {
+        return this.superAdminService.getMapSettings();
+    }
+
+    @Post('map-settings')
+    async updateMapSettings(@Body() data: { apiToken: string; expiresAt?: string }) {
+        return this.superAdminService.updateMapSettings(data);
+    }
+
+    @Post('map-settings/test')
+    async testMapConnection(@Body() data: { apiToken: string }) {
+        return this.superAdminService.testMapConnection(data.apiToken);
+    }
+
     // SECURITY: Reset endpoint removed - use direct database access for data cleanup
     // @Delete('reset-database')
     // async resetDatabase(@Query('key') key: string) {
