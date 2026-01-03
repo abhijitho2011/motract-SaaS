@@ -4,15 +4,18 @@ export declare class SuperAdminService {
     private db;
     constructor(db: NodePgDatabase<typeof schema>);
     createOrganization(data: {
-        accountType: 'WORKSHOP' | 'RSA' | 'SUPPLIER' | 'REBUILD_CENTER';
-        name: string;
+        accountType: 'WORKSHOP' | 'WHEEL_ALIGNMENT' | 'WATERWASH' | 'RSA' | 'BATTERY_SERVICE' | 'SUPPLIER' | 'REBUILD_CENTER';
+        subCategory?: string;
+        businessName: string;
         email: string;
         phone: string;
-        address?: string;
+        address: string;
         city?: string;
         state?: string;
         pincode?: string;
         gstin?: string;
+        latitude?: number;
+        longitude?: number;
         isAuthorized?: boolean;
         createdBy: string;
         adminUser: {
@@ -27,13 +30,17 @@ export declare class SuperAdminService {
             createdAt: string;
             updatedAt: string;
             email: string;
-            address: string | null;
+            address: string;
             city: string | null;
             state: string | null;
             pincode: string | null;
             gstin: string | null;
             isActive: boolean;
-            accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
+            latitude: number | null;
+            longitude: number | null;
+            accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+            subCategory: string | null;
+            businessName: string;
             phone: string;
             isAuthorized: boolean;
             createdBy: string | null;
@@ -60,13 +67,17 @@ export declare class SuperAdminService {
         createdAt: string;
         updatedAt: string;
         email: string;
-        address: string | null;
+        address: string;
         city: string | null;
         state: string | null;
         pincode: string | null;
         gstin: string | null;
         isActive: boolean;
-        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
+        latitude: number | null;
+        longitude: number | null;
+        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        subCategory: string | null;
+        businessName: string;
         phone: string;
         isAuthorized: boolean;
         createdBy: string | null;
@@ -77,19 +88,23 @@ export declare class SuperAdminService {
         createdAt: string;
         updatedAt: string;
         email: string;
-        address: string | null;
+        address: string;
         city: string | null;
         state: string | null;
         pincode: string | null;
         gstin: string | null;
         isActive: boolean;
-        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
+        latitude: number | null;
+        longitude: number | null;
+        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        subCategory: string | null;
+        businessName: string;
         phone: string;
         isAuthorized: boolean;
         createdBy: string | null;
     }>;
     updateOrganization(id: string, data: {
-        name?: string;
+        businessName?: string;
         email?: string;
         phone?: string;
         address?: string;
@@ -97,19 +112,26 @@ export declare class SuperAdminService {
         state?: string;
         pincode?: string;
         gstin?: string;
+        latitude?: number;
+        longitude?: number;
+        subCategory?: string;
         isAuthorized?: boolean;
         isActive?: boolean;
     }): Promise<{
         id: string;
-        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
+        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        subCategory: string | null;
+        businessName: string;
         name: string;
         email: string;
         phone: string;
-        address: string | null;
+        address: string;
         city: string | null;
         state: string | null;
         pincode: string | null;
         gstin: string | null;
+        latitude: number | null;
+        longitude: number | null;
         isAuthorized: boolean;
         isActive: boolean;
         createdBy: string | null;
@@ -119,19 +141,95 @@ export declare class SuperAdminService {
     deleteOrganization(id: string): Promise<{
         message: string;
     }>;
+    getMapData(filters?: {
+        accountType?: string;
+    }): Promise<{
+        id: string;
+        name: string;
+        createdAt: string;
+        updatedAt: string;
+        email: string;
+        address: string;
+        city: string | null;
+        state: string | null;
+        pincode: string | null;
+        gstin: string | null;
+        isActive: boolean;
+        latitude: number | null;
+        longitude: number | null;
+        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        subCategory: string | null;
+        businessName: string;
+        phone: string;
+        isAuthorized: boolean;
+        createdBy: string | null;
+    }[]>;
+    getAllCategories(): Promise<{
+        id: string;
+        name: string;
+        createdAt: string;
+        description: string | null;
+        canHaveSubCategories: boolean;
+    }[]>;
+    createCategory(data: {
+        name: string;
+        description?: string;
+        canHaveSubCategories?: boolean;
+    }): Promise<{
+        id: string;
+        name: string;
+        createdAt: string;
+        description: string | null;
+        canHaveSubCategories: boolean;
+    }>;
+    updateCategory(id: string, data: {
+        name?: string;
+        description?: string;
+        canHaveSubCategories?: boolean;
+    }): Promise<{
+        id: string;
+        name: string;
+        description: string | null;
+        canHaveSubCategories: boolean;
+        createdAt: string;
+    }>;
+    deleteCategory(id: string): Promise<{
+        message: string;
+    }>;
+    getSubCategories(categoryId: string): Promise<{
+        id: string;
+        name: string;
+        createdAt: string;
+        description: string | null;
+        categoryId: string;
+    }[]>;
+    createSubCategory(categoryId: string, data: {
+        name: string;
+        description?: string;
+    }): Promise<{
+        id: string;
+        name: string;
+        createdAt: string;
+        description: string | null;
+        categoryId: string;
+    }>;
     getAuthorizedOrganizations(): Promise<{
         id: string;
         name: string;
         createdAt: string;
         updatedAt: string;
         email: string;
-        address: string | null;
+        address: string;
         city: string | null;
         state: string | null;
         pincode: string | null;
         gstin: string | null;
         isActive: boolean;
-        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
+        latitude: number | null;
+        longitude: number | null;
+        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        subCategory: string | null;
+        businessName: string;
         phone: string;
         isAuthorized: boolean;
         createdBy: string | null;
@@ -142,13 +240,17 @@ export declare class SuperAdminService {
         createdAt: string;
         updatedAt: string;
         email: string;
-        address: string | null;
+        address: string;
         city: string | null;
         state: string | null;
         pincode: string | null;
         gstin: string | null;
         isActive: boolean;
-        accountType: "SUPPLIER" | "WORKSHOP" | "RSA" | "REBUILD_CENTER";
+        latitude: number | null;
+        longitude: number | null;
+        accountType: "SUPPLIER" | "WORKSHOP" | "WHEEL_ALIGNMENT" | "WATERWASH" | "RSA" | "BATTERY_SERVICE" | "REBUILD_CENTER";
+        subCategory: string | null;
+        businessName: string;
         phone: string;
         isAuthorized: boolean;
         createdBy: string | null;
@@ -176,7 +278,10 @@ export declare class SuperAdminService {
         totalOrganizations: number;
         byType: {
             workshop: number;
+            wheelAlignment: number;
+            waterwash: number;
             rsa: number;
+            batteryService: number;
             supplier: number;
             rebuildCenter: number;
         };

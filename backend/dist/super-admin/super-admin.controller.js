@@ -36,6 +36,12 @@ let SuperAdminController = class SuperAdminController {
             filters.isActive = isActive === 'true';
         return this.superAdminService.getAllOrganizations(filters);
     }
+    async getMapData(accountType) {
+        const filters = {};
+        if (accountType)
+            filters.accountType = accountType;
+        return this.superAdminService.getMapData(filters);
+    }
     async getOrganization(id) {
         return this.superAdminService.getOrganizationById(id);
     }
@@ -45,10 +51,28 @@ let SuperAdminController = class SuperAdminController {
     async deleteOrganization(id) {
         return this.superAdminService.deleteOrganization(id);
     }
-    async getAuthorizedAccounts() {
+    async getAllCategories() {
+        return this.superAdminService.getAllCategories();
+    }
+    async createCategory(data) {
+        return this.superAdminService.createCategory(data);
+    }
+    async updateCategory(id, data) {
+        return this.superAdminService.updateCategory(id, data);
+    }
+    async deleteCategory(id) {
+        return this.superAdminService.deleteCategory(id);
+    }
+    async getSubCategories(categoryId) {
+        return this.superAdminService.getSubCategories(categoryId);
+    }
+    async createSubCategory(categoryId, data) {
+        return this.superAdminService.createSubCategory(categoryId, data);
+    }
+    async getAuthorizedOrganizations() {
         return this.superAdminService.getAuthorizedOrganizations();
     }
-    async getRSAActivity() {
+    async getRSAOrganizations() {
         return this.superAdminService.getRSAOrganizations();
     }
     async getOnlineBookings(organizationId, status, startDate, endDate) {
@@ -72,14 +96,14 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], SuperAdminController.prototype, "getDashboardStats", null);
 __decorate([
-    (0, common_1.Post)('accounts'),
+    (0, common_1.Post)('organizations'),
     __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], SuperAdminController.prototype, "createOrganization", null);
 __decorate([
-    (0, common_1.Get)('accounts'),
+    (0, common_1.Get)('organizations'),
     __param(0, (0, common_1.Query)('accountType')),
     __param(1, (0, common_1.Query)('isAuthorized')),
     __param(2, (0, common_1.Query)('isActive')),
@@ -88,14 +112,21 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], SuperAdminController.prototype, "getAllOrganizations", null);
 __decorate([
-    (0, common_1.Get)('accounts/:id'),
+    (0, common_1.Get)('organizations/map'),
+    __param(0, (0, common_1.Query)('accountType')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], SuperAdminController.prototype, "getMapData", null);
+__decorate([
+    (0, common_1.Get)('organizations/:id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], SuperAdminController.prototype, "getOrganization", null);
 __decorate([
-    (0, common_1.Put)('accounts/:id'),
+    (0, common_1.Put)('organizations/:id'),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
@@ -103,26 +134,69 @@ __decorate([
     __metadata("design:returntype", Promise)
 ], SuperAdminController.prototype, "updateOrganization", null);
 __decorate([
-    (0, common_1.Delete)('accounts/:id'),
+    (0, common_1.Delete)('organizations/:id'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
 ], SuperAdminController.prototype, "deleteOrganization", null);
 __decorate([
-    (0, common_1.Get)('authorized-accounts'),
+    (0, common_1.Get)('categories'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], SuperAdminController.prototype, "getAuthorizedAccounts", null);
+], SuperAdminController.prototype, "getAllCategories", null);
 __decorate([
-    (0, common_1.Get)('rsa-activity'),
+    (0, common_1.Post)('categories'),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], SuperAdminController.prototype, "createCategory", null);
+__decorate([
+    (0, common_1.Put)('categories/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], SuperAdminController.prototype, "updateCategory", null);
+__decorate([
+    (0, common_1.Delete)('categories/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], SuperAdminController.prototype, "deleteCategory", null);
+__decorate([
+    (0, common_1.Get)('categories/:id/sub-categories'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], SuperAdminController.prototype, "getSubCategories", null);
+__decorate([
+    (0, common_1.Post)('categories/:id/sub-categories'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", Promise)
+], SuperAdminController.prototype, "createSubCategory", null);
+__decorate([
+    (0, common_1.Get)('authorized-organizations'),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", Promise)
-], SuperAdminController.prototype, "getRSAActivity", null);
+], SuperAdminController.prototype, "getAuthorizedOrganizations", null);
 __decorate([
-    (0, common_1.Get)('online-bookings'),
+    (0, common_1.Get)('rsa-organizations'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], SuperAdminController.prototype, "getRSAOrganizations", null);
+__decorate([
+    (0, common_1.Get)('bookings'),
     __param(0, (0, common_1.Query)('organizationId')),
     __param(1, (0, common_1.Query)('status')),
     __param(2, (0, common_1.Query)('startDate')),

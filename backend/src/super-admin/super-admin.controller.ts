@@ -12,12 +12,12 @@ export class SuperAdminController {
     }
 
     // Account Management
-    @Post('accounts')
+    @Post('organizations')
     async createOrganization(@Body() data: any) {
         return this.superAdminService.createOrganization(data);
     }
 
-    @Get('accounts')
+    @Get('organizations')
     async getAllOrganizations(
         @Query('accountType') accountType?: string,
         @Query('isAuthorized') isAuthorized?: string,
@@ -31,34 +31,72 @@ export class SuperAdminController {
         return this.superAdminService.getAllOrganizations(filters);
     }
 
-    @Get('accounts/:id')
+    @Get('organizations/map')
+    async getMapData(@Query('accountType') accountType?: string) {
+        const filters: any = {};
+        if (accountType) filters.accountType = accountType;
+        return this.superAdminService.getMapData(filters);
+    }
+
+    @Get('organizations/:id')
     async getOrganization(@Param('id') id: string) {
         return this.superAdminService.getOrganizationById(id);
     }
 
-    @Put('accounts/:id')
+    @Put('organizations/:id')
     async updateOrganization(@Param('id') id: string, @Body() data: any) {
         return this.superAdminService.updateOrganization(id, data);
     }
 
-    @Delete('accounts/:id')
+    @Delete('organizations/:id')
     async deleteOrganization(@Param('id') id: string) {
         return this.superAdminService.deleteOrganization(id);
     }
 
+    // Category Management
+    @Get('categories')
+    async getAllCategories() {
+        return this.superAdminService.getAllCategories();
+    }
+
+    @Post('categories')
+    async createCategory(@Body() data: any) {
+        return this.superAdminService.createCategory(data);
+    }
+
+    @Put('categories/:id')
+    async updateCategory(@Param('id') id: string, @Body() data: any) {
+        return this.superAdminService.updateCategory(id, data);
+    }
+
+    @Delete('categories/:id')
+    async deleteCategory(@Param('id') id: string) {
+        return this.superAdminService.deleteCategory(id);
+    }
+
+    @Get('categories/:id/sub-categories')
+    async getSubCategories(@Param('id') categoryId: string) {
+        return this.superAdminService.getSubCategories(categoryId);
+    }
+
+    @Post('categories/:id/sub-categories')
+    async createSubCategory(@Param('id') categoryId: string, @Body() data: any) {
+        return this.superAdminService.createSubCategory(categoryId, data);
+    }
+
     // Monitoring
-    @Get('authorized-accounts')
-    async getAuthorizedAccounts() {
+    @Get('authorized-organizations')
+    async getAuthorizedOrganizations() {
         return this.superAdminService.getAuthorizedOrganizations();
     }
 
-    @Get('rsa-activity')
-    async getRSAActivity() {
+    @Get('rsa-organizations')
+    async getRSAOrganizations() {
         return this.superAdminService.getRSAOrganizations();
     }
 
     // Online Bookings
-    @Get('online-bookings')
+    @Get('bookings')
     async getOnlineBookings(
         @Query('organizationId') organizationId?: string,
         @Query('status') status?: string,

@@ -63,7 +63,9 @@ let SuperAdminService = class SuperAdminService {
         const [organization] = await this.db.insert(schema_1.organizations).values({
             id: crypto.randomUUID(),
             accountType: data.accountType,
-            name: data.name,
+            subCategory: data.subCategory,
+            businessName: data.businessName,
+            name: data.businessName,
             email: data.email,
             phone: data.phone,
             address: data.address,
@@ -71,6 +73,8 @@ let SuperAdminService = class SuperAdminService {
             state: data.state,
             pincode: data.pincode,
             gstin: data.gstin,
+            latitude: data.latitude,
+            longitude: data.longitude,
             isAuthorized,
             isActive: true,
             createdBy: data.createdBy,
@@ -91,10 +95,9 @@ let SuperAdminService = class SuperAdminService {
         return { organization, adminUser: { ...adminUser, password: undefined } };
     }
     async getAllOrganizations(filters) {
-        let query = this.db.query.organizations.findMany({
+        const allOrgs = await this.db.query.organizations.findMany({
             orderBy: [(0, drizzle_orm_1.desc)(schema_1.organizations.createdAt)],
         });
-        const allOrgs = await query;
         let filtered = allOrgs;
         if (filters?.accountType) {
             filtered = filtered.filter(o => o.accountType === filters.accountType);
@@ -117,11 +120,12 @@ let SuperAdminService = class SuperAdminService {
         return org;
     }
     async updateOrganization(id, data) {
+        const updateData = { ...data, updatedAt: new Date().toISOString() };
+        if (data.businessName) {
+            updateData.name = data.businessName;
+        }
         const [updated] = await this.db.update(schema_1.organizations)
-            .set({
-            ...data,
-            updatedAt: new Date().toISOString(),
-        })
+            .set(updateData)
             .where((0, drizzle_orm_1.eq)(schema_1.organizations.id, id))
             .returning();
         if (!updated) {
@@ -138,16 +142,73 @@ let SuperAdminService = class SuperAdminService {
         }
         return { message: 'Organization deleted successfully' };
     }
+    async getMapData(filters) {
+        let orgs = await this.db.query.organizations.findMany({
+            where: (0, drizzle_orm_1.eq)(schema_1.organizations.isActive, true),
+        });
+        if (filters?.accountType) {
+            orgs = orgs.filter(o => o.accountType === filters.accountType);
+        }
+        return orgs.filter(o => o.latitude && o.longitude);
+    }
+    async getAllCategories() {
+        return this.db.query.serviceCategories.findMany({
+            orderBy: [(0, drizzle_orm_1.asc)(schema_1.serviceCategories.name)],
+        });
+    }
+    async createCategory(data) {
+        const [category] = await this.db.insert(schema_1.serviceCategories).values({
+            id: crypto.randomUUID(),
+            name: data.name,
+            description: data.description,
+            canHaveSubCategories: data.canHaveSubCategories || false,
+        }).returning();
+        return category;
+    }
+    async updateCategory(id, data) {
+        const [updated] = await this.db.update(schema_1.serviceCategories)
+            .set(data)
+            .where((0, drizzle_orm_1.eq)(schema_1.serviceCategories.id, id))
+            .returning();
+        if (!updated) {
+            throw new common_1.NotFoundException('Category not found');
+        }
+        return updated;
+    }
+    async deleteCategory(id) {
+        const [deleted] = await this.db.delete(schema_1.serviceCategories)
+            .where((0, drizzle_orm_1.eq)(schema_1.serviceCategories.id, id))
+            .returning();
+        if (!deleted) {
+            throw new common_1.NotFoundException('Category not found');
+        }
+        return { message: 'Category deleted successfully' };
+    }
+    async getSubCategories(categoryId) {
+        return this.db.query.serviceSubCategories.findMany({
+            where: (0, drizzle_orm_1.eq)(schema_1.serviceSubCategories.categoryId, categoryId),
+            orderBy: [(0, drizzle_orm_1.asc)(schema_1.serviceSubCategories.name)],
+        });
+    }
+    async createSubCategory(categoryId, data) {
+        const [subCategory] = await this.db.insert(schema_1.serviceSubCategories).values({
+            id: crypto.randomUUID(),
+            categoryId,
+            name: data.name,
+            description: data.description,
+        }).returning();
+        return subCategory;
+    }
     async getAuthorizedOrganizations() {
         return this.db.query.organizations.findMany({
             where: (0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(schema_1.organizations.isAuthorized, true), (0, drizzle_orm_1.eq)(schema_1.organizations.isActive, true)),
-            orderBy: [(0, drizzle_orm_1.asc)(schema_1.organizations.name)],
+            orderBy: [(0, drizzle_orm_1.asc)(schema_1.organizations.businessName)],
         });
     }
     async getRSAOrganizations() {
         return this.db.query.organizations.findMany({
             where: (0, drizzle_orm_1.eq)(schema_1.organizations.accountType, 'RSA'),
-            orderBy: [(0, drizzle_orm_1.asc)(schema_1.organizations.name)],
+            orderBy: [(0, drizzle_orm_1.asc)(schema_1.organizations.businessName)],
         });
     }
     async getAllBookings(filters) {
@@ -170,7 +231,10 @@ let SuperAdminService = class SuperAdminService {
             totalOrganizations: allOrgs.length,
             byType: {
                 workshop: allOrgs.filter(o => o.accountType === 'WORKSHOP').length,
+                wheelAlignment: allOrgs.filter(o => o.accountType === 'WHEEL_ALIGNMENT').length,
+                waterwash: allOrgs.filter(o => o.accountType === 'WATERWASH').length,
                 rsa: allOrgs.filter(o => o.accountType === 'RSA').length,
+                batteryService: allOrgs.filter(o => o.accountType === 'BATTERY_SERVICE').length,
                 supplier: allOrgs.filter(o => o.accountType === 'SUPPLIER').length,
                 rebuildCenter: allOrgs.filter(o => o.accountType === 'REBUILD_CENTER').length,
             },

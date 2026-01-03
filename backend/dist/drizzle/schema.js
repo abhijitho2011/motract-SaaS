@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.variantsRelations = exports.makesRelations = exports.modelsRelations = exports.slotBookings = exports.serviceBayMapping = exports.services = exports.bays = exports.expenses = exports.users = exports.workshopBreaks = exports.inventoryBatches = exports.payments = exports.invoices = exports.purchaseItems = exports.purchases = exports.suppliers = exports.inventoryPartNumbers = exports.inventoryVehicleMapping = exports.inventoryItems = exports.subCategories = exports.jobItems = exports.jobInspections = exports.brands = exports.categories = exports.jobParts = exports.onlineBookings = exports.superAdmins = exports.organizations = exports.accountTypes = exports.workshops = exports.jobComplaints = exports.jobCards = exports.customers = exports.vehicleOwners = exports.vehicles = exports.variants = exports.models = exports.makes = exports.bookingStatus = exports.accountType = exports.txnType = exports.slotStatus = exports.role = exports.paymentMode = exports.jobStage = exports.jobPriority = exports.invoiceType = exports.fuelType = exports.bayType = exports.approvalStatus = void 0;
-exports.slotBookingsRelations = exports.serviceBayMappingRelations = exports.servicesRelations = exports.baysRelations = exports.expensesRelations = exports.workshopBreaksRelations = exports.paymentsRelations = exports.invoicesRelations = exports.purchaseItemsRelations = exports.purchasesRelations = exports.suppliersRelations = exports.inventoryPartNumbersRelations = exports.inventoryVehicleMappingRelations = exports.categoriesRelations = exports.subCategoriesRelations = exports.jobItemsRelations = exports.jobInspectionsRelations = exports.inventoryItemsRelations = exports.inventoryBatchesRelations = exports.jobPartsRelations = exports.jobComplaintsRelations = exports.jobCardsRelations = exports.workshopsRelations = exports.customersRelations = exports.usersRelations = exports.vehicleOwnersRelations = exports.vehiclesRelations = void 0;
+exports.modelsRelations = exports.slotBookings = exports.serviceBayMapping = exports.services = exports.bays = exports.expenses = exports.users = exports.workshopBreaks = exports.inventoryBatches = exports.payments = exports.invoices = exports.purchaseItems = exports.purchases = exports.suppliers = exports.inventoryPartNumbers = exports.inventoryVehicleMapping = exports.inventoryItems = exports.subCategories = exports.jobItems = exports.jobInspections = exports.brands = exports.categories = exports.jobParts = exports.onlineBookings = exports.superAdmins = exports.serviceSubCategories = exports.serviceCategories = exports.organizations = exports.accountTypes = exports.workshops = exports.jobComplaints = exports.jobCards = exports.customers = exports.vehicleOwners = exports.vehicles = exports.variants = exports.models = exports.makes = exports.bookingStatus = exports.accountType = exports.txnType = exports.slotStatus = exports.role = exports.paymentMode = exports.jobStage = exports.jobPriority = exports.invoiceType = exports.fuelType = exports.bayType = exports.approvalStatus = void 0;
+exports.slotBookingsRelations = exports.serviceBayMappingRelations = exports.servicesRelations = exports.baysRelations = exports.expensesRelations = exports.workshopBreaksRelations = exports.paymentsRelations = exports.invoicesRelations = exports.purchaseItemsRelations = exports.purchasesRelations = exports.suppliersRelations = exports.inventoryPartNumbersRelations = exports.inventoryVehicleMappingRelations = exports.categoriesRelations = exports.subCategoriesRelations = exports.jobItemsRelations = exports.jobInspectionsRelations = exports.inventoryItemsRelations = exports.inventoryBatchesRelations = exports.jobPartsRelations = exports.jobComplaintsRelations = exports.jobCardsRelations = exports.workshopsRelations = exports.customersRelations = exports.usersRelations = exports.vehicleOwnersRelations = exports.vehiclesRelations = exports.variantsRelations = exports.makesRelations = void 0;
 const pg_core_1 = require("drizzle-orm/pg-core");
 const drizzle_orm_1 = require("drizzle-orm");
 const relations_1 = require("drizzle-orm/relations");
@@ -15,7 +15,7 @@ exports.paymentMode = (0, pg_core_1.pgEnum)("PaymentMode", ['CASH', 'UPI', 'CARD
 exports.role = (0, pg_core_1.pgEnum)("Role", ['SUPER_ADMIN', 'WORKSHOP_ADMIN', 'WORKSHOP_MANAGER', 'TECHNICIAN', 'CLIENT', 'RSA_PROVIDER', 'SUPPLIER']);
 exports.slotStatus = (0, pg_core_1.pgEnum)("SlotStatus", ['AVAILABLE', 'BOOKED', 'BLOCKED']);
 exports.txnType = (0, pg_core_1.pgEnum)("TxnType", ['CREDIT', 'DEBIT']);
-exports.accountType = (0, pg_core_1.pgEnum)("AccountType", ['WORKSHOP', 'RSA', 'SUPPLIER', 'REBUILD_CENTER']);
+exports.accountType = (0, pg_core_1.pgEnum)("AccountType", ['WORKSHOP', 'WHEEL_ALIGNMENT', 'WATERWASH', 'RSA', 'BATTERY_SERVICE', 'SUPPLIER', 'REBUILD_CENTER']);
 exports.bookingStatus = (0, pg_core_1.pgEnum)("BookingStatus", ['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED']);
 exports.makes = (0, pg_core_1.pgTable)("makes", {
     id: (0, pg_core_1.text)().primaryKey().notNull(),
@@ -177,14 +177,18 @@ exports.accountTypes = (0, pg_core_1.pgTable)("account_types", {
 exports.organizations = (0, pg_core_1.pgTable)("organizations", {
     id: (0, pg_core_1.text)().primaryKey().notNull(),
     accountType: (0, exports.accountType)().notNull(),
+    subCategory: (0, pg_core_1.text)(),
+    businessName: (0, pg_core_1.text)().notNull(),
     name: (0, pg_core_1.text)().notNull(),
     email: (0, pg_core_1.text)().notNull(),
     phone: (0, pg_core_1.text)().notNull(),
-    address: (0, pg_core_1.text)(),
+    address: (0, pg_core_1.text)().notNull(),
     city: (0, pg_core_1.text)(),
     state: (0, pg_core_1.text)(),
     pincode: (0, pg_core_1.text)(),
     gstin: (0, pg_core_1.text)(),
+    latitude: (0, pg_core_1.doublePrecision)(),
+    longitude: (0, pg_core_1.doublePrecision)(),
     isAuthorized: (0, pg_core_1.boolean)().default(false).notNull(),
     isActive: (0, pg_core_1.boolean)().default(true).notNull(),
     createdBy: (0, pg_core_1.text)(),
@@ -192,6 +196,29 @@ exports.organizations = (0, pg_core_1.pgTable)("organizations", {
     updatedAt: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).notNull(),
 }, (table) => [
     (0, pg_core_1.uniqueIndex)("organizations_email_key").using("btree", table.email.asc().nullsLast().op("text_ops")),
+]);
+exports.serviceCategories = (0, pg_core_1.pgTable)("service_categories", {
+    id: (0, pg_core_1.text)().primaryKey().notNull(),
+    name: (0, pg_core_1.text)().notNull(),
+    description: (0, pg_core_1.text)(),
+    canHaveSubCategories: (0, pg_core_1.boolean)().default(false).notNull(),
+    createdAt: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).default((0, drizzle_orm_1.sql) `CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+    (0, pg_core_1.uniqueIndex)("service_categories_name_key").using("btree", table.name.asc().nullsLast().op("text_ops")),
+]);
+exports.serviceSubCategories = (0, pg_core_1.pgTable)("service_sub_categories", {
+    id: (0, pg_core_1.text)().primaryKey().notNull(),
+    categoryId: (0, pg_core_1.text)().notNull(),
+    name: (0, pg_core_1.text)().notNull(),
+    description: (0, pg_core_1.text)(),
+    createdAt: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).default((0, drizzle_orm_1.sql) `CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+    (0, pg_core_1.uniqueIndex)("service_sub_categories_categoryId_name_key").using("btree", table.categoryId.asc().nullsLast().op("text_ops"), table.name.asc().nullsLast().op("text_ops")),
+    (0, pg_core_1.foreignKey)({
+        columns: [table.categoryId],
+        foreignColumns: [exports.serviceCategories.id],
+        name: "service_sub_categories_categoryId_fkey"
+    }).onUpdate("cascade").onDelete("cascade"),
 ]);
 exports.superAdmins = (0, pg_core_1.pgTable)("super_admins", {
     id: (0, pg_core_1.text)().primaryKey().notNull(),

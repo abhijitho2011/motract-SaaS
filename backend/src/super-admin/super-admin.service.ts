@@ -7,6 +7,8 @@ import {
     superAdmins,
     onlineBookings,
     users,
+    serviceCategories,
+    serviceSubCategories,
 } from '../drizzle/schema';
 import { eq, and, desc, asc } from 'drizzle-orm';
 import * as crypto from 'crypto';
@@ -21,15 +23,18 @@ export class SuperAdminService {
 
     // Account Management
     async createOrganization(data: {
-        accountType: 'WORKSHOP' | 'RSA' | 'SUPPLIER' | 'REBUILD_CENTER';
-        name: string;
+        accountType: 'WORKSHOP' | 'WHEEL_ALIGNMENT' | 'WATERWASH' | 'RSA' | 'BATTERY_SERVICE' | 'SUPPLIER' | 'REBUILD_CENTER';
+        subCategory?: string; // For RSA
+        businessName: string;
         email: string;
         phone: string;
-        address?: string;
+        address: string;
         city?: string;
         state?: string;
         pincode?: string;
         gstin?: string;
+        latitude?: number;
+        longitude?: number;
         isAuthorized?: boolean;
         createdBy: string; // Super admin ID
         adminUser: {
@@ -45,7 +50,9 @@ export class SuperAdminService {
         const [organization] = await this.db.insert(organizations).values({
             id: crypto.randomUUID(),
             accountType: data.accountType,
-            name: data.name,
+            subCategory: data.subCategory,
+            businessName: data.businessName,
+            name: data.businessName, // Use businessName for name field
             email: data.email,
             phone: data.phone,
             address: data.address,
@@ -53,6 +60,8 @@ export class SuperAdminService {
             state: data.state,
             pincode: data.pincode,
             gstin: data.gstin,
+            latitude: data.latitude,
+            longitude: data.longitude,
             isAuthorized,
             isActive: true,
             createdBy: data.createdBy,
@@ -81,15 +90,9 @@ export class SuperAdminService {
         isAuthorized?: boolean;
         isActive?: boolean;
     }) {
-        let query = this.db.query.organizations.findMany({
+        const allOrgs = await this.db.query.organizations.findMany({
             orderBy: [desc(organizations.createdAt)],
         });
-
-        // Apply filters if provided
-        // Note: Drizzle query builder doesn't support dynamic where easily,
-        // so we'll fetch all and filter in memory for now
-        // In production, use proper query building
-        const allOrgs = await query;
 
         let filtered = allOrgs;
         if (filters?.accountType) {
@@ -118,7 +121,7 @@ export class SuperAdminService {
     }
 
     async updateOrganization(id: string, data: {
-        name?: string;
+        businessName?: string;
         email?: string;
         phone?: string;
         address?: string;
@@ -126,14 +129,19 @@ export class SuperAdminService {
         state?: string;
         pincode?: string;
         gstin?: string;
+        latitude?: number;
+        longitude?: number;
+        subCategory?: string;
         isAuthorized?: boolean;
         isActive?: boolean;
     }) {
+        const updateData: any = { ...data, updatedAt: new Date().toISOString() };
+        if (data.businessName) {
+            updateData.name = data.businessName; // Keep name in sync
+        }
+
         const [updated] = await this.db.update(organizations)
-            .set({
-                ...data,
-                updatedAt: new Date().toISOString(),
-            })
+            .set(updateData)
             .where(eq(organizations.id, id))
             .returning();
 
@@ -156,6 +164,81 @@ export class SuperAdminService {
         return { message: 'Organization deleted successfully' };
     }
 
+    // Map Data
+    async getMapData(filters?: { accountType?: string }) {
+        let orgs = await this.db.query.organizations.findMany({
+            where: eq(organizations.isActive, true),
+        });
+
+        if (filters?.accountType) {
+            orgs = orgs.filter(o => o.accountType === filters.accountType);
+        }
+
+        // Only return orgs with coordinates
+        return orgs.filter(o => o.latitude && o.longitude);
+    }
+
+    // Category Management
+    async getAllCategories() {
+        return this.db.query.serviceCategories.findMany({
+            orderBy: [asc(serviceCategories.name)],
+        });
+    }
+
+    async createCategory(data: { name: string; description?: string; canHaveSubCategories?: boolean }) {
+        const [category] = await this.db.insert(serviceCategories).values({
+            id: crypto.randomUUID(),
+            name: data.name,
+            description: data.description,
+            canHaveSubCategories: data.canHaveSubCategories || false,
+        }).returning();
+
+        return category;
+    }
+
+    async updateCategory(id: string, data: { name?: string; description?: string; canHaveSubCategories?: boolean }) {
+        const [updated] = await this.db.update(serviceCategories)
+            .set(data)
+            .where(eq(serviceCategories.id, id))
+            .returning();
+
+        if (!updated) {
+            throw new NotFoundException('Category not found');
+        }
+
+        return updated;
+    }
+
+    async deleteCategory(id: string) {
+        const [deleted] = await this.db.delete(serviceCategories)
+            .where(eq(serviceCategories.id, id))
+            .returning();
+
+        if (!deleted) {
+            throw new NotFoundException('Category not found');
+        }
+
+        return { message: 'Category deleted successfully' };
+    }
+
+    async getSubCategories(categoryId: string) {
+        return this.db.query.serviceSubCategories.findMany({
+            where: eq(serviceSubCategories.categoryId, categoryId),
+            orderBy: [asc(serviceSubCategories.name)],
+        });
+    }
+
+    async createSubCategory(categoryId: string, data: { name: string; description?: string }) {
+        const [subCategory] = await this.db.insert(serviceSubCategories).values({
+            id: crypto.randomUUID(),
+            categoryId,
+            name: data.name,
+            description: data.description,
+        }).returning();
+
+        return subCategory;
+    }
+
     // Monitoring
     async getAuthorizedOrganizations() {
         return this.db.query.organizations.findMany({
@@ -163,14 +246,14 @@ export class SuperAdminService {
                 eq(organizations.isAuthorized, true),
                 eq(organizations.isActive, true),
             ),
-            orderBy: [asc(organizations.name)],
+            orderBy: [asc(organizations.businessName)],
         });
     }
 
     async getRSAOrganizations() {
         return this.db.query.organizations.findMany({
             where: eq(organizations.accountType, 'RSA'),
-            orderBy: [asc(organizations.name)],
+            orderBy: [asc(organizations.businessName)],
         });
     }
 
@@ -192,7 +275,6 @@ export class SuperAdminService {
         if (filters?.status) {
             filtered = filtered.filter(b => b.status === filters.status);
         }
-        // Add date filtering if needed
 
         return filtered;
     }
@@ -206,7 +288,10 @@ export class SuperAdminService {
             totalOrganizations: allOrgs.length,
             byType: {
                 workshop: allOrgs.filter(o => o.accountType === 'WORKSHOP').length,
+                wheelAlignment: allOrgs.filter(o => o.accountType === 'WHEEL_ALIGNMENT').length,
+                waterwash: allOrgs.filter(o => o.accountType === 'WATERWASH').length,
                 rsa: allOrgs.filter(o => o.accountType === 'RSA').length,
+                batteryService: allOrgs.filter(o => o.accountType === 'BATTERY_SERVICE').length,
                 supplier: allOrgs.filter(o => o.accountType === 'SUPPLIER').length,
                 rebuildCenter: allOrgs.filter(o => o.accountType === 'REBUILD_CENTER').length,
             },

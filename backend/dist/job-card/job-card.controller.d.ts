@@ -135,11 +135,11 @@ export declare class JobCardController {
             updatedAt: string;
             workshopId: string;
             description: string | null;
+            categoryId: string;
             isOem: boolean;
             hsnCode: string | null;
             taxPercent: number;
             reorderLevel: number;
-            categoryId: string;
             subCategoryId: string | null;
         } | undefined;
     }>;

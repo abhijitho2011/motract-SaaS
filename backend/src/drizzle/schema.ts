@@ -12,7 +12,7 @@ export const paymentMode = pgEnum("PaymentMode", ['CASH', 'UPI', 'CARD', 'BANK_T
 export const role = pgEnum("Role", ['SUPER_ADMIN', 'WORKSHOP_ADMIN', 'WORKSHOP_MANAGER', 'TECHNICIAN', 'CLIENT', 'RSA_PROVIDER', 'SUPPLIER'])
 export const slotStatus = pgEnum("SlotStatus", ['AVAILABLE', 'BOOKED', 'BLOCKED'])
 export const txnType = pgEnum("TxnType", ['CREDIT', 'DEBIT'])
-export const accountType = pgEnum("AccountType", ['WORKSHOP', 'RSA', 'SUPPLIER', 'REBUILD_CENTER'])
+export const accountType = pgEnum("AccountType", ['WORKSHOP', 'WHEEL_ALIGNMENT', 'WATERWASH', 'RSA', 'BATTERY_SERVICE', 'SUPPLIER', 'REBUILD_CENTER'])
 export const bookingStatus = pgEnum("BookingStatus", ['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'])
 
 
@@ -187,14 +187,18 @@ export const accountTypes = pgTable("account_types", {
 export const organizations = pgTable("organizations", {
 	id: text().primaryKey().notNull(),
 	accountType: accountType().notNull(),
-	name: text().notNull(),
+	subCategory: text(), // For RSA: Recovery Truck, Mobile Mechanic, etc.
+	businessName: text().notNull(),
+	name: text().notNull(), // Kept for backward compatibility
 	email: text().notNull(),
 	phone: text().notNull(),
-	address: text(),
+	address: text().notNull(),
 	city: text(),
 	state: text(),
 	pincode: text(),
 	gstin: text(),
+	latitude: doublePrecision(), // For map view
+	longitude: doublePrecision(), // For map view
 	isAuthorized: boolean().default(false).notNull(),
 	isActive: boolean().default(true).notNull(),
 	createdBy: text(), // Super admin ID who created this
@@ -202,6 +206,31 @@ export const organizations = pgTable("organizations", {
 	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
 }, (table) => [
 	uniqueIndex("organizations_email_key").using("btree", table.email.asc().nullsLast().op("text_ops")),
+]);
+
+export const serviceCategories = pgTable("service_categories", {
+	id: text().primaryKey().notNull(),
+	name: text().notNull(),
+	description: text(),
+	canHaveSubCategories: boolean().default(false).notNull(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+	uniqueIndex("service_categories_name_key").using("btree", table.name.asc().nullsLast().op("text_ops")),
+]);
+
+export const serviceSubCategories = pgTable("service_sub_categories", {
+	id: text().primaryKey().notNull(),
+	categoryId: text().notNull(),
+	name: text().notNull(),
+	description: text(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+	uniqueIndex("service_sub_categories_categoryId_name_key").using("btree", table.categoryId.asc().nullsLast().op("text_ops"), table.name.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.categoryId],
+		foreignColumns: [serviceCategories.id],
+		name: "service_sub_categories_categoryId_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
 ]);
 
 export const superAdmins = pgTable("super_admins", {
