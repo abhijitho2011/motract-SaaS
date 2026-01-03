@@ -6,19 +6,19 @@ import helmet from 'helmet';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Security: Helmet - Set security headers
-  app.use(helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-      },
-    },
-    hsts: {
-      maxAge: 31536000,
-      includeSubDomains: true,
-    },
-  }));
+  // Security: Helmet - Set security headers (TEMPORARILY DISABLED FOR DEBUGGING)
+  // app.use(helmet({
+  //   contentSecurityPolicy: {
+  //     directives: {
+  //       defaultSrc: ["'self'"],
+  //       styleSrc: ["'self'", "'unsafe-inline'"],
+  //     },
+  //   },
+  //   hsts: {
+  //     maxAge: 31536000,
+  //     includeSubDomains: true,
+  //   },
+  // }));
 
   // Security: CORS - Allow all origins for mobile app compatibility
   app.enableCors({
@@ -28,13 +28,13 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
-  // Security: Input validation (relaxed for mobile compatibility)
-  app.useGlobalPipes(new ValidationPipe({
-    whitelist: true,
-    forbidNonWhitelisted: false, // Allow extra fields from mobile app
-    transform: true,
-    skipMissingProperties: true, // Don't fail on missing optional fields
-  }));
+  // Security: Input validation (TEMPORARILY DISABLED FOR DEBUGGING)
+  // app.useGlobalPipes(new ValidationPipe({
+  //   whitelist: true,
+  //   forbidNonWhitelisted: false,
+  //   transform: true,
+  //   skipMissingProperties: true,
+  // }));
 
   await app.listen(process.env.PORT ?? 3000);
 }
