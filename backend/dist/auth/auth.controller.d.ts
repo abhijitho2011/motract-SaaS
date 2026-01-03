@@ -17,4 +17,8 @@ export declare class AuthController {
         role: "SUPER_ADMIN" | "WORKSHOP_ADMIN" | "WORKSHOP_MANAGER" | "TECHNICIAN" | "CLIENT" | "RSA_PROVIDER" | "SUPPLIER";
         workshopId: string | null;
     }>;
+    getProfile(req: any): Promise<{
+        message: string;
+        user: any;
+    }>;
 }

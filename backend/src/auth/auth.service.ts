@@ -63,6 +63,11 @@ export class AuthService {
   }
 
   async register(data: typeof users.$inferInsert) {
+    // Generate ID if not present
+    if (!data.id) {
+      data.id = crypto.randomUUID();
+    }
+
     // Hash password
     if (data.password) {
       data.password = await bcrypt.hash(data.password, 10);

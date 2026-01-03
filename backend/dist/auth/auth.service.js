@@ -98,6 +98,9 @@ let AuthService = class AuthService {
         };
     }
     async register(data) {
+        if (!data.id) {
+            data.id = crypto.randomUUID();
+        }
         if (data.password) {
             data.password = await bcrypt.hash(data.password, 10);
         }

@@ -9,6 +9,7 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { Throttle } from '@nestjs/throttler';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -32,5 +33,14 @@ export class AuthController {
   @Post('register')
   async register(@Body() userData: any) {
     return this.authService.register(userData);
+  }
+
+  @Get('me')
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@Request() req: any) {
+    return {
+      message: 'JWT authentication working',
+      user: req.user,
+    };
   }
 }
