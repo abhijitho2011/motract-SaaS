@@ -43,46 +43,52 @@ export class SuperAdminService {
             password: string;
         };
     }) {
-        // RSA is always authorized
-        const isAuthorized = data.accountType === 'RSA' ? true : (data.isAuthorized || false);
+        try {
+            // RSA is always authorized
+            const isAuthorized = data.accountType === 'RSA' ? true : (data.isAuthorized !== undefined ? data.isAuthorized : false);
 
-        // Create organization
-        const [organization] = await this.db.insert(organizations).values({
-            id: crypto.randomUUID(),
-            accountType: data.accountType,
-            subCategory: data.subCategory,
-            businessName: data.businessName,
-            name: data.businessName, // Use businessName for name field
-            email: data.email,
-            phone: data.phone,
-            address: data.address,
-            city: data.city,
-            state: data.state,
-            pincode: data.pincode,
-            gstin: data.gstin,
-            latitude: data.latitude,
-            longitude: data.longitude,
-            isAuthorized,
-            isActive: true,
-            createdBy: data.createdBy,
-            updatedAt: new Date().toISOString(),
-        }).returning();
+            // Create organization
+            const [organization] = await this.db.insert(organizations).values({
+                id: crypto.randomUUID(),
+                accountType: data.accountType,
+                subCategory: data.subCategory,
+                businessName: data.businessName,
+                name: data.businessName, // Use businessName for name field
+                email: data.email,
+                phone: data.phone,
+                address: data.address,
+                city: data.city,
+                state: data.state,
+                pincode: data.pincode,
+                gstin: data.gstin,
+                latitude: data.latitude,
+                longitude: data.longitude,
+                isAuthorized,
+                isActive: true,
+                createdBy: data.createdBy,
+                updatedAt: new Date().toISOString(),
+            }).returning();
 
-        // Create admin user for the organization
-        const hashedPassword = await bcrypt.hash(data.adminUser.password, 10);
-        const [adminUser] = await this.db.insert(users).values({
-            id: crypto.randomUUID(),
-            email: data.adminUser.email,
-            mobile: data.phone, // Use organization phone as user mobile
-            password: hashedPassword,
-            name: data.adminUser.name,
-            role: data.accountType === 'WORKSHOP' ? 'WORKSHOP_ADMIN' :
-                data.accountType === 'RSA' ? 'RSA_PROVIDER' : 'SUPPLIER',
-            workshopId: organization.id, // Link to organization
-            updatedAt: new Date().toISOString(),
-        }).returning();
+            // Create admin user for the organization
+            const hashedPassword = await bcrypt.hash(data.adminUser.password, 10);
+            const [adminUser] = await this.db.insert(users).values({
+                id: crypto.randomUUID(),
+                email: data.adminUser.email,
+                mobile: data.phone, // Use organization phone as user mobile
+                password: hashedPassword,
+                name: data.adminUser.name,
+                role: data.accountType === 'WORKSHOP' ? 'WORKSHOP_ADMIN' :
+                    data.accountType === 'RSA' ? 'RSA_PROVIDER' : 'SUPPLIER',
+                workshopId: organization.id, // Link to organization
+                updatedAt: new Date().toISOString(),
+            }).returning();
 
-        return { organization, adminUser: { ...adminUser, password: undefined } };
+            return { organization, adminUser: { ...adminUser, password: undefined } };
+        } catch (error) {
+            // Log error (if logger available)
+            // Throw with message to help debugging
+            throw new BadRequestException(`Creation failed: ${error.message}`);
+        }
     }
 
     async getAllOrganizations(filters?: {

@@ -22,7 +22,11 @@ export class AuthService {
     if (user && user.password && (await bcrypt.compare(pass, user.password))) {
 
       // Check if attached organization exists (Zombie user check)
-      if (user.workshopId) {
+      if (user.role !== 'SUPER_ADMIN') {
+        if (!user.workshopId) {
+          return null; // Orphaned user
+        }
+
         const org = await this.db.query.organizations.findFirst({
           where: eq(organizations.id, user.workshopId),
         });
