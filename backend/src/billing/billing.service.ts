@@ -19,7 +19,7 @@ export class BillingService {
   ) { }
 
   async generateInvoice(jobCardId: string) {
-    const job = await this.db.query.jobCards.findFirst({
+    let job = await this.db.query.jobCards.findFirst({
       where: eq(jobCards.id, jobCardId),
       with: {
         jobItems: true, // tasks
@@ -30,6 +30,21 @@ export class BillingService {
         invoices: true, // check if invoice exists (named invoices plural in relations)
       }
     });
+
+    if (!job) {
+      // Try finding by Job Card Number (readable ID)
+      job = await this.db.query.jobCards.findFirst({
+        where: eq(jobCards.jobCardNumber, jobCardId), // logic assumes jobCardId input could be Number string
+        with: {
+          jobItems: true,
+          jobParts: true,
+          customer: true,
+          vehicle: true,
+          workshop: true,
+          invoices: true,
+        }
+      });
+    }
 
     if (!job) throw new NotFoundException('Job Card not found');
 

@@ -424,11 +424,27 @@ export const suppliers = pgTable("suppliers", {
 	mobile: text().notNull(),
 	gstin: text(),
 	address: text(),
+	email: text(),
 }, (table) => [
 	foreignKey({
 		columns: [table.workshopId],
 		foreignColumns: [workshops.id],
 		name: "suppliers_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+]);
+
+export const inspectionMasters = pgTable("inspection_masters", {
+	id: text().primaryKey().notNull(),
+	workshopId: text().notNull(),
+	category: text().notNull(),
+	name: text().notNull(),
+	isActive: boolean().default(true).notNull(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "inspection_masters_workshopId_fkey"
 	}).onUpdate("cascade").onDelete("restrict"),
 ]);
 
