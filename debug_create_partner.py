@@ -11,14 +11,16 @@ def debug_create():
     # But user might be hitting "Already Exists".
     # I'll use a random suffix.
     import random
+    import time
+    timestamp = int(time.time()) + 1
     suffix = random.randint(1000, 9999)
     phone = f"987654{suffix}"
-    business_name = f"Test Workshop {suffix}"
-    email = f"test_workshop_{suffix}_{phone}@motract.com"
+    business_name = f"Test Workshop {timestamp}"
+    email = f"test_workshop_{timestamp}_{suffix}@motract.com"
     
     payload = {
-        "accountType": "WORKSHOP",
-        "subCategory": "General Service, Oil Change",
+        "accountType": "RSA",
+        "subCategory": "Puncture Repair, Towing",
         "businessName": business_name,
         "email": email,
         "phone": phone,

@@ -35,6 +35,12 @@ export class AuthService {
           // Organization deleted, block login
           return null;
         }
+
+        // STRICT ACCESS CONTROL: Only WORKSHOP accounts can login to Workshop App
+        // RSA, Supplier, Rebuild Center are blocked until their apps are ready
+        if (org.accountType !== 'WORKSHOP') {
+          return null;
+        }
       }
 
       const { password, ...result } = user;
