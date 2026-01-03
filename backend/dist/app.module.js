@@ -22,6 +22,7 @@ const dashboard_module_1 = require("./dashboard/dashboard.module");
 const purchase_module_1 = require("./purchase/purchase.module");
 const expense_module_1 = require("./expense/expense.module");
 const reports_module_1 = require("./reports/reports.module");
+const super_admin_module_1 = require("./super-admin/super-admin.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -40,6 +41,7 @@ exports.AppModule = AppModule = __decorate([
             purchase_module_1.PurchaseModule,
             expense_module_1.ExpenseModule,
             reports_module_1.ReportsModule,
+            super_admin_module_1.SuperAdminModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

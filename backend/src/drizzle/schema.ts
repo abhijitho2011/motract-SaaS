@@ -12,6 +12,8 @@ export const paymentMode = pgEnum("PaymentMode", ['CASH', 'UPI', 'CARD', 'BANK_T
 export const role = pgEnum("Role", ['SUPER_ADMIN', 'WORKSHOP_ADMIN', 'WORKSHOP_MANAGER', 'TECHNICIAN', 'CLIENT', 'RSA_PROVIDER', 'SUPPLIER'])
 export const slotStatus = pgEnum("SlotStatus", ['AVAILABLE', 'BOOKED', 'BLOCKED'])
 export const txnType = pgEnum("TxnType", ['CREDIT', 'DEBIT'])
+export const accountType = pgEnum("AccountType", ['WORKSHOP', 'RSA', 'SUPPLIER', 'REBUILD_CENTER'])
+export const bookingStatus = pgEnum("BookingStatus", ['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED'])
 
 
 export const makes = pgTable("makes", {
@@ -174,6 +176,70 @@ export const workshops = pgTable("workshops", {
 	slotDurationMin: integer().default(30).notNull(),
 	workingDays: text().array().default(["RAY['MON'::text", "'TUE'::text", "'WED'::text", "'THU'::text", "'FRI'::text", "'SAT'::tex"]),
 });
+
+// Super Admin System Tables
+export const accountTypes = pgTable("account_types", {
+	id: text().primaryKey().notNull(),
+	name: accountType().notNull(),
+	description: text(),
+});
+
+export const organizations = pgTable("organizations", {
+	id: text().primaryKey().notNull(),
+	accountType: accountType().notNull(),
+	name: text().notNull(),
+	email: text().notNull(),
+	phone: text().notNull(),
+	address: text(),
+	city: text(),
+	state: text(),
+	pincode: text(),
+	gstin: text(),
+	isAuthorized: boolean().default(false).notNull(),
+	isActive: boolean().default(true).notNull(),
+	createdBy: text(), // Super admin ID who created this
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+}, (table) => [
+	uniqueIndex("organizations_email_key").using("btree", table.email.asc().nullsLast().op("text_ops")),
+]);
+
+export const superAdmins = pgTable("super_admins", {
+	id: text().primaryKey().notNull(),
+	userId: text().notNull(),
+	name: text().notNull(),
+	email: text().notNull(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+	uniqueIndex("super_admins_userId_key").using("btree", table.userId.asc().nullsLast().op("text_ops")),
+	uniqueIndex("super_admins_email_key").using("btree", table.email.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.userId],
+		foreignColumns: [users.id],
+		name: "super_admins_userId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+]);
+
+export const onlineBookings = pgTable("online_bookings", {
+	id: text().primaryKey().notNull(),
+	organizationId: text().notNull(),
+	customerName: text().notNull(),
+	customerMobile: text().notNull(),
+	customerEmail: text(),
+	vehicleRegNumber: text(),
+	serviceType: text(),
+	scheduledDate: timestamp({ precision: 3, mode: 'string' }),
+	status: bookingStatus().default('PENDING').notNull(),
+	notes: text(),
+	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
+	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.organizationId],
+		foreignColumns: [organizations.id],
+		name: "online_bookings_organizationId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+]);
 
 export const jobParts = pgTable("job_parts", {
 	id: text().primaryKey().notNull(),

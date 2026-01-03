@@ -13,6 +13,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
 import { PurchaseModule } from './purchase/purchase.module';
 import { ExpenseModule } from './expense/expense.module';
 import { ReportsModule } from './reports/reports.module';
+import { SuperAdminModule } from './super-admin/super-admin.module';
 
 
 @Module({
@@ -29,6 +30,7 @@ import { ReportsModule } from './reports/reports.module';
     PurchaseModule,
     ExpenseModule,
     ReportsModule,
+    SuperAdminModule,
   ],
   controllers: [AppController],
   providers: [AppService],

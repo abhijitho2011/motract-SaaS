@@ -8,27 +8,27 @@ export declare class ExpenseService {
         date: string;
         id: string;
         workshopId: string;
+        notes: string | null;
         amount: number;
         category: string;
-        notes: string | null;
         attachmentUrl: string | null;
     }>;
     getExpenses(workshopId: string): Promise<{
         date: string;
         id: string;
         workshopId: string;
+        notes: string | null;
         amount: number;
         category: string;
-        notes: string | null;
         attachmentUrl: string | null;
     }[]>;
     deleteExpense(id: string): Promise<{
         date: string;
         id: string;
         workshopId: string;
+        notes: string | null;
         amount: number;
         category: string;
-        notes: string | null;
         attachmentUrl: string | null;
     }[]>;
 }

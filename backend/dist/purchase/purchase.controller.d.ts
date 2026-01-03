@@ -21,11 +21,11 @@ export declare class PurchaseController {
             id: string;
             createdAt: string;
             workshopId: string;
+            status: string;
             supplierId: string;
             invoiceDate: string;
             invoiceNumber: string | null;
             totalAmount: number;
-            status: string;
         }[];
     }[]>;
     getSupplier(id: string): Promise<any>;

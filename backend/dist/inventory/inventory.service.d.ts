@@ -58,13 +58,13 @@ export declare class InventoryService {
         createdAt: string;
         updatedAt: string;
         workshopId: string;
+        description: string | null;
         isOem: boolean;
         hsnCode: string | null;
         taxPercent: number;
         reorderLevel: number;
         categoryId: string;
         subCategoryId: string | null;
-        description: string | null;
         inventoryPartNumbers: {
             id: string;
             itemId: string;

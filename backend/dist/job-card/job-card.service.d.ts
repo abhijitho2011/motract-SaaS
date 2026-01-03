@@ -107,9 +107,9 @@ export declare class JobCardService {
     }): Promise<{
         id: string;
         jobCardId: string;
+        description: string;
         gstPercent: number;
         isApproved: boolean;
-        description: string;
         price: number;
         completionStatus: string | null;
     }[]>;
@@ -136,13 +136,13 @@ export declare class JobCardService {
             createdAt: string;
             updatedAt: string;
             workshopId: string;
+            description: string | null;
             isOem: boolean;
             hsnCode: string | null;
             taxPercent: number;
             reorderLevel: number;
             categoryId: string;
             subCategoryId: string | null;
-            description: string | null;
         } | undefined;
     }>;
     assignTechnician(id: string, technicianId: string): Promise<{

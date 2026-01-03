@@ -6,27 +6,27 @@ export declare class ExpenseController {
         date: string;
         id: string;
         workshopId: string;
+        notes: string | null;
         amount: number;
         category: string;
-        notes: string | null;
         attachmentUrl: string | null;
     }>;
     findAll(workshopId: string): Promise<{
         date: string;
         id: string;
         workshopId: string;
+        notes: string | null;
         amount: number;
         category: string;
-        notes: string | null;
         attachmentUrl: string | null;
     }[]>;
     remove(id: string): Promise<{
         date: string;
         id: string;
         workshopId: string;
+        notes: string | null;
         amount: number;
         category: string;
-        notes: string | null;
         attachmentUrl: string | null;
     }[]>;
 }

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.jobCardsRelations = exports.workshopsRelations = exports.customersRelations = exports.usersRelations = exports.vehicleOwnersRelations = exports.vehiclesRelations = exports.variantsRelations = exports.makesRelations = exports.modelsRelations = exports.slotBookings = exports.serviceBayMapping = exports.services = exports.bays = exports.expenses = exports.users = exports.workshopBreaks = exports.inventoryBatches = exports.payments = exports.invoices = exports.purchaseItems = exports.purchases = exports.suppliers = exports.inventoryPartNumbers = exports.inventoryVehicleMapping = exports.inventoryItems = exports.subCategories = exports.jobItems = exports.jobInspections = exports.brands = exports.categories = exports.jobParts = exports.workshops = exports.jobComplaints = exports.jobCards = exports.customers = exports.vehicleOwners = exports.vehicles = exports.variants = exports.models = exports.makes = exports.txnType = exports.slotStatus = exports.role = exports.paymentMode = exports.jobStage = exports.jobPriority = exports.invoiceType = exports.fuelType = exports.bayType = exports.approvalStatus = void 0;
-exports.slotBookingsRelations = exports.serviceBayMappingRelations = exports.servicesRelations = exports.baysRelations = exports.expensesRelations = exports.workshopBreaksRelations = exports.paymentsRelations = exports.invoicesRelations = exports.purchaseItemsRelations = exports.purchasesRelations = exports.suppliersRelations = exports.inventoryPartNumbersRelations = exports.inventoryVehicleMappingRelations = exports.categoriesRelations = exports.subCategoriesRelations = exports.jobItemsRelations = exports.jobInspectionsRelations = exports.inventoryItemsRelations = exports.inventoryBatchesRelations = exports.jobPartsRelations = exports.jobComplaintsRelations = void 0;
+exports.variantsRelations = exports.makesRelations = exports.modelsRelations = exports.slotBookings = exports.serviceBayMapping = exports.services = exports.bays = exports.expenses = exports.users = exports.workshopBreaks = exports.inventoryBatches = exports.payments = exports.invoices = exports.purchaseItems = exports.purchases = exports.suppliers = exports.inventoryPartNumbers = exports.inventoryVehicleMapping = exports.inventoryItems = exports.subCategories = exports.jobItems = exports.jobInspections = exports.brands = exports.categories = exports.jobParts = exports.onlineBookings = exports.superAdmins = exports.organizations = exports.accountTypes = exports.workshops = exports.jobComplaints = exports.jobCards = exports.customers = exports.vehicleOwners = exports.vehicles = exports.variants = exports.models = exports.makes = exports.bookingStatus = exports.accountType = exports.txnType = exports.slotStatus = exports.role = exports.paymentMode = exports.jobStage = exports.jobPriority = exports.invoiceType = exports.fuelType = exports.bayType = exports.approvalStatus = void 0;
+exports.slotBookingsRelations = exports.serviceBayMappingRelations = exports.servicesRelations = exports.baysRelations = exports.expensesRelations = exports.workshopBreaksRelations = exports.paymentsRelations = exports.invoicesRelations = exports.purchaseItemsRelations = exports.purchasesRelations = exports.suppliersRelations = exports.inventoryPartNumbersRelations = exports.inventoryVehicleMappingRelations = exports.categoriesRelations = exports.subCategoriesRelations = exports.jobItemsRelations = exports.jobInspectionsRelations = exports.inventoryItemsRelations = exports.inventoryBatchesRelations = exports.jobPartsRelations = exports.jobComplaintsRelations = exports.jobCardsRelations = exports.workshopsRelations = exports.customersRelations = exports.usersRelations = exports.vehicleOwnersRelations = exports.vehiclesRelations = void 0;
 const pg_core_1 = require("drizzle-orm/pg-core");
 const drizzle_orm_1 = require("drizzle-orm");
 const relations_1 = require("drizzle-orm/relations");
@@ -15,6 +15,8 @@ exports.paymentMode = (0, pg_core_1.pgEnum)("PaymentMode", ['CASH', 'UPI', 'CARD
 exports.role = (0, pg_core_1.pgEnum)("Role", ['SUPER_ADMIN', 'WORKSHOP_ADMIN', 'WORKSHOP_MANAGER', 'TECHNICIAN', 'CLIENT', 'RSA_PROVIDER', 'SUPPLIER']);
 exports.slotStatus = (0, pg_core_1.pgEnum)("SlotStatus", ['AVAILABLE', 'BOOKED', 'BLOCKED']);
 exports.txnType = (0, pg_core_1.pgEnum)("TxnType", ['CREDIT', 'DEBIT']);
+exports.accountType = (0, pg_core_1.pgEnum)("AccountType", ['WORKSHOP', 'RSA', 'SUPPLIER', 'REBUILD_CENTER']);
+exports.bookingStatus = (0, pg_core_1.pgEnum)("BookingStatus", ['PENDING', 'CONFIRMED', 'COMPLETED', 'CANCELLED']);
 exports.makes = (0, pg_core_1.pgTable)("makes", {
     id: (0, pg_core_1.text)().primaryKey().notNull(),
     name: (0, pg_core_1.text)().notNull(),
@@ -167,6 +169,65 @@ exports.workshops = (0, pg_core_1.pgTable)("workshops", {
     slotDurationMin: (0, pg_core_1.integer)().default(30).notNull(),
     workingDays: (0, pg_core_1.text)().array().default(["RAY['MON'::text", "'TUE'::text", "'WED'::text", "'THU'::text", "'FRI'::text", "'SAT'::tex"]),
 });
+exports.accountTypes = (0, pg_core_1.pgTable)("account_types", {
+    id: (0, pg_core_1.text)().primaryKey().notNull(),
+    name: (0, exports.accountType)().notNull(),
+    description: (0, pg_core_1.text)(),
+});
+exports.organizations = (0, pg_core_1.pgTable)("organizations", {
+    id: (0, pg_core_1.text)().primaryKey().notNull(),
+    accountType: (0, exports.accountType)().notNull(),
+    name: (0, pg_core_1.text)().notNull(),
+    email: (0, pg_core_1.text)().notNull(),
+    phone: (0, pg_core_1.text)().notNull(),
+    address: (0, pg_core_1.text)(),
+    city: (0, pg_core_1.text)(),
+    state: (0, pg_core_1.text)(),
+    pincode: (0, pg_core_1.text)(),
+    gstin: (0, pg_core_1.text)(),
+    isAuthorized: (0, pg_core_1.boolean)().default(false).notNull(),
+    isActive: (0, pg_core_1.boolean)().default(true).notNull(),
+    createdBy: (0, pg_core_1.text)(),
+    createdAt: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).default((0, drizzle_orm_1.sql) `CURRENT_TIMESTAMP`).notNull(),
+    updatedAt: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).notNull(),
+}, (table) => [
+    (0, pg_core_1.uniqueIndex)("organizations_email_key").using("btree", table.email.asc().nullsLast().op("text_ops")),
+]);
+exports.superAdmins = (0, pg_core_1.pgTable)("super_admins", {
+    id: (0, pg_core_1.text)().primaryKey().notNull(),
+    userId: (0, pg_core_1.text)().notNull(),
+    name: (0, pg_core_1.text)().notNull(),
+    email: (0, pg_core_1.text)().notNull(),
+    createdAt: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).default((0, drizzle_orm_1.sql) `CURRENT_TIMESTAMP`).notNull(),
+}, (table) => [
+    (0, pg_core_1.uniqueIndex)("super_admins_userId_key").using("btree", table.userId.asc().nullsLast().op("text_ops")),
+    (0, pg_core_1.uniqueIndex)("super_admins_email_key").using("btree", table.email.asc().nullsLast().op("text_ops")),
+    (0, pg_core_1.foreignKey)({
+        columns: [table.userId],
+        foreignColumns: [exports.users.id],
+        name: "super_admins_userId_fkey"
+    }).onUpdate("cascade").onDelete("restrict"),
+]);
+exports.onlineBookings = (0, pg_core_1.pgTable)("online_bookings", {
+    id: (0, pg_core_1.text)().primaryKey().notNull(),
+    organizationId: (0, pg_core_1.text)().notNull(),
+    customerName: (0, pg_core_1.text)().notNull(),
+    customerMobile: (0, pg_core_1.text)().notNull(),
+    customerEmail: (0, pg_core_1.text)(),
+    vehicleRegNumber: (0, pg_core_1.text)(),
+    serviceType: (0, pg_core_1.text)(),
+    scheduledDate: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }),
+    status: (0, exports.bookingStatus)().default('PENDING').notNull(),
+    notes: (0, pg_core_1.text)(),
+    createdAt: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).default((0, drizzle_orm_1.sql) `CURRENT_TIMESTAMP`).notNull(),
+    updatedAt: (0, pg_core_1.timestamp)({ precision: 3, mode: 'string' }).notNull(),
+}, (table) => [
+    (0, pg_core_1.foreignKey)({
+        columns: [table.organizationId],
+        foreignColumns: [exports.organizations.id],
+        name: "online_bookings_organizationId_fkey"
+    }).onUpdate("cascade").onDelete("restrict"),
+]);
 exports.jobParts = (0, pg_core_1.pgTable)("job_parts", {
     id: (0, pg_core_1.text)().primaryKey().notNull(),
     jobCardId: (0, pg_core_1.text)().notNull(),
