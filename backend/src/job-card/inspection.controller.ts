@@ -8,7 +8,7 @@ export class InspectionController {
     constructor(private readonly inspectionService: InspectionService) { }
 
     @Post()
-    async create(@Request() req, @Body() body: { category: string; name: string }) {
+    async create(@Request() req: any, @Body() body: { category: string; name: string }) {
         return this.inspectionService.create({
             workshopId: req.user.workshopId,
             category: body.category,
@@ -17,7 +17,7 @@ export class InspectionController {
     }
 
     @Get()
-    async findAll(@Request() req) {
+    async findAll(@Request() req: any) {
         return this.inspectionService.findAll(req.user.workshopId);
     }
 
