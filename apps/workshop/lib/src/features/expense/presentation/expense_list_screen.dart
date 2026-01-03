@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:gap/gap.dart';
 import 'package:workshop/src/features/expense/data/expense_repository.dart';
 import 'package:workshop/src/features/settings/data/settings_repository.dart';
 
@@ -14,7 +13,7 @@ class ExpenseListScreen extends ConsumerStatefulWidget {
 class _ExpenseListScreenState extends ConsumerState<ExpenseListScreen> {
   @override
   Widget build(BuildContext context) {
-    final workshopId = ref.watch(workshopProvider).asData?.value?['id'];
+    final workshopId = ref.watch(workshopProvider).asData?.value['id'];
     // Handle loading workshopId properly
     if (workshopId == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));

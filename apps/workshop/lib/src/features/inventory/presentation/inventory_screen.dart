@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
-import 'package:go_router/go_router.dart';
 import 'package:workshop/src/features/inventory/presentation/inventory_controller.dart';
+import 'package:workshop/src/features/inventory/presentation/add_inventory_item_screen.dart';
 import 'package:workshop/src/core/widgets/app_drawer.dart';
 
 class InventoryScreen extends ConsumerWidget {
@@ -80,8 +80,14 @@ class InventoryScreen extends ConsumerWidget {
         error: (err, stack) => Center(child: Text('Error: $err')),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddItemDialog(context, ref);
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const AddInventoryItemScreen()),
+          );
+          if (result == true) {
+            ref.invalidate(inventoryControllerProvider);
+          }
         },
         child: const Icon(Icons.add),
       ),

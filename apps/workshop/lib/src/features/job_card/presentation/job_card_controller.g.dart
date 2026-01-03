@@ -33,7 +33,7 @@ final class JobCardControllerProvider
   JobCardController create() => JobCardController();
 }
 
-String _$jobCardControllerHash() => r'45f079ba30db3965d20d81d958443ed25a4c6e73';
+String _$jobCardControllerHash() => r'5286d81e70255b3e3ad4d1613d3a8fced5f4ab7b';
 
 abstract class _$JobCardController extends $AsyncNotifier<void> {
   FutureOr<void> build();

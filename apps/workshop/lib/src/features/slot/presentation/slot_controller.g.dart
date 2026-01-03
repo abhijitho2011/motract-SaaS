@@ -33,7 +33,7 @@ final class SlotControllerProvider
   SlotController create() => SlotController();
 }
 
-String _$slotControllerHash() => r'cc35a9bf03e22372d71bb99035c02ba299a3a038';
+String _$slotControllerHash() => r'c50fb759d3904791275c3ec27976f07c4758f1cf';
 
 abstract class _$SlotController
     extends $AsyncNotifier<List<Map<String, dynamic>>> {

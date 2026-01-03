@@ -29,15 +29,62 @@ class _InspectionScreenState extends ConsumerState<InspectionScreen> {
 
   final _fuelController = TextEditingController();
   final _odoController = TextEditingController();
+  bool _isLoading = true;
+  bool _inspectionLocked = false;
+  Map<String, dynamic>? _jobCardData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadJobCard();
+  }
+
+  Future<void> _loadJobCard() async {
+    try {
+      final api = ref.read(jobCardApiProvider);
+      final data = await api.getJobCard(widget.jobCardId);
+      setState(() {
+        _jobCardData = data;
+        _inspectionLocked = data['inspection'] != null;
+        _isLoading = false;
+      });
+    } catch (e) {
+      setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Inspection')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
-      appBar: AppBar(title: const Text('New Inspection')),
+      appBar: AppBar(
+        title: Text(_inspectionLocked ? 'View Inspection' : 'New Inspection'),
+      ),
       body: DefaultTabController(
         length: 2,
         child: Column(
           children: [
+            if (_inspectionLocked)
+              Container(
+                color: Colors.orange.shade100,
+                padding: const EdgeInsets.all(8),
+                child: const Row(
+                  children: [
+                    Icon(Icons.lock, size: 16),
+                    Gap(8),
+                    Text(
+                      'Inspection completed. Editing disabled.',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                  ],
+                ),
+              ),
             const TabBar(
               tabs: [
                 Tab(text: 'Exterior'),
@@ -65,6 +112,7 @@ class _InspectionScreenState extends ConsumerState<InspectionScreen> {
                             labelText: 'Fuel Level (%)',
                           ),
                           keyboardType: TextInputType.number,
+                          enabled: !_inspectionLocked,
                         ),
                       ),
                       const Gap(16),
@@ -75,18 +123,28 @@ class _InspectionScreenState extends ConsumerState<InspectionScreen> {
                             labelText: 'Odometer (km)',
                           ),
                           keyboardType: TextInputType.number,
+                          enabled: !_inspectionLocked,
                         ),
                       ),
                     ],
                   ),
                   const Gap(16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: FilledButton(
-                      onPressed: _submit,
-                      child: const Text('Save & Complete Inspection'),
+                  if (!_inspectionLocked)
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: _submit,
+                        child: const Text('Save & Complete Inspection'),
+                      ),
                     ),
-                  ),
+                  if (_inspectionLocked)
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton(
+                        onPressed: _closeJobCard,
+                        child: const Text('Close & Move to Billing'),
+                      ),
+                    ),
                 ],
               ),
             ),
@@ -102,11 +160,13 @@ class _InspectionScreenState extends ConsumerState<InspectionScreen> {
         return CheckboxListTile(
           title: Text(key),
           value: checks[key],
-          onChanged: (v) {
-            setState(() {
-              checks[key] = v!;
-            });
-          },
+          onChanged: _inspectionLocked
+              ? null
+              : (v) {
+                  setState(() {
+                    checks[key] = v!;
+                  });
+                },
         );
       }).toList(),
     );
@@ -130,6 +190,27 @@ class _InspectionScreenState extends ConsumerState<InspectionScreen> {
           context,
         ).showSnackBar(const SnackBar(content: Text('Inspection Saved!')));
         context.pop();
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
+    }
+  }
+
+  Future<void> _closeJobCard() async {
+    final api = ref.read(jobCardApiProvider);
+
+    try {
+      await api.updateStage(widget.jobCardId, {'stage': 'BILLING'});
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Job Card moved to Billing!')),
+        );
+        context.go('/billing');
       }
     } catch (e) {
       if (mounted) {

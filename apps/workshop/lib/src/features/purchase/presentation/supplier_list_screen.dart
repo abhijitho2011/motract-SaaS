@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:workshop/src/features/purchase/data/purchase_repository.dart';
 import 'package:workshop/src/features/settings/data/settings_repository.dart';
 
@@ -14,7 +13,7 @@ class SupplierListScreen extends ConsumerStatefulWidget {
 class _SupplierListScreenState extends ConsumerState<SupplierListScreen> {
   @override
   Widget build(BuildContext context) {
-    final workshopId = ref.watch(workshopProvider).asData?.value?['id'];
+    final workshopId = ref.watch(workshopProvider).asData?.value['id'];
     if (workshopId == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }

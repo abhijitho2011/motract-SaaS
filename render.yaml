@@ -3,8 +3,8 @@ services:
     name: motract-backend
     env: node
     plan: free
-    buildCommand: cd backend && npm install && npm run build && ls -R dist
-    startCommand: cd backend && ls -la && npx drizzle-kit push && node dist/main
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npx drizzle-kit push && node dist/main
     envVars:
       - key: DATABASE_URL
         fromDatabase:

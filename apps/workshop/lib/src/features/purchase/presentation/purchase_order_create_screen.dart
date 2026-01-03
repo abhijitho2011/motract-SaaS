@@ -75,7 +75,7 @@ class _PurchaseOrderCreateScreenState
 
   @override
   Widget build(BuildContext context) {
-    final workshopId = ref.watch(workshopProvider).asData?.value?['id'];
+    final workshopId = ref.watch(workshopProvider).asData?.value['id'];
     final suppliersAsync = workshopId != null
         ? ref.watch(purchaseApiProvider).getSuppliers(workshopId)
         : Future.value([]);
@@ -96,7 +96,7 @@ class _PurchaseOrderCreateScreenState
                   decoration: const InputDecoration(
                     labelText: 'Select Supplier',
                   ),
-                  value: _selectedSupplierId,
+                  initialValue: _selectedSupplierId,
                   items: suppliers.map<DropdownMenuItem<String>>((s) {
                     return DropdownMenuItem(
                       value: s['id'],
@@ -162,10 +162,11 @@ class _PurchaseOrderCreateScreenState
         ).showSnackBar(const SnackBar(content: Text('PO Created')));
       }
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

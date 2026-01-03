@@ -38,7 +38,7 @@ final class JobCardListControllerProvider
 }
 
 String _$jobCardListControllerHash() =>
-    r'82cce1c1b84459048599eb72652bb24578aae50f';
+    r'1b1efb6ca29ba5a080f103313eb87d99d65789e4';
 
 abstract class _$JobCardListController
     extends $AsyncNotifier<List<Map<String, dynamic>>> {

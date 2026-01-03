@@ -34,7 +34,7 @@ final class DashboardControllerProvider
 }
 
 String _$dashboardControllerHash() =>
-    r'b16b9268c8ccae40a50fa07d874efcb74b028e02';
+    r'b50f89ae1038711e313e0961cac0aab9a3b7e0f1';
 
 abstract class _$DashboardController
     extends $AsyncNotifier<Map<String, dynamic>> {

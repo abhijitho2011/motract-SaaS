@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:gap/gap.dart';
 import 'package:workshop/src/features/billing/data/billing_repository.dart';
 import 'package:workshop/src/features/job_card/data/job_card_repository.dart';
@@ -46,10 +45,12 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
       body: FutureBuilder(
         future: jobAsync,
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting)
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
-          if (snapshot.hasError)
+          }
+          if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
+          }
 
           final job = snapshot.data as Map<String, dynamic>;
           final invoice =
@@ -155,10 +156,11 @@ class _InvoiceScreenState extends ConsumerState<InvoiceScreen> {
         _invoiceData = res;
       });
     } catch (e) {
-      if (mounted)
+      if (mounted) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Error: $e')));
+      }
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:workshop/src/core/theme/theme_controller.dart';
+import 'package:workshop/src/features/settings/presentation/inventory_settings_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -54,6 +55,22 @@ class SettingsScreen extends ConsumerWidget {
                 ref.read(themeControllerProvider.notifier).toggleTheme();
               },
             ),
+          ),
+          const Divider(),
+          const _SectionHeader(title: 'Master Data'),
+          ListTile(
+            leading: const Icon(Icons.inventory),
+            title: const Text('Inventory Settings'),
+            subtitle: const Text('Manage brands, categories, vehicle data'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const InventorySettingsScreen(),
+                ),
+              );
+            },
           ),
           const Divider(),
           const _SectionHeader(title: 'About'),

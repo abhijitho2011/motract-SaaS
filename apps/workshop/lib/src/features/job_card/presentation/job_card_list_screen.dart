@@ -27,10 +27,32 @@ class JobCardListScreen extends ConsumerWidget {
 
                   return Card(
                     child: ListTile(
-                      leading: CircleAvatar(child: Text('${index + 1}')),
-                      title: Text(
-                        vehicle['regNumber'] ?? 'Unknown Vehicle',
-                      ), // From relation
+                      leading: CircleAvatar(
+                        child: Text(
+                          job['jobCardNumber'] != null
+                              ? job['jobCardNumber'].toString().split('-').last
+                              : '${index + 1}',
+                        ),
+                      ),
+                      title: Row(
+                        children: [
+                          if (job['jobCardNumber'] != null) ...[
+                            Text(
+                              job['jobCardNumber'],
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                            const Gap(8),
+                          ],
+                          Expanded(
+                            child: Text(
+                              vehicle['regNumber'] ?? 'Unknown Vehicle',
+                            ),
+                          ),
+                        ],
+                      ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -109,8 +131,8 @@ class JobCardListScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/vehicle/lookup'),
-        child: const Icon(Icons.add),
         tooltip: 'Create Job Card',
+        child: const Icon(Icons.add),
       ),
     );
   }

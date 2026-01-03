@@ -9,7 +9,7 @@ class PurchaseOrderListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final workshopId = ref.watch(workshopProvider).asData?.value?['id'];
+    final workshopId = ref.watch(workshopProvider).asData?.value['id'];
     if (workshopId == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }

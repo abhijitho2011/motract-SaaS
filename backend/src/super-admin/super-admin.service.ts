@@ -153,6 +153,9 @@ export class SuperAdminService {
     }
 
     async deleteOrganization(id: string) {
+        // Delete users associated with this organization first
+        await this.db.delete(users).where(eq(users.workshopId, id));
+
         const [deleted] = await this.db.delete(organizations)
             .where(eq(organizations.id, id))
             .returning();
