@@ -64,9 +64,9 @@ export class AuthService {
   }
 
   async register(data: typeof users.$inferInsert) {
-    // Generate ID if not present
     if (!data.id) {
-      data.id = crypto.randomUUID();
+      // Use randomBytes for Node compatibility
+      data.id = crypto.randomBytes(16).toString('hex');
     }
 
     // Hash password
