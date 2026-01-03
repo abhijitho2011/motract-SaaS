@@ -484,15 +484,49 @@ export class SuperAdminService {
         });
     }
 
-    async updateVehicle(id: string, data: { engineNumber?: string; vin?: string }) {
+    async updateVehicle(id: string, data: {
+        regNumber?: string;
+        variantId?: string;
+        engineNumber?: string;
+        vin?: string;
+        pollutionExpiryDate?: string;
+        insuranceExpiryDate?: string;
+    }) {
+        const updateData: any = { updatedAt: new Date().toISOString() };
+        if (data.regNumber) updateData.regNumber = data.regNumber;
+        if (data.variantId) updateData.variantId = data.variantId;
+        if (data.engineNumber !== undefined) updateData.engineNumber = data.engineNumber;
+        if (data.vin !== undefined) updateData.vin = data.vin;
+        if (data.pollutionExpiryDate !== undefined) updateData.pollutionExpiryDate = data.pollutionExpiryDate;
+        if (data.insuranceExpiryDate !== undefined) updateData.insuranceExpiryDate = data.insuranceExpiryDate;
+
         const [updated] = await this.db.update(vehicles)
-            .set({
-                engineNumber: data.engineNumber,
-                vin: data.vin,
-                updatedAt: new Date().toISOString(),
-            })
+            .set(updateData)
             .where(eq(vehicles.id, id))
             .returning();
         return updated;
+    }
+
+    async getVehicleServiceHistory(vehicleId: string) {
+        // Get all job cards for this vehicle, with their invoices
+        const jobCardsWithInvoices = await this.db.query.jobCards.findMany({
+            where: eq(schema.jobCards.vehicleId, vehicleId),
+            with: {
+                invoices: true,
+                workshop: true,
+            },
+            orderBy: [desc(schema.jobCards.createdAt)],
+        });
+
+        // Flatten to get all invoices
+        const allInvoices = jobCardsWithInvoices.flatMap(jc =>
+            (jc.invoices || []).map((inv: any) => ({
+                ...inv,
+                workshopName: jc.workshop?.businessName || 'Unknown',
+                jobCardNumber: jc.jobCardNumber,
+            }))
+        );
+
+        return allInvoices;
     }
 }

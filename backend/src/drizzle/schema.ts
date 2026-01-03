@@ -59,6 +59,8 @@ export const vehicles = pgTable("vehicles", {
 	mfgYear: integer(),
 	variantId: text().notNull(),
 	workshopId: text(), // Optional for now to support legacy data
+	pollutionExpiryDate: timestamp({ mode: 'string' }),
+	insuranceExpiryDate: timestamp({ mode: 'string' }),
 	createdAt: timestamp({ precision: 3, mode: 'string' }).default(sql`CURRENT_TIMESTAMP`).notNull(),
 	updatedAt: timestamp({ precision: 3, mode: 'string' }).notNull(),
 }, (table) => [

@@ -140,9 +140,21 @@ export class SuperAdminController {
     @Put('vehicles/:id')
     async updateVehicle(
         @Param('id') id: string,
-        @Body() data: { engineNumber?: string; vin?: string },
+        @Body() data: {
+            regNumber?: string;
+            variantId?: string;
+            engineNumber?: string;
+            vin?: string;
+            pollutionExpiryDate?: string;
+            insuranceExpiryDate?: string;
+        },
     ) {
         return this.superAdminService.updateVehicle(id, data);
+    }
+
+    @Get('vehicles/:id/service-history')
+    async getVehicleServiceHistory(@Param('id') id: string) {
+        return this.superAdminService.getVehicleServiceHistory(id);
     }
 
     // SECURITY: Reset endpoint removed - use direct database access for data cleanup
