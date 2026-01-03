@@ -483,4 +483,16 @@ export class SuperAdminService {
             orderBy: [desc(vehicles.updatedAt)],
         });
     }
+
+    async updateVehicle(id: string, data: { engineNumber?: string; vin?: string }) {
+        const [updated] = await this.db.update(vehicles)
+            .set({
+                engineNumber: data.engineNumber,
+                vin: data.vin,
+                updatedAt: new Date().toISOString(),
+            })
+            .where(eq(vehicles.id, id))
+            .returning();
+        return updated;
+    }
 }
