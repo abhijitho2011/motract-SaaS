@@ -22,7 +22,7 @@ export declare class ExpenseService {
         category: string;
         attachmentUrl: string | null;
     }[]>;
-    deleteExpense(id: string): Promise<{
+    deleteExpense(id: string, workshopId: string): Promise<{
         date: string;
         id: string;
         workshopId: string;
@@ -30,5 +30,5 @@ export declare class ExpenseService {
         amount: number;
         category: string;
         attachmentUrl: string | null;
-    }[]>;
+    }>;
 }

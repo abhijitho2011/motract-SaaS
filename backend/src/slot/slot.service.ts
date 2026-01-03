@@ -1,9 +1,9 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 import { DrizzleAsyncProvider } from '../drizzle/drizzle.provider';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as schema from '../drizzle/schema';
 import { bays, slotBookings } from '../drizzle/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import * as crypto from 'crypto';
 
 @Injectable()
@@ -56,8 +56,17 @@ export class SlotService {
         return updated;
     }
 
-    async deleteBay(id: string) {
+    async deleteBay(id: string, workshopId: string) {
+        // Verify bay belongs to workshop before deleting
+        const bay = await this.db.query.bays.findFirst({
+            where: and(eq(bays.id, id), eq(bays.workshopId, workshopId)),
+        });
+
+        if (!bay) {
+            throw new NotFoundException('Bay not found or access denied');
+        }
+
         await this.db.delete(bays).where(eq(bays.id, id));
-        return { success: true };
+        return { message: 'Bay deleted successfully' };
     }
 }

@@ -48,7 +48,7 @@ export declare class SlotService {
         type: "SERVICE" | "WASHING" | "ALIGNMENT" | "ELECTRICAL" | "GENERAL";
         isActive: boolean;
     }>;
-    deleteBay(id: string): Promise<{
-        success: boolean;
+    deleteBay(id: string, workshopId: string): Promise<{
+        message: string;
     }>;
 }

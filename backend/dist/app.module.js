@@ -23,12 +23,17 @@ const purchase_module_1 = require("./purchase/purchase.module");
 const expense_module_1 = require("./expense/expense.module");
 const reports_module_1 = require("./reports/reports.module");
 const super_admin_module_1 = require("./super-admin/super-admin.module");
+const throttler_1 = require("@nestjs/throttler");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
         imports: [
+            throttler_1.ThrottlerModule.forRoot([{
+                    ttl: Number(process.env.THROTTLE_TTL) || 60000,
+                    limit: Number(process.env.THROTTLE_LIMIT) || 10,
+                }]),
             drizzle_module_1.DrizzleModule,
             users_module_1.UsersModule,
             auth_module_1.AuthModule,

@@ -31,7 +31,7 @@ export class ExpenseController {
   }
 
   @Delete(':id')
-  async remove(@Param('id') id: string) {
-    return this.expenseService.deleteExpense(id);
+  async remove(@Request() req: any, @Param('id') id: string) {
+    return this.expenseService.deleteExpense(id, req.user.workshopId);
   }
 }

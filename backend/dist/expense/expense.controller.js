@@ -30,8 +30,8 @@ let ExpenseController = class ExpenseController {
     async findAll(req) {
         return this.expenseService.getExpenses(req.user.workshopId);
     }
-    async remove(id) {
-        return this.expenseService.deleteExpense(id);
+    async remove(req, id) {
+        return this.expenseService.deleteExpense(id, req.user.workshopId);
     }
 };
 exports.ExpenseController = ExpenseController;
@@ -52,9 +52,10 @@ __decorate([
 ], ExpenseController.prototype, "findAll", null);
 __decorate([
     (0, common_1.Delete)(':id'),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], ExpenseController.prototype, "remove", null);
 exports.ExpenseController = ExpenseController = __decorate([

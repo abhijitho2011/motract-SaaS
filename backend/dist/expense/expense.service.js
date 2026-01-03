@@ -70,8 +70,15 @@ let ExpenseService = class ExpenseService {
             orderBy: [(0, drizzle_orm_1.desc)(schema_1.expenses.date)],
         });
     }
-    async deleteExpense(id) {
-        return this.db.delete(schema_1.expenses).where((0, drizzle_orm_1.eq)(schema_1.expenses.id, id)).returning();
+    async deleteExpense(id, workshopId) {
+        const [deleted] = await this.db
+            .delete(schema_1.expenses)
+            .where((0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(schema_1.expenses.id, id), (0, drizzle_orm_1.eq)(schema_1.expenses.workshopId, workshopId)))
+            .returning();
+        if (!deleted) {
+            throw new common_1.NotFoundException('Expense not found or access denied');
+        }
+        return deleted;
     }
 };
 exports.ExpenseService = ExpenseService;

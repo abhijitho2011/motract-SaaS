@@ -87,12 +87,6 @@ let SuperAdminController = class SuperAdminController {
             filters.endDate = endDate;
         return this.superAdminService.getAllBookings(filters);
     }
-    async resetDatabase(key) {
-        if (key !== 'RESET_ME_NOW') {
-            throw new Error('Invalid key');
-        }
-        return this.superAdminService.resetDatabase();
-    }
 };
 exports.SuperAdminController = SuperAdminController;
 __decorate([
@@ -211,13 +205,6 @@ __decorate([
     __metadata("design:paramtypes", [String, String, String, String]),
     __metadata("design:returntype", Promise)
 ], SuperAdminController.prototype, "getOnlineBookings", null);
-__decorate([
-    (0, common_1.Delete)('reset-database'),
-    __param(0, (0, common_1.Query)('key')),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", Promise)
-], SuperAdminController.prototype, "resetDatabase", null);
 exports.SuperAdminController = SuperAdminController = __decorate([
     (0, common_1.Controller)('super-admin'),
     __metadata("design:paramtypes", [super_admin_service_1.SuperAdminService])

@@ -96,9 +96,15 @@ let SlotService = class SlotService {
             .returning();
         return updated;
     }
-    async deleteBay(id) {
+    async deleteBay(id, workshopId) {
+        const bay = await this.db.query.bays.findFirst({
+            where: (0, drizzle_orm_1.and)((0, drizzle_orm_1.eq)(schema_1.bays.id, id), (0, drizzle_orm_1.eq)(schema_1.bays.workshopId, workshopId)),
+        });
+        if (!bay) {
+            throw new common_1.NotFoundException('Bay not found or access denied');
+        }
         await this.db.delete(schema_1.bays).where((0, drizzle_orm_1.eq)(schema_1.bays.id, id));
-        return { success: true };
+        return { message: 'Bay deleted successfully' };
     }
 };
 exports.SlotService = SlotService;

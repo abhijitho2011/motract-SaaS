@@ -116,12 +116,13 @@ export class SuperAdminService {
 
             return { organization, adminUser: { ...adminUser, password: undefined } };
         } catch (error) {
-            // Log error (if logger available)
-            // Throw with message to help debugging
-            throw new BadRequestException(`Creation failed: ${error.message}`);
+            // Log error internally for debugging
+            console.error('Organization creation failed:', error);
+
+            // Return generic error message to prevent information leakage
+            throw new BadRequestException('Failed to create organization. Please check your input and try again.');
         }
     }
-
     async getAllOrganizations(filters?: {
         accountType?: string;
         isAuthorized?: boolean;

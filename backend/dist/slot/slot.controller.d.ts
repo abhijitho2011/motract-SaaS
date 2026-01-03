@@ -46,7 +46,7 @@ export declare class SlotController {
         type: "SERVICE" | "WASHING" | "ALIGNMENT" | "ELECTRICAL" | "GENERAL";
         isActive: boolean;
     }>;
-    deleteBay(id: string): Promise<{
-        success: boolean;
+    deleteBay(req: any, id: string): Promise<{
+        message: string;
     }>;
 }

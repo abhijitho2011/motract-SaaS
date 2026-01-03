@@ -20,7 +20,7 @@ export declare class ExpenseController {
         category: string;
         attachmentUrl: string | null;
     }[]>;
-    remove(id: string): Promise<{
+    remove(req: any, id: string): Promise<{
         date: string;
         id: string;
         workshopId: string;
@@ -28,5 +28,5 @@ export declare class ExpenseController {
         amount: number;
         category: string;
         attachmentUrl: string | null;
-    }[]>;
+    }>;
 }

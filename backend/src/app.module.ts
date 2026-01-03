@@ -14,10 +14,16 @@ import { PurchaseModule } from './purchase/purchase.module';
 import { ExpenseModule } from './expense/expense.module';
 import { ReportsModule } from './reports/reports.module';
 import { SuperAdminModule } from './super-admin/super-admin.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 
 @Module({
   imports: [
+    // Security: Rate limiting
+    ThrottlerModule.forRoot([{
+      ttl: Number(process.env.THROTTLE_TTL) || 60000,
+      limit: Number(process.env.THROTTLE_LIMIT) || 10,
+    }]),
     DrizzleModule,
     UsersModule,
     AuthModule,

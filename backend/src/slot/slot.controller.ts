@@ -34,7 +34,7 @@ export class SlotController {
     }
 
     @Delete('bays/:id')
-    async deleteBay(@Param('id') id: string) {
-        return this.slotService.deleteBay(id);
+    async deleteBay(@Request() req: any, @Param('id') id: string) {
+        return this.slotService.deleteBay(id, req.user.workshopId);
     }
 }

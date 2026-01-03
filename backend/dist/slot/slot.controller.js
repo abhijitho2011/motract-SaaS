@@ -36,8 +36,8 @@ let SlotController = class SlotController {
     async updateBay(id, data) {
         return this.slotService.updateBay(id, data);
     }
-    async deleteBay(id) {
-        return this.slotService.deleteBay(id);
+    async deleteBay(req, id) {
+        return this.slotService.deleteBay(id, req.user.workshopId);
     }
 };
 exports.SlotController = SlotController;
@@ -73,9 +73,10 @@ __decorate([
 ], SlotController.prototype, "updateBay", null);
 __decorate([
     (0, common_1.Delete)('bays/:id'),
-    __param(0, (0, common_1.Param)('id')),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], SlotController.prototype, "deleteBay", null);
 exports.SlotController = SlotController = __decorate([

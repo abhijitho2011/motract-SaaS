@@ -111,7 +111,8 @@ let SuperAdminService = class SuperAdminService {
             return { organization, adminUser: { ...adminUser, password: undefined } };
         }
         catch (error) {
-            throw new common_1.BadRequestException(`Creation failed: ${error.message}`);
+            console.error('Organization creation failed:', error);
+            throw new common_1.BadRequestException('Failed to create organization. Please check your input and try again.');
         }
     }
     async getAllOrganizations(filters) {

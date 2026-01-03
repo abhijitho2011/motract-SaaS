@@ -111,11 +111,12 @@ export class SuperAdminController {
 
         return this.superAdminService.getAllBookings(filters);
     }
-    @Delete('reset-database')
-    async resetDatabase(@Query('key') key: string) {
-        if (key !== 'RESET_ME_NOW') {
-            throw new Error('Invalid key');
-        }
-        return this.superAdminService.resetDatabase();
-    }
+    // SECURITY: Reset endpoint removed - use direct database access for data cleanup
+    // @Delete('reset-database')
+    // async resetDatabase(@Query('key') key: string) {
+    //     if (key !== 'RESET_ME_NOW') {
+    //         throw new Error('Invalid key');
+    //     }
+    //     return this.superAdminService.resetDatabase();
+    // }
 }
