@@ -699,6 +699,10 @@ export const vehiclesRelations = relations(vehicles, ({ one, many }) => ({
 		fields: [vehicles.variantId],
 		references: [variants.id]
 	}),
+	workshop: one(workshops, {
+		fields: [vehicles.workshopId],
+		references: [workshops.id]
+	}),
 	vehicleOwners: many(vehicleOwners),
 	jobCards: many(jobCards),
 }));
@@ -795,17 +799,7 @@ export const inventoryBatchesRelations = relations(inventoryBatches, ({ one, man
 	}),
 }));
 
-// Relations
-export const vehiclesRelations = relations(vehicles, ({ one }) => ({
-	variant: one(variants, {
-		fields: [vehicles.variantId],
-		references: [variants.id]
-	}),
-	workshop: one(workshops, {
-		fields: [vehicles.workshopId],
-		references: [workshops.id]
-	}),
-}));
+
 
 export const inventoryItemsRelations = relations(inventoryItems, ({ one, many }) => ({
 	jobParts: many(jobParts),
