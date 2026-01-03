@@ -10,8 +10,20 @@ import {
     serviceCategories,
     serviceSubCategories,
     workshops,
+    jobCards,
+    jobComplaints,
+    jobInspections,
+    jobItems,
+    jobParts,
+    invoices,
+    quotations,
+    customers,
+    vehicles,
+    inventoryItems,
+    inventoryBatches,
+    inventorySkus,
 } from '../drizzle/schema';
-import { eq, and, desc, asc } from 'drizzle-orm';
+import { eq, and, desc, asc, ne } from 'drizzle-orm';
 import * as crypto from 'crypto';
 import * as bcrypt from 'bcrypt';
 
@@ -336,5 +348,41 @@ export class SuperAdminService {
         };
 
         return stats;
+    }
+
+    // Database Reset (DANGEROUS)
+    async resetDatabase() {
+        // Delete in dependency order
+        // 1. Job Card Dependencies
+        await this.db.delete(jobParts);
+        await this.db.delete(jobItems);
+        await this.db.delete(jobInspections);
+        await this.db.delete(jobComplaints);
+
+        // 2. Billing
+        await this.db.delete(invoices);
+        await this.db.delete(quotations);
+
+        // 3. Core Transaction
+        await this.db.delete(jobCards);
+
+        // 4. Inventory
+        await this.db.delete(inventorySkus);
+        await this.db.delete(inventoryBatches);
+        await this.db.delete(inventoryItems);
+
+        // 5. Customer & Vehicle
+        await this.db.delete(vehicles);
+        await this.db.delete(customers);
+
+        // 6. Users (Preserve Super Admin)
+        // role != 'SUPER_ADMIN'
+        await this.db.delete(users).where(ne(users.role, 'SUPER_ADMIN'));
+
+        // 7. Organizations
+        await this.db.delete(workshops);
+        await this.db.delete(organizations);
+
+        return { message: 'Database reset successfully. Super Admin preserved.' };
     }
 }
