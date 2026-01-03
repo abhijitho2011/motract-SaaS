@@ -20,39 +20,11 @@ Attempting Create Partner at https://motract-backend-5sct.onrender.com/super-adm
     "password": "password123"
   }
 }
-Status Code: 201
+Status Code: 400
 
 FULL RESPONSE:
 {
-  "organization": {
-    "id": "385d81b4-8be6-4355-b8de-da8a96e7b554",
-    "accountType": "RSA",
-    "subCategory": "Puncture Repair, Towing",
-    "businessName": "Test Workshop 1767455240",
-    "name": "Test Workshop 1767455240",
-    "email": "test_workshop_1767455240_8268@motract.com",
-    "phone": "9876548268",
-    "address": "123 Test St",
-    "city": "Bangalore",
-    "state": "Karnataka",
-    "pincode": "560001",
-    "gstin": null,
-    "latitude": 12.9716,
-    "longitude": 77.5946,
-    "isAuthorized": true,
-    "isActive": true,
-    "createdBy": "debug-script",
-    "createdAt": "2026-01-03 15:47:19.861",
-    "updatedAt": "2026-01-03 15:47:19.802"
-  },
-  "adminUser": {
-    "id": "ed9a8727-672b-4a16-8ba0-a8276bb02b48",
-    "email": "test_workshop_1767455240_8268@motract.com",
-    "mobile": "9876548268",
-    "role": "RSA_PROVIDER",
-    "name": "Test Workshop 1767455240",
-    "createdAt": "2026-01-03 15:47:20.204",
-    "updatedAt": "2026-01-03 15:47:20.193",
-    "workshopId": "385d81b4-8be6-4355-b8de-da8a96e7b554"
-  }
+  "message": "Creation failed: Failed query: insert into \"organizations\" (\"id\", \"accountType\", \"subCategory\", \"businessName\", \"name\", \"email\", \"phone\", \"address\", \"city\", \"state\", \"pincode\", \"gstin\", \"latitude\", \"longitude\", \"isAuthorized\", \"isActive\", \"createdBy\", \"createdAt\", \"updatedAt\") values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, default, $18) returning \"id\", \"accountType\", \"subCategory\", \"businessName\", \"name\", \"email\", \"phone\", \"address\", \"city\", \"state\", \"pincode\", \"gstin\", \"latitude\", \"longitude\", \"isAuthorized\", \"isActive\", \"createdBy\", \"createdAt\", \"updatedAt\"\nparams: bb902497-19c0-4a29-b1c3-46f0802aa40d,RSA,Puncture Repair, Towing,Test Workshop 1767455240,Test Workshop 1767455240,test_workshop_1767455240_8268@motract.com,9876548268,123 Test St,Bangalore,Karnataka,560001,,12.9716,77.5946,true,true,debug-script,2026-01-03T15:59:02.905Z",
+  "error": "Bad Request",
+  "statusCode": 400
 }

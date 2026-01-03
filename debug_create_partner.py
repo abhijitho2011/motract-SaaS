@@ -12,11 +12,10 @@ def debug_create():
     # I'll use a random suffix.
     import random
     import time
-    timestamp = int(time.time()) + 1
-    suffix = random.randint(1000, 9999)
-    phone = f"987654{suffix}"
-    business_name = f"Test Workshop {timestamp}"
-    email = f"test_workshop_{timestamp}_{suffix}@motract.com"
+    # Hardcode previous successful values to force duplicate error
+    phone = "9876548268"
+    business_name = "Test Workshop 1767455240"
+    email = "test_workshop_1767455240_8268@motract.com"
     
     payload = {
         "accountType": "RSA",

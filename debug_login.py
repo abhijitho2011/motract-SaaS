@@ -7,8 +7,8 @@ BASE_URL = "https://motract-backend-5sct.onrender.com"
 def debug_login():
     url = f"{BASE_URL}/auth/login"
     payload = {
-        "mobile": "9999999999",
-        "password": "admin123" 
+        "mobile": "9876548268",
+        "password": "password123" 
     }
     
     output = []

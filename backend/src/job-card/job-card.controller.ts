@@ -7,19 +7,23 @@ import {
   Patch,
   Query,
   Put,
+  UseGuards,
+  Request,
 } from '@nestjs/common';
 import { JobCardService } from './job-card.service';
 import type { JobStage, JobPriority } from '../drizzle/types';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('job-cards')
+@UseGuards(JwtAuthGuard)
 export class JobCardController {
   constructor(private readonly jobCardService: JobCardService) { }
 
   @Post()
   async create(
+    @Request() req,
     @Body()
     body: {
-      workshopId: string;
       vehicleId: string;
       customerName: string;
       customerMobile: string;
@@ -30,12 +34,20 @@ export class JobCardController {
       priority?: JobPriority;
     },
   ) {
-    return this.jobCardService.create(body);
+    // Force use of authenticated user's workshopId
+    return this.jobCardService.create({
+      ...body,
+      workshopId: req.user.workshopId,
+    });
   }
 
   @Get()
-  async findAll(@Query('workshopId') workshopId: string) {
-    return this.jobCardService.findAll(workshopId);
+  async findAll(@Request() req, @Query('workshopId') queryWorkshopId?: string) {
+    // If Super Admin, allow query override. Otherwise enforce user's workshop.
+    if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
+      return this.jobCardService.findAll(queryWorkshopId);
+    }
+    return this.jobCardService.findAll(req.user.workshopId);
   }
 
   @Get(':id')

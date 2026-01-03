@@ -1,9 +1,11 @@
-import { Controller, Post, Get, Param, Body } from '@nestjs/common';
+import { Controller, Post, Get, Param, Body, UseGuards } from '@nestjs/common';
 import { BillingService } from './billing.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('billing')
+@UseGuards(JwtAuthGuard)
 export class BillingController {
-  constructor(private readonly billingService: BillingService) {}
+  constructor(private readonly billingService: BillingService) { }
 
   @Post('generate/:jobCardId')
   async generateInvoice(@Param('jobCardId') jobCardId: string) {

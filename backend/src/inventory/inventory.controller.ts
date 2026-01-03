@@ -1,7 +1,19 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Query,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { InventoryService } from './inventory.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('inventory')
+@UseGuards(JwtAuthGuard)
 export class InventoryController {
   constructor(private readonly inventoryService: InventoryService) { }
 
@@ -36,8 +48,8 @@ export class InventoryController {
   }
 
   @Post('items')
-  async createItem(@Body() data: any) {
-    return this.inventoryService.createItem(data);
+  async createItem(@Request() req, @Body() data: any) {
+    return this.inventoryService.createItem({ ...data, workshopId: req.user.workshopId });
   }
 
   @Post('items/:id/skus')
@@ -52,8 +64,12 @@ export class InventoryController {
   }
 
   @Get('items')
-  async findAll(@Query('workshopId') workshopId: string) {
-    return this.inventoryService.findAll(workshopId);
+  async findAll(@Request() req, @Query('workshopId') queryWorkshopId?: string) {
+    // Enforce Tenant Isolation
+    if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
+      return this.inventoryService.findAll(queryWorkshopId);
+    }
+    return this.inventoryService.findAll(req.user.workshopId);
   }
 
   @Get('items/:id')

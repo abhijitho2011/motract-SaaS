@@ -1,35 +1,51 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Request } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @Controller('dashboard')
+@UseGuards(JwtAuthGuard)
 export class DashboardController {
-  constructor(private readonly dashboardService: DashboardService) {}
+  constructor(private readonly dashboardService: DashboardService) { }
 
   @Get('kpis')
-  async getKPIs(@Query('workshopId') workshopId: string) {
-    return this.dashboardService.getKPIs(workshopId);
+  async getKPIs(@Request() req, @Query('workshopId') queryWorkshopId?: string) {
+    if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
+      return this.dashboardService.getKPIs(queryWorkshopId);
+    }
+    return this.dashboardService.getKPIs(req.user.workshopId);
   }
 
   @Get('job-funnel')
-  async getJobStatusFunnel(@Query('workshopId') workshopId: string) {
-    return this.dashboardService.getJobStatusFunnel(workshopId);
+  async getJobStatusFunnel(@Request() req, @Query('workshopId') queryWorkshopId?: string) {
+    if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
+      return this.dashboardService.getJobStatusFunnel(queryWorkshopId);
+    }
+    return this.dashboardService.getJobStatusFunnel(req.user.workshopId);
   }
 
   @Get('revenue-graph')
   async getRevenueGraph(
-    @Query('workshopId') workshopId: string,
+    @Request() req,
+    @Query('workshopId') queryWorkshopId?: string,
     @Query('days') days?: string,
   ) {
     const daysNum = days ? parseInt(days, 10) : 7;
-    return this.dashboardService.getRevenueGraph(workshopId, daysNum);
+    if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
+      return this.dashboardService.getRevenueGraph(queryWorkshopId, daysNum);
+    }
+    return this.dashboardService.getRevenueGraph(req.user.workshopId, daysNum);
   }
 
   @Get('top-services')
   async getTopServices(
-    @Query('workshopId') workshopId: string,
+    @Request() req,
+    @Query('workshopId') queryWorkshopId?: string,
     @Query('limit') limit?: string,
   ) {
     const limitNum = limit ? parseInt(limit, 10) : 5;
-    return this.dashboardService.getTopServices(workshopId, limitNum);
+    if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
+      return this.dashboardService.getTopServices(queryWorkshopId, limitNum);
+    }
+    return this.dashboardService.getTopServices(req.user.workshopId, limitNum);
   }
 }
