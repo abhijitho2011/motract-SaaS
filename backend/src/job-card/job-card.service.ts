@@ -152,6 +152,7 @@ export class JobCardService {
         jobInspections: true, // Note relation name singular/plural check? Schema has 'jobInspections'
         jobItems: true, // tasks
         jobParts: { with: { inventoryItem: true } },
+        invoices: true,
       },
     });
 
@@ -178,6 +179,8 @@ export class JobCardService {
     } else {
       res.inspection = null;
     }
+    // Map invoices array to singular invoice
+    res.invoice = res.invoices?.[0] ?? null;
     // Rename jobItems to tasks if frontend expects tasks
     // Prisma `tasks: true`? Prisma schema has `tasks JobItem[]`.
     // Drizzle `jobItems`.
