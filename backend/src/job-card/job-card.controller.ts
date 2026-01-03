@@ -21,7 +21,7 @@ export class JobCardController {
 
   @Post()
   async create(
-    @Request() req,
+    @Request() req: any,
     @Body()
     body: {
       vehicleId: string;
@@ -42,7 +42,7 @@ export class JobCardController {
   }
 
   @Get()
-  async findAll(@Request() req, @Query('workshopId') queryWorkshopId?: string) {
+  async findAll(@Request() req: any, @Query('workshopId') queryWorkshopId?: string) {
     // If Super Admin, allow query override. Otherwise enforce user's workshop.
     if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
       return this.jobCardService.findAll(queryWorkshopId);

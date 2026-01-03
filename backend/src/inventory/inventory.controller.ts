@@ -48,7 +48,7 @@ export class InventoryController {
   }
 
   @Post('items')
-  async createItem(@Request() req, @Body() data: any) {
+  async createItem(@Request() req: any, @Body() data: any) {
     return this.inventoryService.createItem({ ...data, workshopId: req.user.workshopId });
   }
 
@@ -64,7 +64,7 @@ export class InventoryController {
   }
 
   @Get('items')
-  async findAll(@Request() req, @Query('workshopId') queryWorkshopId?: string) {
+  async findAll(@Request() req: any, @Query('workshopId') queryWorkshopId?: string) {
     // Enforce Tenant Isolation
     if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
       return this.inventoryService.findAll(queryWorkshopId);

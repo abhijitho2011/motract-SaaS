@@ -8,7 +8,7 @@ export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) { }
 
   @Get('kpis')
-  async getKPIs(@Request() req, @Query('workshopId') queryWorkshopId?: string) {
+  async getKPIs(@Request() req: any, @Query('workshopId') queryWorkshopId?: string) {
     if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
       return this.dashboardService.getKPIs(queryWorkshopId);
     }
@@ -16,7 +16,7 @@ export class DashboardController {
   }
 
   @Get('job-funnel')
-  async getJobStatusFunnel(@Request() req, @Query('workshopId') queryWorkshopId?: string) {
+  async getJobStatusFunnel(@Request() req: any, @Query('workshopId') queryWorkshopId?: string) {
     if (req.user.role === 'SUPER_ADMIN' && queryWorkshopId) {
       return this.dashboardService.getJobStatusFunnel(queryWorkshopId);
     }
@@ -25,7 +25,7 @@ export class DashboardController {
 
   @Get('revenue-graph')
   async getRevenueGraph(
-    @Request() req,
+    @Request() req: any,
     @Query('workshopId') queryWorkshopId?: string,
     @Query('days') days?: string,
   ) {
@@ -38,7 +38,7 @@ export class DashboardController {
 
   @Get('top-services')
   async getTopServices(
-    @Request() req,
+    @Request() req: any,
     @Query('workshopId') queryWorkshopId?: string,
     @Query('limit') limit?: string,
   ) {
