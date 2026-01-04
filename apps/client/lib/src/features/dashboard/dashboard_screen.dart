@@ -4,6 +4,7 @@ import 'package:client/src/features/auth/login_screen.dart';
 import 'package:client/src/features/vehicles/add_vehicle_screen.dart';
 import 'package:client/src/features/vehicles/vehicle_history_screen.dart';
 import 'package:client/src/features/booking/book_service_screen.dart';
+import 'package:client/src/features/rsa/request_rsa_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -348,9 +349,10 @@ class _DashboardScreenState extends State<DashboardScreen> {
   }
 
   void _requestRSA() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('RSA Request feature coming soon!')),
-    );
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => RequestRsaScreen(vehicles: _vehicles)),
+    ).then((_) => _loadData());
   }
 }
 
