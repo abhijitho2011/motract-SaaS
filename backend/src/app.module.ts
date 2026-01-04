@@ -16,6 +16,7 @@ import { ReportsModule } from './reports/reports.module';
 import { SuperAdminModule } from './super-admin/super-admin.module';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { MapModule } from './map/map.module';
+import { RsaModule } from './rsa/rsa.module';
 
 
 import { ConfigModule } from '@nestjs/config';
@@ -44,6 +45,7 @@ import { ConfigModule } from '@nestjs/config';
     ReportsModule,
     SuperAdminModule,
     MapModule,
+    RsaModule,
   ],
   controllers: [AppController],
   providers: [AppService],

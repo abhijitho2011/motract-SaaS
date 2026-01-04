@@ -974,3 +974,182 @@ export const mapSettings = pgTable("map_settings", {
 	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
 	updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
 });
+
+// =============================================
+// RSA (Roadside Assistance) Freelance System
+// =============================================
+
+// RSA Enums
+export const rsaVehicleType = pgEnum("RsaVehicleType", ['BIKE', 'TOW_TRUCK', 'FLATBED', 'JUMPSTART_VAN', 'SERVICE_VAN']);
+export const rsaServiceType = pgEnum("RsaServiceType", ['JUMPSTART', 'PUNCTURE', 'TOWING', 'RECOVERY', 'FUEL_DELIVERY']);
+export const rsaJobStatus = pgEnum("RsaJobStatus", ['REQUESTED', 'ACCEPTED', 'ON_THE_WAY', 'ARRIVED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']);
+
+// RSA Profiles - Freelancer identity (NOT tied to workshop)
+export const rsaProfiles = pgTable("rsa_profiles", {
+	id: text().primaryKey().notNull(),
+	userId: text('user_id').notNull(),
+	name: text().notNull(),
+	phone: text().notNull(),
+	vehicleType: rsaVehicleType('vehicle_type').notNull(),
+	services: text('services').array().notNull(), // Array of RsaServiceType values
+	isActive: boolean('is_active').default(true).notNull(),
+	isOnline: boolean('is_online').default(false).notNull(),
+	currentLat: doublePrecision('current_lat'),
+	currentLng: doublePrecision('current_lng'),
+	rating: doublePrecision().default(5.0),
+	totalJobs: integer('total_jobs').default(0),
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	uniqueIndex("rsa_profiles_userId_key").using("btree", table.userId.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.userId],
+		foreignColumns: [users.id],
+		name: "rsa_profiles_userId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+]);
+
+// RSA Jobs - Service requests from clients
+export const rsaJobs = pgTable("rsa_jobs", {
+	id: text().primaryKey().notNull(),
+	clientId: text('client_id').notNull(),
+	rsaId: text('rsa_id'), // Nullable until RSA accepts
+	vehicleId: text('vehicle_id').notNull(),
+
+	serviceType: rsaServiceType('service_type').notNull(),
+	status: rsaJobStatus().default('REQUESTED').notNull(),
+
+	pickupLat: doublePrecision('pickup_lat').notNull(),
+	pickupLng: doublePrecision('pickup_lng').notNull(),
+	pickupAddress: text('pickup_address'),
+
+	destinationLat: doublePrecision('destination_lat'),
+	destinationLng: doublePrecision('destination_lng'),
+	destinationAddress: text('destination_address'),
+	destinationWorkshopId: text('destination_workshop_id'),
+
+	fare: doublePrecision(),
+	distanceKm: doublePrecision('distance_km'),
+
+	notes: text(),
+	cancellationReason: text('cancellation_reason'),
+
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+	acceptedAt: timestamp('accepted_at', { mode: 'string' }),
+	completedAt: timestamp('completed_at', { mode: 'string' }),
+	cancelledAt: timestamp('cancelled_at', { mode: 'string' }),
+}, (table) => [
+	foreignKey({
+		columns: [table.clientId],
+		foreignColumns: [users.id],
+		name: "rsa_jobs_clientId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.rsaId],
+		foreignColumns: [rsaProfiles.id],
+		name: "rsa_jobs_rsaId_fkey"
+	}).onUpdate("cascade").onDelete("set null"),
+	foreignKey({
+		columns: [table.vehicleId],
+		foreignColumns: [vehicles.id],
+		name: "rsa_jobs_vehicleId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.destinationWorkshopId],
+		foreignColumns: [workshops.id],
+		name: "rsa_jobs_destinationWorkshopId_fkey"
+	}).onUpdate("cascade").onDelete("set null"),
+]);
+
+// Vehicle Service History - Unified history for all services
+export const vehicleServiceHistory = pgTable("vehicle_service_history", {
+	id: text().primaryKey().notNull(),
+	vehicleId: text('vehicle_id').notNull(),
+	serviceType: text('service_type').notNull(), // RSA_JUMPSTART, RSA_TOWING, WORKSHOP_SERVICE, etc.
+	performedBy: text('performed_by').notNull(), // 'RSA' | 'WORKSHOP'
+	rsaJobId: text('rsa_job_id'),
+	jobCardId: text('job_card_id'),
+	workshopId: text('workshop_id'),
+	rsaProfileId: text('rsa_profile_id'),
+	notes: text(),
+	serviceDate: timestamp('service_date', { mode: 'string' }).notNull(),
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.vehicleId],
+		foreignColumns: [vehicles.id],
+		name: "vehicle_service_history_vehicleId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.rsaJobId],
+		foreignColumns: [rsaJobs.id],
+		name: "vehicle_service_history_rsaJobId_fkey"
+	}).onUpdate("cascade").onDelete("set null"),
+	foreignKey({
+		columns: [table.jobCardId],
+		foreignColumns: [jobCards.id],
+		name: "vehicle_service_history_jobCardId_fkey"
+	}).onUpdate("cascade").onDelete("set null"),
+	foreignKey({
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "vehicle_service_history_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("set null"),
+	foreignKey({
+		columns: [table.rsaProfileId],
+		foreignColumns: [rsaProfiles.id],
+		name: "vehicle_service_history_rsaProfileId_fkey"
+	}).onUpdate("cascade").onDelete("set null"),
+]);
+
+// RSA Relations
+export const rsaProfilesRelations = relations(rsaProfiles, ({ one, many }) => ({
+	user: one(users, {
+		fields: [rsaProfiles.userId],
+		references: [users.id]
+	}),
+	jobs: many(rsaJobs),
+	serviceHistory: many(vehicleServiceHistory),
+}));
+
+export const rsaJobsRelations = relations(rsaJobs, ({ one }) => ({
+	client: one(users, {
+		fields: [rsaJobs.clientId],
+		references: [users.id]
+	}),
+	rsa: one(rsaProfiles, {
+		fields: [rsaJobs.rsaId],
+		references: [rsaProfiles.id]
+	}),
+	vehicle: one(vehicles, {
+		fields: [rsaJobs.vehicleId],
+		references: [vehicles.id]
+	}),
+	destinationWorkshop: one(workshops, {
+		fields: [rsaJobs.destinationWorkshopId],
+		references: [workshops.id]
+	}),
+}));
+
+export const vehicleServiceHistoryRelations = relations(vehicleServiceHistory, ({ one }) => ({
+	vehicle: one(vehicles, {
+		fields: [vehicleServiceHistory.vehicleId],
+		references: [vehicles.id]
+	}),
+	rsaJob: one(rsaJobs, {
+		fields: [vehicleServiceHistory.rsaJobId],
+		references: [rsaJobs.id]
+	}),
+	jobCard: one(jobCards, {
+		fields: [vehicleServiceHistory.jobCardId],
+		references: [jobCards.id]
+	}),
+	workshop: one(workshops, {
+		fields: [vehicleServiceHistory.workshopId],
+		references: [workshops.id]
+	}),
+	rsaProfile: one(rsaProfiles, {
+		fields: [vehicleServiceHistory.rsaProfileId],
+		references: [rsaProfiles.id]
+	}),
+}));
