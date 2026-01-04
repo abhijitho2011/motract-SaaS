@@ -56,6 +56,53 @@ export class RsaService {
         return profile;
     }
 
+    // Get or create RSA profile from organization data
+    async getOrCreateProfileByUserId(userId: string, organizationId?: string) {
+        // First try to find existing profile
+        let profile = await this.getProfileByUserId(userId);
+        if (profile) {
+            return profile;
+        }
+
+        // If no profile, try to create from organization
+        if (!organizationId) {
+            // Try to get organizationId from user's workshopId
+            const user = await this.db.query.users.findFirst({
+                where: eq(users.id, userId),
+            });
+            organizationId = user?.workshopId || undefined;
+        }
+
+        if (!organizationId) {
+            return null;
+        }
+
+        // Get organization data
+        const org = await this.db.query.organizations.findFirst({
+            where: eq(schema.organizations.id, organizationId),
+        });
+
+        if (!org || org.accountType !== 'RSA') {
+            return null;
+        }
+
+        // Auto-create RSA profile from organization
+        const id = uuid();
+        const [newProfile] = await this.db.insert(rsaProfiles).values({
+            id,
+            userId,
+            name: org.businessName,
+            phone: org.phone,
+            vehicleType: 'TOW_TRUCK' as any, // Default based on subCategory
+            services: ['TOWING', 'RECOVERY'] as any, // Default services
+            isActive: true,
+            isOnline: false,
+            updatedAt: new Date().toISOString(),
+        }).returning();
+
+        return newProfile;
+    }
+
     async getAllProfiles(filters?: { isActive?: boolean; isOnline?: boolean }) {
         const conditions = [];
         if (filters?.isActive !== undefined) {

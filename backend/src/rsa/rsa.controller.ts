@@ -10,15 +10,15 @@ export class RsaController {
     // RSA Profile
     @Get('profile')
     async getProfile(@Req() req: any) {
-        return this.rsaService.getProfileByUserId(req.user.sub);
+        return this.rsaService.getOrCreateProfileByUserId(req.user.sub, req.user.rsaId);
     }
 
     // Go Online
     @Put('online')
     async goOnline(@Req() req: any, @Body() body: { lat: number; lng: number }) {
-        const profile = await this.rsaService.getProfileByUserId(req.user.sub);
+        const profile = await this.rsaService.getOrCreateProfileByUserId(req.user.sub, req.user.rsaId);
         if (!profile) {
-            throw new Error('RSA profile not found');
+            throw new Error('RSA profile not found and could not be created');
         }
         return this.rsaService.goOnline(profile.id, body.lat, body.lng);
     }
@@ -26,7 +26,7 @@ export class RsaController {
     // Go Offline
     @Put('offline')
     async goOffline(@Req() req: any) {
-        const profile = await this.rsaService.getProfileByUserId(req.user.sub);
+        const profile = await this.rsaService.getOrCreateProfileByUserId(req.user.sub, req.user.rsaId);
         if (!profile) {
             throw new Error('RSA profile not found');
         }
@@ -36,7 +36,7 @@ export class RsaController {
     // Update Location
     @Put('location')
     async updateLocation(@Req() req: any, @Body() body: { lat: number; lng: number }) {
-        const profile = await this.rsaService.getProfileByUserId(req.user.sub);
+        const profile = await this.rsaService.getOrCreateProfileByUserId(req.user.sub, req.user.rsaId);
         if (!profile) {
             throw new Error('RSA profile not found');
         }
@@ -52,7 +52,7 @@ export class RsaController {
     // Get My Jobs
     @Get('jobs')
     async getMyJobs(@Req() req: any, @Query('status') status?: string) {
-        const profile = await this.rsaService.getProfileByUserId(req.user.sub);
+        const profile = await this.rsaService.getOrCreateProfileByUserId(req.user.sub, req.user.rsaId);
         if (!profile) {
             throw new Error('RSA profile not found');
         }
@@ -68,7 +68,7 @@ export class RsaController {
     // Accept Job
     @Put('jobs/:id/accept')
     async acceptJob(@Param('id') id: string, @Req() req: any) {
-        const profile = await this.rsaService.getProfileByUserId(req.user.sub);
+        const profile = await this.rsaService.getOrCreateProfileByUserId(req.user.sub, req.user.rsaId);
         if (!profile) {
             throw new Error('RSA profile not found');
         }
@@ -82,7 +82,7 @@ export class RsaController {
         @Req() req: any,
         @Body() body: { status: string }
     ) {
-        const profile = await this.rsaService.getProfileByUserId(req.user.sub);
+        const profile = await this.rsaService.getOrCreateProfileByUserId(req.user.sub, req.user.rsaId);
         if (!profile) {
             throw new Error('RSA profile not found');
         }
@@ -96,7 +96,7 @@ export class RsaController {
         @Req() req: any,
         @Body() body: { fare?: number; distanceKm?: number }
     ) {
-        const profile = await this.rsaService.getProfileByUserId(req.user.sub);
+        const profile = await this.rsaService.getOrCreateProfileByUserId(req.user.sub, req.user.rsaId);
         if (!profile) {
             throw new Error('RSA profile not found');
         }
