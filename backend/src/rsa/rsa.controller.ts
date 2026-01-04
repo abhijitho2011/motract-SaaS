@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, Query, UseGuards, Req, BadRequestException } from '@nestjs/common';
 import { RsaService } from './rsa.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
@@ -16,16 +16,20 @@ export class RsaController {
     // Go Online
     @Put('online')
     async goOnline(@Req() req: any, @Body() body: { lat: number; lng: number }) {
-        console.log('goOnline controller - user:', JSON.stringify(req.user));
-        console.log('goOnline controller - body:', JSON.stringify(body));
-        const profile = await this.rsaService.getOrCreateProfileByUserId(req.user.sub, req.user.rsaId);
-        console.log('goOnline controller - profile:', JSON.stringify(profile));
-        if (!profile) {
-            console.error('goOnline controller - profile is null');
-            throw new Error('RSA profile not found and could not be created');
+        try {
+            console.log('goOnline controller - user:', JSON.stringify(req.user));
+            console.log('goOnline controller - body:', JSON.stringify(body));
+            const profile = await this.rsaService.getOrCreateProfileByUserId(req.user.sub, req.user.rsaId);
+            console.log('goOnline controller - profile:', JSON.stringify(profile));
+            if (!profile) {
+                throw new BadRequestException('RSA profile not found and could not be created');
+            }
+            console.log('goOnline controller - calling goOnline with profile.id:', profile.id);
+            return await this.rsaService.goOnline(profile.id, body.lat, body.lng);
+        } catch (error: any) {
+            console.error('goOnline controller error:', error);
+            throw new BadRequestException(`goOnline failed: ${error.message || JSON.stringify(error)}`);
         }
-        console.log('goOnline controller - calling goOnline with profile.id:', profile.id);
-        return this.rsaService.goOnline(profile.id, body.lat, body.lng);
     }
 
     // Go Offline
