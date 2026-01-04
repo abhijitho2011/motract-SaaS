@@ -58,49 +58,65 @@ export class RsaService {
 
     // Get or create RSA profile from organization data
     async getOrCreateProfileByUserId(userId: string, organizationId?: string) {
+        console.log('getOrCreateProfileByUserId called with userId:', userId, 'organizationId:', organizationId);
+
         // First try to find existing profile
         let profile = await this.getProfileByUserId(userId);
         if (profile) {
+            console.log('Found existing profile:', profile.id);
             return profile;
         }
+        console.log('No existing profile found, attempting to create');
 
         // If no profile, try to create from organization
         if (!organizationId) {
             // Try to get organizationId from user's workshopId
+            console.log('No organizationId provided, looking up user...');
             const user = await this.db.query.users.findFirst({
                 where: eq(users.id, userId),
             });
+            console.log('User found:', user ? 'yes' : 'no', 'workshopId:', user?.workshopId);
             organizationId = user?.workshopId || undefined;
         }
 
         if (!organizationId) {
+            console.log('No organizationId found, returning null');
             return null;
         }
 
         // Get organization data
+        console.log('Looking up organization with id:', organizationId);
         const org = await this.db.query.organizations.findFirst({
             where: eq(organizations.id, organizationId),
         });
+        console.log('Organization found:', org ? 'yes' : 'no', 'accountType:', org?.accountType);
 
         if (!org || org.accountType !== 'RSA') {
+            console.log('Organization not found or not RSA type, returning null');
             return null;
         }
 
         // Auto-create RSA profile from organization
+        console.log('Creating RSA profile with name:', org.businessName, 'phone:', org.phone);
         const id = uuid();
-        const [newProfile] = await this.db.insert(rsaProfiles).values({
-            id,
-            userId,
-            name: org.businessName,
-            phone: org.phone,
-            vehicleType: 'TOW_TRUCK' as any, // Default based on subCategory
-            services: ['TOWING', 'RECOVERY'] as any, // Default services
-            isActive: true,
-            isOnline: false,
-            updatedAt: new Date().toISOString(),
-        }).returning();
-
-        return newProfile;
+        try {
+            const [newProfile] = await this.db.insert(rsaProfiles).values({
+                id,
+                userId,
+                name: org.businessName,
+                phone: org.phone,
+                vehicleType: 'TOW_TRUCK' as any, // Default based on subCategory
+                services: ['TOWING', 'RECOVERY'] as any, // Default services
+                isActive: true,
+                isOnline: false,
+                updatedAt: new Date().toISOString(),
+            }).returning();
+            console.log('RSA profile created successfully:', newProfile);
+            return newProfile;
+        } catch (error) {
+            console.error('Failed to create RSA profile:', error);
+            throw error;
+        }
     }
 
     async getAllProfiles(filters?: { isActive?: boolean; isOnline?: boolean }) {
