@@ -522,7 +522,7 @@ export class SuperAdminService {
         const allInvoices = jobCardsWithInvoices.flatMap(jc =>
             (jc.invoices || []).map((inv: any) => ({
                 ...inv,
-                workshopName: jc.workshop?.businessName || 'Unknown',
+                workshopName: (jc as any).workshop?.businessName || 'Unknown',
                 jobCardNumber: jc.jobCardNumber,
             }))
         );
