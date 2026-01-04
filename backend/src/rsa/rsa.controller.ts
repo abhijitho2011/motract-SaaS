@@ -16,10 +16,15 @@ export class RsaController {
     // Go Online
     @Put('online')
     async goOnline(@Req() req: any, @Body() body: { lat: number; lng: number }) {
+        console.log('goOnline controller - user:', JSON.stringify(req.user));
+        console.log('goOnline controller - body:', JSON.stringify(body));
         const profile = await this.rsaService.getOrCreateProfileByUserId(req.user.sub, req.user.rsaId);
+        console.log('goOnline controller - profile:', JSON.stringify(profile));
         if (!profile) {
+            console.error('goOnline controller - profile is null');
             throw new Error('RSA profile not found and could not be created');
         }
+        console.log('goOnline controller - calling goOnline with profile.id:', profile.id);
         return this.rsaService.goOnline(profile.id, body.lat, body.lng);
     }
 
