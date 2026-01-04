@@ -80,4 +80,67 @@ export class AuthService {
     }
     return this.usersService.create(data);
   }
+
+  // RSA-specific login: validates against organizations with accountType='RSA'
+  async validateRSA(phone: string, pass: string): Promise<any> {
+    // Find user by mobile
+    const user = await this.usersService.findOne(phone);
+    if (!user || !user.password) {
+      return null;
+    }
+
+    // Validate password
+    if (!(await bcrypt.compare(pass, user.password))) {
+      return null;
+    }
+
+    // Check if user is linked to an RSA organization
+    if (!user.workshopId) {
+      return null;
+    }
+
+    const org = await this.db.query.organizations.findFirst({
+      where: eq(organizations.id, user.workshopId),
+    });
+
+    if (!org) {
+      return null;
+    }
+
+    // Must be RSA account type
+    if (org.accountType !== 'RSA') {
+      return null;
+    }
+
+    // Check if RSA is active
+    if (!org.isActive) {
+      return null;
+    }
+
+    const { password, ...result } = user;
+    return { ...result, organization: org };
+  }
+
+  async loginRSA(user: any) {
+    const payload = {
+      mobile: user.mobile,
+      sub: user.id,
+      role: 'RSA_PROVIDER',
+      rsaId: user.workshopId, // Organization ID for RSA
+      orgName: user.organization?.businessName,
+      subCategory: user.organization?.subCategory,
+    };
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        name: user.name,
+        mobile: user.mobile,
+        role: 'RSA_PROVIDER',
+        rsaId: user.workshopId,
+        orgName: user.organization?.businessName,
+        subCategory: user.organization?.subCategory,
+      },
+    };
+  }
 }

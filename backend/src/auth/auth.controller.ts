@@ -43,4 +43,15 @@ export class AuthController {
       user: req.user,
     };
   }
+
+  // RSA-specific login endpoint (phone + password)
+  @Post('rsa-login')
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 attempts per minute
+  async rsaLogin(@Body() body: { phone: string; password: string }) {
+    const user = await this.authService.validateRSA(body.phone, body.password);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials or not an RSA account');
+    }
+    return this.authService.loginRSA(user);
+  }
 }
