@@ -59,6 +59,9 @@ export class RsaBookingController {
         }
 
         const rsa = job.rsa;
+        if (!rsa) {
+            return { tracking: false, message: 'RSA profile not found' };
+        }
         return {
             tracking: true,
             rsaId: rsa.id,

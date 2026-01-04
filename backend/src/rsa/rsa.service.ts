@@ -31,7 +31,7 @@ export class RsaService {
             userId: data.userId,
             name: data.name,
             phone: data.phone,
-            vehicleType: data.vehicleType,
+            vehicleType: data.vehicleType as any,
             services: data.services,
             isActive: true,
             isOnline: false,
@@ -79,8 +79,9 @@ export class RsaService {
         services: string[];
         isActive: boolean;
     }>) {
+        const updateData: any = { ...data, updatedAt: new Date().toISOString() };
         const [updated] = await this.db.update(rsaProfiles)
-            .set({ ...data, updatedAt: new Date().toISOString() })
+            .set(updateData)
             .where(eq(rsaProfiles.id, id))
             .returning();
         return updated;
@@ -202,8 +203,8 @@ export class RsaService {
             id,
             clientId: data.clientId,
             vehicleId: data.vehicleId,
-            serviceType: data.serviceType,
-            status: 'REQUESTED',
+            serviceType: data.serviceType as any,
+            status: 'REQUESTED' as any,
             pickupLat: data.pickupLat,
             pickupLng: data.pickupLng,
             pickupAddress: data.pickupAddress,
@@ -275,7 +276,7 @@ export class RsaService {
         const [updated] = await this.db.update(rsaJobs)
             .set({
                 rsaId,
-                status: 'ACCEPTED',
+                status: 'ACCEPTED' as any,
                 acceptedAt: new Date().toISOString(),
             })
             .where(eq(rsaJobs.id, jobId))
@@ -326,7 +327,7 @@ export class RsaService {
         // Update job status
         const [updated] = await this.db.update(rsaJobs)
             .set({
-                status: 'COMPLETED',
+                status: 'COMPLETED' as any,
                 completedAt: new Date().toISOString(),
                 fare,
                 distanceKm,
@@ -371,7 +372,7 @@ export class RsaService {
 
         const [updated] = await this.db.update(rsaJobs)
             .set({
-                status: 'CANCELLED',
+                status: 'CANCELLED' as any,
                 cancelledAt: new Date().toISOString(),
                 cancellationReason: reason,
             })
