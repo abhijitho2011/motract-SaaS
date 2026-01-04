@@ -143,16 +143,23 @@ export class RsaService {
     // =============================================
 
     async goOnline(rsaId: string, lat: number, lng: number) {
-        const [updated] = await this.db.update(rsaProfiles)
-            .set({
-                isOnline: true,
-                currentLat: lat,
-                currentLng: lng,
-                updatedAt: new Date().toISOString(),
-            })
-            .where(eq(rsaProfiles.id, rsaId))
-            .returning();
-        return updated;
+        try {
+            console.log('goOnline called with rsaId:', rsaId, 'lat:', lat, 'lng:', lng);
+            const [updated] = await this.db.update(rsaProfiles)
+                .set({
+                    isOnline: true,
+                    currentLat: lat,
+                    currentLng: lng,
+                    updatedAt: new Date().toISOString(),
+                })
+                .where(eq(rsaProfiles.id, rsaId))
+                .returning();
+            console.log('goOnline success:', updated);
+            return updated;
+        } catch (error) {
+            console.error('goOnline error:', error);
+            throw error;
+        }
     }
 
     async goOffline(rsaId: string) {
