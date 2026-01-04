@@ -22,6 +22,7 @@ import 'package:workshop/src/features/purchase/presentation/purchase_order_creat
 import 'package:workshop/src/features/purchase/presentation/purchase_order_details_screen.dart';
 import 'package:workshop/src/features/expense/presentation/expense_list_screen.dart';
 import 'package:workshop/src/features/reports/presentation/reports_screen.dart';
+import 'package:workshop/src/features/vehicle/presentation/vehicle_database_screen.dart';
 
 part 'router.g.dart';
 
@@ -56,6 +57,10 @@ GoRouter router(Ref ref) {
       GoRoute(
         path: '/inventory',
         builder: (context, state) => const InventoryScreen(),
+      ),
+      GoRoute(
+        path: '/vehicles',
+        builder: (context, state) => const VehicleDatabaseScreen(),
       ),
       GoRoute(
         path: '/billing',

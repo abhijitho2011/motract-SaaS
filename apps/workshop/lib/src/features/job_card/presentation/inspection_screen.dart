@@ -13,19 +13,8 @@ class InspectionScreen extends ConsumerStatefulWidget {
 }
 
 class _InspectionScreenState extends ConsumerState<InspectionScreen> {
-  final Map<String, bool> _exteriorChecks = {
-    'Scratches': false,
-    'Dents': false,
-    'Broken Glass': false,
-    'Lights Broken': false,
-  };
-
-  final Map<String, bool> _interiorChecks = {
-    'Dirty Seats': false,
-    'Floor Mats Missing': false,
-    'AC Not Working': false,
-    'Music System Issue': false,
-  };
+  Map<String, bool> _exteriorChecks = {};
+  Map<String, bool> _interiorChecks = {};
 
   final _fuelController = TextEditingController();
   final _odoController = TextEditingController();
@@ -36,14 +25,58 @@ class _InspectionScreenState extends ConsumerState<InspectionScreen> {
   @override
   void initState() {
     super.initState();
-    _loadJobCard();
+    _loadData();
   }
 
-  Future<void> _loadJobCard() async {
+  Future<void> _loadData() async {
     try {
       final api = ref.read(jobCardApiProvider);
+
+      // Load Masters
+      final masters = await api.getInspectionMasters() as List;
+      final exteriorMaster = masters
+          .where((i) => i['category'] == 'EXTERIOR')
+          .map((i) => i['name'] as String)
+          .toList();
+      final interiorMaster = masters
+          .where((i) => i['category'] == 'INTERIOR')
+          .map((i) => i['name'] as String)
+          .toList();
+
+      // Initialize with false
+      final extMap = {for (var e in exteriorMaster) e: false};
+      final intMap = {for (var e in interiorMaster) e: false};
+
+      // Load Job Card
       final data = await api.getJobCard(widget.jobCardId);
+
+      if (data['inspection'] != null) {
+        // Merge saved data
+        final savedExt = Map<String, dynamic>.from(
+          data['inspection']['exterior'] ?? {},
+        );
+        final savedInt = Map<String, dynamic>.from(
+          data['inspection']['interior'] ?? {},
+        );
+
+        savedExt.forEach((k, v) => extMap[k] = v == true);
+        savedInt.forEach((k, v) => intMap[k] = v == true);
+
+        // Also ensure any NEW masters are present (false by default) but if saved didn't have them, they are false.
+        // However, if inspection is LOCKED, maybe we shouldn't show new items?
+        // Logic: allow view of what was saved + potentially new items if we want (but locked so uneditable).
+
+        if (data['inspection']['fuelLevel'] != null) {
+          _fuelController.text = data['inspection']['fuelLevel'].toString();
+        }
+        if (data['inspection']['odometer'] != null) {
+          _odoController.text = data['inspection']['odometer'].toString();
+        }
+      }
+
       setState(() {
+        _exteriorChecks = extMap;
+        _interiorChecks = intMap;
         _jobCardData = data;
         _inspectionLocked = data['inspection'] != null;
         _isLoading = false;

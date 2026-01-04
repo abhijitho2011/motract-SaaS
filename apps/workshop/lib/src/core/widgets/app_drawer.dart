@@ -57,6 +57,11 @@ class AppDrawer extends ConsumerWidget {
             route: '/inventory',
           ),
           _DrawerItem(
+            icon: Icons.directions_car,
+            title: 'Vehicle Database',
+            route: '/vehicles',
+          ),
+          _DrawerItem(
             icon: Icons.shopping_cart,
             title: 'Purchase',
             route: '/purchase/orders',

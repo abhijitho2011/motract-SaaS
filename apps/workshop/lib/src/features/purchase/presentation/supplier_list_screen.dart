@@ -67,23 +67,48 @@ class _SupplierListScreenState extends ConsumerState<SupplierListScreen> {
   void _showAddSupplierDialog(BuildContext context, String workshopId) {
     final nameCtrl = TextEditingController();
     final mobileCtrl = TextEditingController();
+    final emailCtrl = TextEditingController();
+    final addressCtrl = TextEditingController();
+    final gstinCtrl = TextEditingController();
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Add Supplier'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameCtrl,
-              decoration: const InputDecoration(labelText: 'Name'),
-            ),
-            TextField(
-              controller: mobileCtrl,
-              decoration: const InputDecoration(labelText: 'Mobile'),
-            ),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: nameCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Company/Supplier Name',
+                ),
+              ),
+              TextField(
+                controller: mobileCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Phone Number (Mandatory)',
+                ),
+              ),
+              TextField(
+                controller: emailCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'Email (Optional)',
+                ),
+              ),
+              TextField(
+                controller: addressCtrl,
+                decoration: const InputDecoration(labelText: 'Address'),
+              ),
+              TextField(
+                controller: gstinCtrl,
+                decoration: const InputDecoration(
+                  labelText: 'GST Number (Optional)',
+                ),
+              ),
+            ],
+          ),
         ),
         actions: [
           TextButton(
@@ -97,6 +122,9 @@ class _SupplierListScreenState extends ConsumerState<SupplierListScreen> {
                   'workshopId': workshopId,
                   'name': nameCtrl.text,
                   'mobile': mobileCtrl.text,
+                  'email': emailCtrl.text.isEmpty ? null : emailCtrl.text,
+                  'address': addressCtrl.text,
+                  'gstin': gstinCtrl.text,
                 });
                 if (mounted) Navigator.pop(ctx);
                 setState(() {}); // Refresh

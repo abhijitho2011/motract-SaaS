@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:workshop/src/core/theme/theme_controller.dart';
 import 'package:workshop/src/features/settings/presentation/inventory_settings_screen.dart';
+import 'package:workshop/src/features/settings/presentation/inspection_settings_screen.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -68,6 +69,20 @@ class SettingsScreen extends ConsumerWidget {
                 context,
                 MaterialPageRoute(
                   builder: (_) => const InventorySettingsScreen(),
+                ),
+              );
+            },
+          ),
+          ListTile(
+            leading: const Icon(Icons.checklist),
+            title: const Text('Inspection Settings'),
+            subtitle: const Text('Manage inspection checklist items'),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const InspectionSettingsScreen(),
                 ),
               );
             },

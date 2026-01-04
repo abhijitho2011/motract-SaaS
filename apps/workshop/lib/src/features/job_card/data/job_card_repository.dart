@@ -56,6 +56,15 @@ abstract class JobCardApi {
     @Path('taskId') String taskId,
     @Body() Map<String, dynamic> body,
   );
+
+  @GET('/inspections/masters')
+  Future<dynamic> getInspectionMasters();
+
+  @POST('/inspections/masters')
+  Future<dynamic> createInspectionMaster(@Body() Map<String, dynamic> body);
+
+  @DELETE('/inspections/masters/{id}')
+  Future<dynamic> deleteInspectionMaster(@Path('id') String id);
 }
 
 @riverpod

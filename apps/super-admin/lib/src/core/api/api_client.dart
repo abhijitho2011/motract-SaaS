@@ -159,6 +159,38 @@ class ApiClient {
     return response.data;
   }
 
+  // Registered Vehicles
+  static Future<List<dynamic>> getAllVehicles({
+    String? workshopId,
+    String? regNumber,
+  }) async {
+    final response = await dio.get(
+      '/super-admin/vehicles',
+      queryParameters: {
+        if (workshopId != null) 'workshopId': workshopId,
+        if (regNumber != null) 'regNumber': regNumber,
+      },
+    );
+    return response.data;
+  }
+
+  static Future<dynamic> updateVehicle(
+    String id,
+    Map<String, dynamic> data,
+  ) async {
+    final response = await dio.put('/super-admin/vehicles/$id', data: data);
+    return response.data;
+  }
+
+  static Future<List<dynamic>> getVehicleServiceHistory(
+    String vehicleId,
+  ) async {
+    final response = await dio.get(
+      '/super-admin/vehicles/$vehicleId/service-history',
+    );
+    return response.data;
+  }
+
   // Map Settings
   static Future<Map<String, dynamic>> getMapSettings() async {
     final response = await dio.get('/super-admin/map-settings');
