@@ -2,12 +2,17 @@ import { Injectable, Inject, BadRequestException, NotFoundException, ForbiddenEx
 import { eq, and, desc, sql, or, inArray } from 'drizzle-orm';
 import * as schema from '../drizzle/schema';
 import { v4 as uuid } from 'uuid';
+import { DrizzleAsyncProvider } from '../drizzle/drizzle.provider';
+import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
 const { rsaProfiles, rsaJobs, vehicleServiceHistory, users, vehicles, workshops } = schema;
 
 @Injectable()
 export class RsaService {
-    constructor(@Inject('DRIZZLE') private db: any) { }
+    constructor(
+        @Inject(DrizzleAsyncProvider)
+        private db: NodePgDatabase<typeof schema>,
+    ) { }
 
     // =============================================
     // RSA Profile Management (Admin only)
