@@ -1034,8 +1034,24 @@ export const rsaJobs = pgTable("rsa_jobs", {
 	notes: text(),
 	cancellationReason: text('cancellation_reason'),
 
+	// OTP Verification for RSA jobs
+	startOtp: text('start_otp'), // 4-digit OTP to start work
+	endOtp: text('end_otp'), // 4-digit OTP for completion (Recovery)
+	startOtpVerifiedAt: timestamp('start_otp_verified_at', { mode: 'string' }),
+	endOtpVerifiedAt: timestamp('end_otp_verified_at', { mode: 'string' }),
+
+	// Client feedback
+	clientRating: integer('client_rating'), // 1-5 stars
+	clientFeedback: text('client_feedback'),
+	problemSolved: boolean('problem_solved'),
+
+	// RSA Provider feedback
+	rsaFeedback: text('rsa_feedback'),
+
 	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
 	acceptedAt: timestamp('accepted_at', { mode: 'string' }),
+	arrivedAt: timestamp('arrived_at', { mode: 'string' }),
+	workStartedAt: timestamp('work_started_at', { mode: 'string' }),
 	completedAt: timestamp('completed_at', { mode: 'string' }),
 	cancelledAt: timestamp('cancelled_at', { mode: 'string' }),
 }, (table) => [
@@ -1151,5 +1167,88 @@ export const vehicleServiceHistoryRelations = relations(vehicleServiceHistory, (
 	rsaProfile: one(rsaProfiles, {
 		fields: [vehicleServiceHistory.rsaProfileId],
 		references: [rsaProfiles.id]
+	}),
+}));
+
+// =============================================
+// Client App Tables
+// =============================================
+
+// Client-Vehicle Linking (allows client to add vehicles to their dashboard)
+export const clientVehicles = pgTable("client_vehicles", {
+	id: text().primaryKey().notNull(),
+	clientId: text('client_id').notNull(),
+	vehicleId: text('vehicle_id').notNull(),
+	addedAt: timestamp('added_at', { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	uniqueIndex("client_vehicles_clientId_vehicleId_key").using("btree", table.clientId.asc().nullsLast().op("text_ops"), table.vehicleId.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.clientId],
+		foreignColumns: [users.id],
+		name: "client_vehicles_clientId_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+		columns: [table.vehicleId],
+		foreignColumns: [vehicles.id],
+		name: "client_vehicles_vehicleId_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+// Workshop Service Bookings
+export const workshopBookings = pgTable("workshop_bookings", {
+	id: text().primaryKey().notNull(),
+	clientId: text('client_id').notNull(),
+	workshopId: text('workshop_id').notNull(),
+	vehicleId: text('vehicle_id').notNull(),
+	serviceCategories: text('service_categories').array(), // Array of selected service types
+	bookingDate: timestamp('booking_date', { mode: 'string' }).notNull(),
+	slotTime: text('slot_time').notNull(), // e.g., "09:00-10:00"
+	status: bookingStatus().default('PENDING').notNull(),
+	notes: text(),
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+	updatedAt: timestamp('updated_at', { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.clientId],
+		foreignColumns: [users.id],
+		name: "workshop_bookings_clientId_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "workshop_bookings_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+	foreignKey({
+		columns: [table.vehicleId],
+		foreignColumns: [vehicles.id],
+		name: "workshop_bookings_vehicleId_fkey"
+	}).onUpdate("cascade").onDelete("restrict"),
+]);
+
+// Client Vehicles Relations
+export const clientVehiclesRelations = relations(clientVehicles, ({ one }) => ({
+	client: one(users, {
+		fields: [clientVehicles.clientId],
+		references: [users.id]
+	}),
+	vehicle: one(vehicles, {
+		fields: [clientVehicles.vehicleId],
+		references: [vehicles.id]
+	}),
+}));
+
+// Workshop Bookings Relations
+export const workshopBookingsRelations = relations(workshopBookings, ({ one }) => ({
+	client: one(users, {
+		fields: [workshopBookings.clientId],
+		references: [users.id]
+	}),
+	workshop: one(workshops, {
+		fields: [workshopBookings.workshopId],
+		references: [workshops.id]
+	}),
+	vehicle: one(vehicles, {
+		fields: [workshopBookings.vehicleId],
+		references: [vehicles.id]
 	}),
 }));

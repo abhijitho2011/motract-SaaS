@@ -143,4 +143,47 @@ export class AuthService {
       },
     };
   }
+
+  // Client-specific login: validates CLIENT role users
+  async validateClient(mobile: string, pass: string): Promise<any> {
+    const user = await this.db.query.users.findFirst({
+      where: eq(users.mobile, mobile),
+    });
+
+    if (!user) return null;
+
+    // Check if user has CLIENT role
+    if (user.role !== 'CLIENT') {
+      return null;
+    }
+
+    // Verify password
+    if (!user.password) return null;
+    const isPasswordValid = await bcrypt.compare(pass, user.password);
+    if (!isPasswordValid) return null;
+
+    const { password, ...result } = user;
+    return result;
+  }
+
+  async loginClient(user: any) {
+    const payload = {
+      mobile: user.mobile,
+      sub: user.id,
+      role: 'CLIENT',
+      email: user.email,
+      name: user.name,
+    };
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: user.id,
+        name: user.name,
+        mobile: user.mobile,
+        email: user.email,
+        role: 'CLIENT',
+      },
+    };
+  }
 }
+

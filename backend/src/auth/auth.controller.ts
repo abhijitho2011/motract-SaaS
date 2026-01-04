@@ -54,4 +54,15 @@ export class AuthController {
     }
     return this.authService.loginRSA(user);
   }
+
+  // Client-specific login endpoint (mobile + password)
+  @Post('client-login')
+  @Throttle({ default: { limit: 5, ttl: 60000 } }) // 5 attempts per minute
+  async clientLogin(@Body() body: { mobile: string; password: string }) {
+    const user = await this.authService.validateClient(body.mobile, body.password);
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials or not a client account');
+    }
+    return this.authService.loginClient(user);
+  }
 }
