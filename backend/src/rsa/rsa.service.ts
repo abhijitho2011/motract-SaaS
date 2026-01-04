@@ -5,7 +5,7 @@ import { v4 as uuid } from 'uuid';
 import { DrizzleAsyncProvider } from '../drizzle/drizzle.provider';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 
-const { rsaProfiles, rsaJobs, vehicleServiceHistory, users, vehicles, workshops } = schema;
+const { rsaProfiles, rsaJobs, vehicleServiceHistory, users, vehicles, workshops, organizations } = schema;
 
 @Injectable()
 export class RsaService {
@@ -79,7 +79,7 @@ export class RsaService {
 
         // Get organization data
         const org = await this.db.query.organizations.findFirst({
-            where: eq(schema.organizations.id, organizationId),
+            where: eq(organizations.id, organizationId),
         });
 
         if (!org || org.accountType !== 'RSA') {
