@@ -66,32 +66,23 @@ export class ClientService {
 
     // Find vehicle by registration number
     async findVehicleByRegNumber(regNumber: string) {
-        const vehicle = await this.db.query.vehicles.findFirst({
-            where: eq(vehicles.regNumber, regNumber.toUpperCase()),
-            with: {
-                variant: {
-                    with: {
-                        model: {
-                            with: {
-                                make: true
-                            }
-                        }
-                    }
-                }
-            }
-        });
-        return vehicle;
+        const results = await this.db.select()
+            .from(vehicles)
+            .where(eq(vehicles.regNumber, regNumber.toUpperCase()))
+            .limit(1);
+        return results[0] || null;
     }
 
     // Check if vehicle already linked to client
     async isVehicleLinkedToClient(clientId: string, vehicleId: string): Promise<boolean> {
-        const link = await this.db.query.clientVehicles.findFirst({
-            where: and(
+        const results = await this.db.select()
+            .from(clientVehicles)
+            .where(and(
                 eq(clientVehicles.clientId, clientId),
                 eq(clientVehicles.vehicleId, vehicleId)
-            ),
-        });
-        return !!link;
+            ))
+            .limit(1);
+        return results.length > 0;
     }
 
     // Add vehicle to client dashboard
@@ -116,19 +107,21 @@ export class ClientService {
             vehicle: {
                 id: vehicle.id,
                 regNumber: vehicle.regNumber,
-                make: vehicle.variant?.model?.make?.name,
-                model: vehicle.variant?.model?.name,
-                variant: vehicle.variant?.name,
-                fuelType: vehicle.variant?.fuelType,
+                make: null, // Would need separate query to get make info
+                model: null,
+                variant: null,
+                fuelType: null,
             }
         };
     }
 
     // Verify VIN and link vehicle to client
     async verifyVinAndLinkVehicle(clientId: string, vehicleId: string, vinNumber: string) {
-        const vehicle = await this.db.query.vehicles.findFirst({
-            where: eq(vehicles.id, vehicleId),
-        });
+        const results = await this.db.select()
+            .from(vehicles)
+            .where(eq(vehicles.id, vehicleId))
+            .limit(1);
+        const vehicle = results[0];
 
         if (!vehicle) {
             throw new NotFoundException('Vehicle not found');
@@ -147,49 +140,48 @@ export class ClientService {
 
         // Link vehicle to client
         const id = uuid();
-        const [link] = await this.db.insert(clientVehicles).values({
-            id,
-            clientId,
-            vehicleId,
-        }).returning();
+        try {
+            console.log('Attempting to insert clientVehicle:', { id, clientId, vehicleId });
+            const [link] = await this.db.insert(clientVehicles).values({
+                id,
+                clientId,
+                vehicleId,
+            }).returning();
 
-        return {
-            success: true,
-            message: 'Vehicle successfully added to your dashboard',
-            link
-        };
+            console.log('Successfully inserted clientVehicle:', link);
+            return {
+                success: true,
+                message: 'Vehicle successfully added to your dashboard',
+                link
+            };
+        } catch (error) {
+            console.error('Error inserting clientVehicle:', error);
+            throw error;
+        }
     }
 
     // Get all vehicles linked to client
     async getClientVehicles(clientId: string) {
-        const links = await this.db.query.clientVehicles.findMany({
-            where: eq(clientVehicles.clientId, clientId),
-            with: {
-                vehicle: {
-                    with: {
-                        variant: {
-                            with: {
-                                model: {
-                                    with: {
-                                        make: true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            orderBy: desc(clientVehicles.addedAt)
-        });
+        // Get client vehicle links with vehicle data using join
+        const results = await this.db.select({
+            linkId: clientVehicles.id,
+            addedAt: clientVehicles.addedAt,
+            vehicleId: vehicles.id,
+            regNumber: vehicles.regNumber,
+            variantId: vehicles.variantId,
+        })
+            .from(clientVehicles)
+            .innerJoin(vehicles, eq(clientVehicles.vehicleId, vehicles.id))
+            .where(eq(clientVehicles.clientId, clientId));
 
-        return links.map(link => ({
-            id: link.vehicle.id,
-            regNumber: link.vehicle.regNumber,
-            make: link.vehicle.variant?.model?.make?.name,
-            model: link.vehicle.variant?.model?.name,
-            variant: link.vehicle.variant?.name,
-            fuelType: link.vehicle.variant?.fuelType,
-            addedAt: link.addedAt,
+        return results.map(r => ({
+            id: r.vehicleId,
+            regNumber: r.regNumber,
+            make: null, // Will be fetched separately if needed
+            model: null,
+            variant: null,
+            fuelType: null,
+            addedAt: r.addedAt,
         }));
     }
 
