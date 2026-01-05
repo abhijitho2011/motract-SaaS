@@ -17,6 +17,28 @@ abstract class SlotApi {
 
   @POST('/slots/book')
   Future<dynamic> bookSlot(@Body() Map<String, dynamic> body);
+
+  // Enhanced Slot Management
+  @POST('/slots/generate')
+  Future<dynamic> generateDailySlots(@Body() Map<String, dynamic> body);
+
+  @GET('/slots/grid')
+  Future<dynamic> getSlotGrid(@Query('date') String date);
+
+  @PUT('/slots/{slotId}/status')
+  Future<dynamic> updateSlotStatus(
+    @Path('slotId') String slotId,
+    @Body() Map<String, dynamic> body,
+  );
+
+  @GET('/slots/bookings')
+  Future<dynamic> getWorkshopBookings();
+
+  @PUT('/slots/bookings/{bookingId}/status')
+  Future<dynamic> updateBookingStatus(
+    @Path('bookingId') String bookingId,
+    @Body() Map<String, dynamic> body,
+  );
 }
 
 @riverpod
