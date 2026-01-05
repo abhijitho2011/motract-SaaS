@@ -251,5 +251,58 @@ export class SlotService {
 
         return { message: `Booking ${status.toLowerCase()} successfully` };
     }
+
+    // =============================================
+    // Workshop Holidays (Day Blocking)
+    // =============================================
+
+    // Block entire day (holiday/unavailable)
+    async blockEntireDay(workshopId: string, date: string, reason?: string) {
+        // Check if already blocked
+        const existing = await this.db.select()
+            .from(schema.workshopHolidays)
+            .where(and(
+                eq(schema.workshopHolidays.workshopId, workshopId),
+                eq(schema.workshopHolidays.date, date)
+            ))
+            .limit(1);
+
+        if (existing.length > 0) {
+            return { message: 'Day is already blocked' };
+        }
+
+        const [holiday] = await this.db.insert(schema.workshopHolidays).values({
+            id: crypto.randomUUID(),
+            workshopId,
+            date,
+            reason,
+        }).returning();
+
+        return { message: 'Day blocked successfully', holiday };
+    }
+
+    // Unblock day
+    async unblockDay(workshopId: string, date: string) {
+        await this.db.delete(schema.workshopHolidays)
+            .where(and(
+                eq(schema.workshopHolidays.workshopId, workshopId),
+                eq(schema.workshopHolidays.date, date)
+            ));
+        return { message: 'Day unblocked successfully' };
+    }
+
+    // Get workshop holidays
+    async getWorkshopHolidays(workshopId: string) {
+        return this.db.select()
+            .from(schema.workshopHolidays)
+            .where(eq(schema.workshopHolidays.workshopId, workshopId));
+    }
+
+    // Get bay name templates (for workshop dropdown)
+    async getBayNameTemplates() {
+        return this.db.select()
+            .from(schema.bayNameTemplates)
+            .where(eq(schema.bayNameTemplates.isActive, true));
+    }
 }
 

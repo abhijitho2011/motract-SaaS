@@ -22,6 +22,7 @@ import {
     inventoryBatches,
     inventoryPartNumbers,
     mapSettings,
+    bayNameTemplates,
 } from '../drizzle/schema';
 import { eq, and, desc, asc, ne } from 'drizzle-orm';
 import * as crypto from 'crypto';
@@ -528,5 +529,43 @@ export class SuperAdminService {
         );
 
         return allInvoices;
+    }
+
+    // =============================================
+    // Bay Name Templates
+    // =============================================
+
+    // Get all bay name templates
+    async getBayNameTemplates() {
+        return this.db.select()
+            .from(bayNameTemplates)
+            .orderBy(asc(bayNameTemplates.name));
+    }
+
+    // Create bay name template
+    async createBayNameTemplate(data: { name: string; description?: string }) {
+        const [template] = await this.db.insert(bayNameTemplates).values({
+            id: crypto.randomUUID(),
+            name: data.name,
+            description: data.description,
+            isActive: true,
+        }).returning();
+        return template;
+    }
+
+    // Update bay name template
+    async updateBayNameTemplate(id: string, data: { name?: string; description?: string; isActive?: boolean }) {
+        const [updated] = await this.db.update(bayNameTemplates)
+            .set(data)
+            .where(eq(bayNameTemplates.id, id))
+            .returning();
+        return updated;
+    }
+
+    // Delete bay name template
+    async deleteBayNameTemplate(id: string) {
+        await this.db.delete(bayNameTemplates)
+            .where(eq(bayNameTemplates.id, id));
+        return { message: 'Bay name template deleted' };
     }
 }

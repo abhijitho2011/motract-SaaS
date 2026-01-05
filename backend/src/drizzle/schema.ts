@@ -1359,3 +1359,42 @@ export const workshopRatingsRelations = relations(workshopRatings, ({ one }) => 
 		references: [workshopBookings.id]
 	}),
 }));
+
+// =============================================
+// Bay Name Templates (Super Admin Configured)
+// =============================================
+
+// Bay name templates - super admin configures these, workshops select from dropdown
+export const bayNameTemplates = pgTable("bay_name_templates", {
+	id: text().primaryKey().notNull(),
+	name: text().notNull(), // "General Service Bay", "Water Wash Bay", etc.
+	description: text(),
+	isActive: boolean().default(true).notNull(),
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	uniqueIndex("bay_name_templates_name_key").using("btree", table.name.asc().nullsLast().op("text_ops")),
+]);
+
+// Workshop holidays - block entire days
+export const workshopHolidays = pgTable("workshop_holidays", {
+	id: text().primaryKey().notNull(),
+	workshopId: text('workshop_id').notNull(),
+	date: text().notNull(), // "2026-01-26"
+	reason: text(), // "Republic Day", "Annual Maintenance", etc.
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	uniqueIndex("workshop_holidays_workshopId_date_key").using("btree", table.workshopId.asc().nullsLast().op("text_ops"), table.date.asc().nullsLast().op("text_ops")),
+	foreignKey({
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "workshop_holidays_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+// Workshop Holidays Relations
+export const workshopHolidaysRelations = relations(workshopHolidays, ({ one }) => ({
+	workshop: one(workshops, {
+		fields: [workshopHolidays.workshopId],
+		references: [workshops.id]
+	}),
+}));

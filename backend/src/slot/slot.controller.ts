@@ -85,5 +85,39 @@ export class SlotController {
     ) {
         return this.slotService.updateBookingStatus(bookingId, req.user.workshopId, data.status);
     }
+
+    // =============================================
+    // Workshop Holidays
+    // =============================================
+
+    // Block entire day (holiday)
+    @Post('holidays')
+    async blockEntireDay(
+        @Request() req: any,
+        @Body() data: { date: string; reason?: string }
+    ) {
+        return this.slotService.blockEntireDay(req.user.workshopId, data.date, data.reason);
+    }
+
+    // Unblock day
+    @Delete('holidays/:date')
+    async unblockDay(
+        @Request() req: any,
+        @Param('date') date: string
+    ) {
+        return this.slotService.unblockDay(req.user.workshopId, date);
+    }
+
+    // Get workshop holidays
+    @Get('holidays')
+    async getWorkshopHolidays(@Request() req: any) {
+        return this.slotService.getWorkshopHolidays(req.user.workshopId);
+    }
+
+    // Get bay name templates (for dropdown)
+    @Get('bay-templates')
+    async getBayNameTemplates() {
+        return this.slotService.getBayNameTemplates();
+    }
 }
 

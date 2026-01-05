@@ -165,4 +165,32 @@ export class SuperAdminController {
     //     }
     //     return this.superAdminService.resetDatabase();
     // }
+
+    // =============================================
+    // Bay Name Templates
+    // =============================================
+
+    @Get('bay-templates')
+    async getBayNameTemplates() {
+        return this.superAdminService.getBayNameTemplates();
+    }
+
+    @Post('bay-templates')
+    async createBayNameTemplate(@Body() data: { name: string; description?: string }) {
+        return this.superAdminService.createBayNameTemplate(data);
+    }
+
+    @Put('bay-templates/:id')
+    async updateBayNameTemplate(
+        @Param('id') id: string,
+        @Body() data: { name?: string; description?: string; isActive?: boolean }
+    ) {
+        return this.superAdminService.updateBayNameTemplate(id, data);
+    }
+
+    @Delete('bay-templates/:id')
+    async deleteBayNameTemplate(@Param('id') id: string) {
+        return this.superAdminService.deleteBayNameTemplate(id);
+    }
 }
+
