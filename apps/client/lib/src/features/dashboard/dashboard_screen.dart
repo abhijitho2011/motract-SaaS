@@ -3,7 +3,7 @@ import 'package:client/src/core/api/api_client.dart';
 import 'package:client/src/features/auth/login_screen.dart';
 import 'package:client/src/features/vehicles/add_vehicle_screen.dart';
 import 'package:client/src/features/vehicles/vehicle_history_screen.dart';
-import 'package:client/src/features/booking/book_service_screen.dart';
+import 'package:client/src/features/booking/enhanced_book_service_screen.dart';
 import 'package:client/src/features/rsa/request_rsa_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -340,10 +340,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => BookServiceScreen(
-          vehicles: _vehicles,
-          preselectedVehicleId: vehicleId,
-        ),
+        builder: (_) => EnhancedBookServiceScreen(vehicles: _vehicles),
       ),
     ).then((_) => _loadData());
   }

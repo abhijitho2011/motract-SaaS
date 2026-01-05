@@ -233,6 +233,114 @@ class ClientApi {
   }
 
   // ==========================================
+  // Enhanced Booking System
+  // ==========================================
+
+  // Get all service categories
+  Future<List<dynamic>> getServiceCategories() async {
+    await loadToken();
+    try {
+      final response = await _dio.get('/client/booking/service-categories');
+      return response.data as List<dynamic>;
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  // Get nearby workshops with ratings
+  Future<List<dynamic>> getNearbyWorkshops({
+    required double lat,
+    required double lng,
+    String? categoryId,
+  }) async {
+    await loadToken();
+    try {
+      final params = <String, dynamic>{
+        'lat': lat.toString(),
+        'lng': lng.toString(),
+      };
+      if (categoryId != null) params['categoryId'] = categoryId;
+
+      final response = await _dio.get(
+        '/client/booking/nearby-workshops',
+        queryParameters: params,
+      );
+      return response.data as List<dynamic>;
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  // Get available slots for a workshop (movie-ticket style)
+  Future<List<dynamic>> getAvailableSlotsForWorkshop(
+    String workshopId,
+    String date, {
+    String? categoryId,
+  }) async {
+    await loadToken();
+    try {
+      final params = <String, dynamic>{'date': date};
+      if (categoryId != null) params['categoryId'] = categoryId;
+
+      final response = await _dio.get(
+        '/client/booking/slots/$workshopId',
+        queryParameters: params,
+      );
+      return response.data as List<dynamic>;
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  // Create booking with slot
+  Future<Map<String, dynamic>> createBookingWithSlot({
+    required String workshopId,
+    required String vehicleId,
+    required String serviceCategoryId,
+    required String date,
+    required String slotTime,
+    String? slotId,
+    String? notes,
+  }) async {
+    await loadToken();
+    try {
+      final response = await _dio.post(
+        '/client/booking/book-slot',
+        data: {
+          'workshopId': workshopId,
+          'vehicleId': vehicleId,
+          'serviceCategoryId': serviceCategoryId,
+          'date': date,
+          'slotTime': slotTime,
+          'slotId': slotId,
+          'notes': notes,
+        },
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  // Submit workshop rating
+  Future<Map<String, dynamic>> submitWorkshopRating({
+    required String bookingId,
+    required int rating,
+    String? feedback,
+  }) async {
+    await loadToken();
+    try {
+      final response = await _dio.post(
+        '/client/booking/$bookingId/rating',
+        data: {'rating': rating, 'feedback': feedback},
+      );
+      return response.data as Map<String, dynamic>;
+    } on DioException catch (e) {
+      throw _handleError(e);
+    }
+  }
+
+  // ==========================================
   // RSA Booking
   // ==========================================
 
