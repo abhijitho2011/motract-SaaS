@@ -23,7 +23,7 @@ class ClientApp extends StatelessWidget {
           brightness: Brightness.light,
         ),
         appBarTheme: const AppBarTheme(centerTitle: true, elevation: 0),
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),

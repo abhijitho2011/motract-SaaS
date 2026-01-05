@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:client/src/core/api/api_client.dart';
 import 'package:client/src/features/rsa/rsa_tracking_screen.dart';
-import 'package:geolocator/geolocator.dart';
 
 class RequestRsaScreen extends StatefulWidget {
   final List<dynamic> vehicles;
@@ -22,10 +21,10 @@ class _RequestRsaScreenState extends State<RequestRsaScreen> {
 
   String? _selectedVehicleId;
   String? _selectedServiceType;
-  Position? _currentPosition;
-  bool _isLoadingLocation = false;
+  // Hardcoded location for testing (Bangalore coordinates)
+  final double _lat = 12.9716;
+  final double _lng = 77.5946;
   bool _isRequesting = false;
-  String? _locationError;
 
   // RSA Service Types
   final List<Map<String, dynamic>> _serviceTypes = [
@@ -71,57 +70,6 @@ class _RequestRsaScreenState extends State<RequestRsaScreen> {
   void initState() {
     super.initState();
     _selectedVehicleId = widget.preselectedVehicleId;
-    _getCurrentLocation();
-  }
-
-  Future<void> _getCurrentLocation() async {
-    setState(() {
-      _isLoadingLocation = true;
-      _locationError = null;
-    });
-
-    try {
-      // Check permission
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-      }
-
-      if (permission == LocationPermission.denied ||
-          permission == LocationPermission.deniedForever) {
-        setState(() {
-          _locationError =
-              'Location permission denied. Please enable in settings.';
-          _isLoadingLocation = false;
-        });
-        return;
-      }
-
-      // Check if location service is enabled
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        setState(() {
-          _locationError = 'Location services are disabled. Please enable GPS.';
-          _isLoadingLocation = false;
-        });
-        return;
-      }
-
-      // Get position
-      final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high,
-      );
-
-      setState(() {
-        _currentPosition = position;
-        _isLoadingLocation = false;
-      });
-    } catch (e) {
-      setState(() {
-        _locationError = 'Failed to get location: $e';
-        _isLoadingLocation = false;
-      });
-    }
   }
 
   Future<void> _requestRsa() async {
@@ -139,21 +87,14 @@ class _RequestRsaScreenState extends State<RequestRsaScreen> {
       return;
     }
 
-    if (_currentPosition == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Unable to get your location')),
-      );
-      return;
-    }
-
     setState(() => _isRequesting = true);
 
     try {
       final result = await _api.requestRsa(
         vehicleId: _selectedVehicleId!,
         serviceType: _selectedServiceType!,
-        lat: _currentPosition!.latitude,
-        lng: _currentPosition!.longitude,
+        lat: _lat,
+        lng: _lng,
       );
 
       if (mounted) {
@@ -204,9 +145,7 @@ class _RequestRsaScreenState extends State<RequestRsaScreen> {
 
             // Request Button
             ElevatedButton(
-              onPressed: (_isRequesting || _currentPosition == null)
-                  ? null
-                  : _requestRsa,
+              onPressed: _isRequesting ? null : _requestRsa,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.orange,
                 foregroundColor: Colors.white,
@@ -238,57 +177,28 @@ class _RequestRsaScreenState extends State<RequestRsaScreen> {
 
   Widget _buildLocationCard() {
     return Card(
-      color: _locationError != null ? Colors.red[50] : Colors.green[50],
+      color: Colors.green[50],
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Row(
           children: [
-            if (_isLoadingLocation)
-              const SizedBox(
-                height: 24,
-                width: 24,
-                child: CircularProgressIndicator(strokeWidth: 2),
-              )
-            else
-              Icon(
-                _currentPosition != null
-                    ? Icons.location_on
-                    : Icons.location_off,
-                color: _currentPosition != null ? Colors.green : Colors.red,
-                size: 24,
-              ),
+            const Icon(Icons.location_on, color: Colors.green, size: 24),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    _isLoadingLocation
-                        ? 'Getting your location...'
-                        : _currentPosition != null
-                        ? 'Location detected'
-                        : 'Location unavailable',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  const Text(
+                    'Location detected',
+                    style: TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  if (_locationError != null)
-                    Text(
-                      _locationError!,
-                      style: TextStyle(color: Colors.red[700], fontSize: 12),
-                    )
-                  else if (_currentPosition != null)
-                    Text(
-                      'Lat: ${_currentPosition!.latitude.toStringAsFixed(4)}, '
-                      'Lng: ${_currentPosition!.longitude.toStringAsFixed(4)}',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 12),
-                    ),
+                  Text(
+                    'Lat: ${_lat.toStringAsFixed(4)}, Lng: ${_lng.toStringAsFixed(4)}',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  ),
                 ],
               ),
             ),
-            if (_locationError != null)
-              IconButton(
-                icon: const Icon(Icons.refresh),
-                onPressed: _getCurrentLocation,
-              ),
           ],
         ),
       ),

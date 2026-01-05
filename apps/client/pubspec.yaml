@@ -44,8 +44,8 @@ dependencies:
   # Date formatting
   intl: ^0.19.0
   
-  # Location services (for RSA)
-  geolocator: ^11.0.0
+  # Location services (for RSA) - temporarily disabled
+  # geolocator: ^11.0.0
 
 dev_dependencies:
   flutter_test:
