@@ -105,4 +105,73 @@ export class ClientController {
     async getMyBookings(@Req() req: any) {
         return this.clientService.getClientBookings(req.user.userId);
     }
+
+    // =============================================
+    // Enhanced Booking System
+    // =============================================
+
+    // Get all service categories
+    @UseGuards(JwtAuthGuard)
+    @Get('booking/service-categories')
+    async getServiceCategories() {
+        return this.clientService.getAllServiceCategories();
+    }
+
+    // Get nearby workshops with ratings
+    @UseGuards(JwtAuthGuard)
+    @Get('booking/nearby-workshops')
+    async getNearbyWorkshops(
+        @Query('lat') lat: string,
+        @Query('lng') lng: string,
+        @Query('categoryId') categoryId?: string
+    ) {
+        return this.clientService.getNearbyWorkshopsWithRatings(
+            parseFloat(lat),
+            parseFloat(lng),
+            categoryId
+        );
+    }
+
+    // Get available slots (movie-ticket style)
+    @UseGuards(JwtAuthGuard)
+    @Get('booking/slots/:workshopId')
+    async getAvailableSlots(
+        @Param('workshopId') workshopId: string,
+        @Query('date') date: string,
+        @Query('categoryId') categoryId?: string
+    ) {
+        return this.clientService.getAvailableSlots(workshopId, date, categoryId);
+    }
+
+    // Create booking with slot reservation
+    @UseGuards(JwtAuthGuard)
+    @Post('booking/book-slot')
+    async createBookingWithSlot(@Req() req: any, @Body() body: {
+        workshopId: string;
+        vehicleId: string;
+        serviceCategoryId: string;
+        date: string;
+        slotTime: string;
+        slotId?: string;
+        notes?: string;
+    }) {
+        return this.clientService.createBookingWithSlot(req.user.userId, body);
+    }
+
+    // Submit workshop rating
+    @UseGuards(JwtAuthGuard)
+    @Post('booking/:bookingId/rating')
+    async submitRating(
+        @Req() req: any,
+        @Param('bookingId') bookingId: string,
+        @Body() body: { rating: number; feedback?: string }
+    ) {
+        return this.clientService.submitWorkshopRating(
+            req.user.userId,
+            bookingId,
+            body.rating,
+            body.feedback
+        );
+    }
 }
+

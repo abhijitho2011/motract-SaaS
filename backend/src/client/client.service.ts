@@ -1,12 +1,12 @@
 import { Injectable, Inject, BadRequestException, NotFoundException, ConflictException } from '@nestjs/common';
-import { eq, and, desc } from 'drizzle-orm';
+import { eq, and, desc, sql, isNull, asc } from 'drizzle-orm';
 import * as schema from '../drizzle/schema';
 import { v4 as uuid } from 'uuid';
 import { DrizzleAsyncProvider } from '../drizzle/drizzle.provider';
 import { NodePgDatabase } from 'drizzle-orm/node-postgres';
 import * as bcrypt from 'bcrypt';
 
-const { users, vehicles, clientVehicles, vehicleServiceHistory, workshopBookings, workshops } = schema;
+const { users, vehicles, clientVehicles, vehicleServiceHistory, workshopBookings, workshops, serviceCategories, workshopBays, workshopBaySlots, workshopRatings } = schema;
 
 @Injectable()
 export class ClientService {
@@ -308,32 +308,15 @@ export class ClientService {
     }
 
     async getClientBookings(clientId: string) {
-        const bookings = await this.db.query.workshopBookings.findMany({
-            where: eq(workshopBookings.clientId, clientId),
-            with: {
-                workshop: true,
-                vehicle: {
-                    with: {
-                        variant: {
-                            with: {
-                                model: {
-                                    with: {
-                                        make: true
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            orderBy: desc(workshopBookings.createdAt)
-        });
+        // Use simple select to avoid relation issues
+        const bookings = await this.db.select()
+            .from(workshopBookings)
+            .where(eq(workshopBookings.clientId, clientId));
 
         return bookings.map(b => ({
             id: b.id,
-            workshopName: b.workshop?.name,
-            vehicleRegNumber: b.vehicle?.regNumber,
-            vehicleName: `${b.vehicle?.variant?.model?.make?.name} ${b.vehicle?.variant?.model?.name}`,
+            workshopId: b.workshopId,
+            vehicleId: b.vehicleId,
             serviceCategories: b.serviceCategories,
             bookingDate: b.bookingDate,
             slotTime: b.slotTime,
@@ -342,4 +325,247 @@ export class ClientService {
             createdAt: b.createdAt,
         }));
     }
+
+    // =============================================
+    // Enhanced Booking System
+    // =============================================
+
+    // Get all service categories
+    async getAllServiceCategories() {
+        const categories = await this.db.select()
+            .from(serviceCategories);
+        return categories;
+    }
+
+    // Get nearby workshops with ratings (location-based)
+    async getNearbyWorkshopsWithRatings(lat: number, lng: number, categoryId?: string) {
+        // Get all active workshops with their average ratings
+        const workshopsData = await this.db.select({
+            id: workshops.id,
+            name: workshops.name,
+            address: workshops.address,
+            city: workshops.city,
+            mobile: workshops.mobile,
+            latitude: workshops.latitude,
+            longitude: workshops.longitude,
+            workingStartHour: workshops.workingStartHour,
+            workingEndHour: workshops.workingEndHour,
+        })
+            .from(workshops)
+            .where(eq(workshops.isActive, true));
+
+        // Calculate distance and get ratings for each workshop
+        const workshopsWithDetails = await Promise.all(workshopsData.map(async (ws) => {
+            // Calculate distance using Haversine formula (simplified)
+            const distance = ws.latitude && ws.longitude
+                ? this.calculateDistance(lat, lng, ws.latitude, ws.longitude)
+                : null;
+
+            // Get average rating
+            const ratingsResult = await this.db.select({
+                avgRating: sql<number>`COALESCE(AVG(${workshopRatings.rating}), 0)`,
+                totalRatings: sql<number>`COUNT(${workshopRatings.id})::int`,
+            })
+                .from(workshopRatings)
+                .where(eq(workshopRatings.workshopId, ws.id));
+
+            return {
+                ...ws,
+                distance: distance ? Math.round(distance * 10) / 10 : null, // km with 1 decimal
+                avgRating: ratingsResult[0]?.avgRating || 0,
+                totalRatings: ratingsResult[0]?.totalRatings || 0,
+            };
+        }));
+
+        // Sort by distance
+        return workshopsWithDetails
+            .filter(ws => ws.distance !== null)
+            .sort((a, b) => (a.distance || 999) - (b.distance || 999));
+    }
+
+    // Helper: Calculate distance using Haversine formula
+    private calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+        const R = 6371; // Earth's radius in km
+        const dLat = this.toRad(lat2 - lat1);
+        const dLng = this.toRad(lng2 - lng1);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(this.toRad(lat1)) * Math.cos(this.toRad(lat2)) *
+            Math.sin(dLng / 2) * Math.sin(dLng / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    private toRad(deg: number): number {
+        return deg * (Math.PI / 180);
+    }
+
+    // Get available slots for a workshop on a specific date
+    async getAvailableSlots(workshopId: string, date: string, serviceCategoryId?: string) {
+        // Get workshop's bays
+        const bays = await this.db.select()
+            .from(workshopBays)
+            .where(and(
+                eq(workshopBays.workshopId, workshopId),
+                eq(workshopBays.isActive, true)
+            ));
+
+        if (bays.length === 0) {
+            // No bays configured - generate default slots from workshop hours
+            const workshopData = await this.db.select()
+                .from(workshops)
+                .where(eq(workshops.id, workshopId))
+                .limit(1);
+
+            if (!workshopData[0]) return [];
+
+            const ws = workshopData[0];
+            return this.generateDefaultSlots(ws.workingStartHour, ws.workingEndHour, ws.slotDurationMin);
+        }
+
+        // Get slots for all bays on the given date
+        const slotsData = await this.db.select({
+            slotId: workshopBaySlots.id,
+            bayId: workshopBaySlots.bayId,
+            startTime: workshopBaySlots.startTime,
+            endTime: workshopBaySlots.endTime,
+            status: workshopBaySlots.status,
+            bayName: workshopBays.name,
+        })
+            .from(workshopBaySlots)
+            .innerJoin(workshopBays, eq(workshopBaySlots.bayId, workshopBays.id))
+            .where(and(
+                eq(workshopBaySlots.date, date),
+                eq(workshopBays.workshopId, workshopId)
+            ))
+            .orderBy(asc(workshopBaySlots.startTime));
+
+        // Group by time slot for movie-ticket style display
+        const slotMap = new Map<string, { time: string, slots: any[] }>();
+        for (const slot of slotsData) {
+            const timeKey = `${slot.startTime}-${slot.endTime}`;
+            if (!slotMap.has(timeKey)) {
+                slotMap.set(timeKey, { time: timeKey, slots: [] });
+            }
+            slotMap.get(timeKey)!.slots.push({
+                slotId: slot.slotId,
+                bayId: slot.bayId,
+                bayName: slot.bayName,
+                status: slot.status,
+            });
+        }
+
+        return Array.from(slotMap.values());
+    }
+
+    // Generate default time slots based on workshop hours
+    private generateDefaultSlots(startHour: string, endHour: string, durationMin: number) {
+        const slots = [];
+        const [startH, startM] = startHour.split(':').map(Number);
+        const [endH, endM] = endHour.split(':').map(Number);
+
+        let current = startH * 60 + startM;
+        const end = endH * 60 + endM;
+
+        while (current + durationMin <= end) {
+            const startTimeH = Math.floor(current / 60).toString().padStart(2, '0');
+            const startTimeM = (current % 60).toString().padStart(2, '0');
+            const endTimeH = Math.floor((current + durationMin) / 60).toString().padStart(2, '0');
+            const endTimeM = ((current + durationMin) % 60).toString().padStart(2, '0');
+
+            slots.push({
+                time: `${startTimeH}:${startTimeM}-${endTimeH}:${endTimeM}`,
+                slots: [{ slotId: null, bayId: null, bayName: 'Default', status: 'AVAILABLE' }]
+            });
+
+            current += durationMin;
+        }
+
+        return slots;
+    }
+
+    // Create booking with slot reservation
+    async createBookingWithSlot(clientId: string, data: {
+        workshopId: string;
+        vehicleId: string;
+        serviceCategoryId: string;
+        date: string;
+        slotTime: string;
+        slotId?: string; // Optional if using pre-configured slots
+        notes?: string;
+    }) {
+        const bookingId = uuid();
+
+        // Create the booking
+        const [booking] = await this.db.insert(workshopBookings).values({
+            id: bookingId,
+            clientId,
+            workshopId: data.workshopId,
+            vehicleId: data.vehicleId,
+            serviceCategories: [data.serviceCategoryId],
+            bookingDate: data.date,
+            slotTime: data.slotTime,
+            status: 'PENDING' as any,
+            notes: data.notes,
+            updatedAt: new Date().toISOString(),
+        }).returning();
+
+        // If a specific slot ID was provided, mark it as booked
+        if (data.slotId) {
+            await this.db.update(workshopBaySlots)
+                .set({
+                    bookingId: bookingId,
+                    status: 'BOOKED' as any
+                })
+                .where(eq(workshopBaySlots.id, data.slotId));
+        }
+
+        return {
+            success: true,
+            message: 'Booking created successfully',
+            booking,
+        };
+    }
+
+    // Submit rating for a workshop after service
+    async submitWorkshopRating(clientId: string, bookingId: string, rating: number, feedback?: string) {
+        // Get the booking to verify ownership and get workshop ID
+        const [booking] = await this.db.select()
+            .from(workshopBookings)
+            .where(and(
+                eq(workshopBookings.id, bookingId),
+                eq(workshopBookings.clientId, clientId)
+            ))
+            .limit(1);
+
+        if (!booking) {
+            throw new NotFoundException('Booking not found');
+        }
+
+        // Check if already rated
+        const existingRating = await this.db.select()
+            .from(workshopRatings)
+            .where(eq(workshopRatings.bookingId, bookingId))
+            .limit(1);
+
+        if (existingRating.length > 0) {
+            throw new ConflictException('You have already rated this service');
+        }
+
+        // Create the rating
+        const [newRating] = await this.db.insert(workshopRatings).values({
+            id: uuid(),
+            workshopId: booking.workshopId,
+            clientId,
+            bookingId,
+            rating,
+            feedback,
+        }).returning();
+
+        return {
+            success: true,
+            message: 'Thank you for your feedback!',
+            rating: newRating,
+        };
+    }
 }
+

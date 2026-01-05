@@ -1252,3 +1252,110 @@ export const workshopBookingsRelations = relations(workshopBookings, ({ one }) =
 		references: [vehicles.id]
 	}),
 }));
+
+// =============================================
+// Enhanced Booking System Tables
+// =============================================
+
+// Workshop Bays - Service bays for slot management
+export const workshopBays = pgTable("workshop_bays", {
+	id: text().primaryKey().notNull(),
+	workshopId: text('workshop_id').notNull(),
+	name: text().notNull(), // "Bay 1", "Wash Bay A", etc.
+	serviceCategories: text('service_categories').array(), // What services this bay handles
+	isActive: boolean().default(true).notNull(),
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "workshop_bays_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+// Workshop Bay Slots - Like movie seats (available/booked/blocked)
+export const workshopBaySlots = pgTable("workshop_bay_slots", {
+	id: text().primaryKey().notNull(),
+	bayId: text('bay_id').notNull(),
+	date: text().notNull(), // "2026-01-06"
+	startTime: text('start_time').notNull(), // "09:00"
+	endTime: text('end_time').notNull(), // "10:00"
+	bookingId: text('booking_id'), // null = available
+	status: slotStatus().default('AVAILABLE').notNull(),
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.bayId],
+		foreignColumns: [workshopBays.id],
+		name: "workshop_bay_slots_bayId_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+		columns: [table.bookingId],
+		foreignColumns: [workshopBookings.id],
+		name: "workshop_bay_slots_bookingId_fkey"
+	}).onUpdate("cascade").onDelete("set null"),
+]);
+
+// Workshop Ratings - Client reviews
+export const workshopRatings = pgTable("workshop_ratings", {
+	id: text().primaryKey().notNull(),
+	workshopId: text('workshop_id').notNull(),
+	clientId: text('client_id').notNull(),
+	bookingId: text('booking_id').notNull(),
+	rating: integer().notNull(), // 1-5 stars
+	feedback: text(),
+	createdAt: timestamp('created_at', { mode: 'string' }).defaultNow().notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.workshopId],
+		foreignColumns: [workshops.id],
+		name: "workshop_ratings_workshopId_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+		columns: [table.clientId],
+		foreignColumns: [users.id],
+		name: "workshop_ratings_clientId_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+	foreignKey({
+		columns: [table.bookingId],
+		foreignColumns: [workshopBookings.id],
+		name: "workshop_ratings_bookingId_fkey"
+	}).onUpdate("cascade").onDelete("cascade"),
+]);
+
+// Workshop Bays Relations
+export const workshopBaysRelations = relations(workshopBays, ({ one, many }) => ({
+	workshop: one(workshops, {
+		fields: [workshopBays.workshopId],
+		references: [workshops.id]
+	}),
+	slots: many(workshopBaySlots),
+}));
+
+// Workshop Bay Slots Relations
+export const workshopBaySlotsRelations = relations(workshopBaySlots, ({ one }) => ({
+	bay: one(workshopBays, {
+		fields: [workshopBaySlots.bayId],
+		references: [workshopBays.id]
+	}),
+	booking: one(workshopBookings, {
+		fields: [workshopBaySlots.bookingId],
+		references: [workshopBookings.id]
+	}),
+}));
+
+// Workshop Ratings Relations
+export const workshopRatingsRelations = relations(workshopRatings, ({ one }) => ({
+	workshop: one(workshops, {
+		fields: [workshopRatings.workshopId],
+		references: [workshops.id]
+	}),
+	client: one(users, {
+		fields: [workshopRatings.clientId],
+		references: [users.id]
+	}),
+	booking: one(workshopBookings, {
+		fields: [workshopRatings.bookingId],
+		references: [workshopBookings.id]
+	}),
+}));
