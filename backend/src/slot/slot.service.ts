@@ -69,4 +69,187 @@ export class SlotService {
         await this.db.delete(bays).where(eq(bays.id, id));
         return { message: 'Bay deleted successfully' };
     }
+
+    // =============================================
+    // Enhanced Slot Management (for client booking)
+    // =============================================
+
+    // Generate daily slots for all bays of a workshop
+    async generateDailySlots(workshopId: string, date: string) {
+        // Get workshop working hours
+        const workshopResult = await this.db.select({
+            startHour: schema.workshops.workingStartHour,
+            endHour: schema.workshops.workingEndHour,
+            slotDuration: schema.workshops.slotDurationMin,
+        })
+            .from(schema.workshops)
+            .where(eq(schema.workshops.id, workshopId))
+            .limit(1);
+
+        if (!workshopResult[0]) {
+            throw new NotFoundException('Workshop not found');
+        }
+
+        const { startHour, endHour, slotDuration } = workshopResult[0];
+
+        // Get all active bays
+        const baysResult = await this.db.select()
+            .from(schema.workshopBays)
+            .where(and(
+                eq(schema.workshopBays.workshopId, workshopId),
+                eq(schema.workshopBays.isActive, true)
+            ));
+
+        if (baysResult.length === 0) {
+            return { message: 'No active bays found', slotsCreated: 0 };
+        }
+
+        // Check if slots already exist for this date
+        const existingSlots = await this.db.select()
+            .from(schema.workshopBaySlots)
+            .innerJoin(schema.workshopBays, eq(schema.workshopBaySlots.bayId, schema.workshopBays.id))
+            .where(and(
+                eq(schema.workshopBays.workshopId, workshopId),
+                eq(schema.workshopBaySlots.date, date)
+            ))
+            .limit(1);
+
+        if (existingSlots.length > 0) {
+            return { message: 'Slots already exist for this date', slotsCreated: 0 };
+        }
+
+        // Generate time slots
+        const slotsToCreate = [];
+        const [startH, startM] = startHour.split(':').map(Number);
+        const [endH, endM] = endHour.split(':').map(Number);
+
+        let current = startH * 60 + startM;
+        const end = endH * 60 + endM;
+
+        while (current + slotDuration <= end) {
+            const startTimeH = Math.floor(current / 60).toString().padStart(2, '0');
+            const startTimeM = (current % 60).toString().padStart(2, '0');
+            const endTimeH = Math.floor((current + slotDuration) / 60).toString().padStart(2, '0');
+            const endTimeM = ((current + slotDuration) % 60).toString().padStart(2, '0');
+
+            for (const bay of baysResult) {
+                slotsToCreate.push({
+                    id: crypto.randomUUID(),
+                    bayId: bay.id,
+                    date,
+                    startTime: `${startTimeH}:${startTimeM}`,
+                    endTime: `${endTimeH}:${endTimeM}`,
+                    status: 'AVAILABLE' as any,
+                });
+            }
+
+            current += slotDuration;
+        }
+
+        // Insert all slots
+        if (slotsToCreate.length > 0) {
+            await this.db.insert(schema.workshopBaySlots).values(slotsToCreate);
+        }
+
+        return {
+            message: `Created ${slotsToCreate.length} slots for ${baysResult.length} bays`,
+            slotsCreated: slotsToCreate.length,
+        };
+    }
+
+    // Get slot grid for a specific date (for workshop app to view)
+    async getSlotGrid(workshopId: string, date: string) {
+        // Get bays
+        const baysResult = await this.db.select()
+            .from(schema.workshopBays)
+            .where(and(
+                eq(schema.workshopBays.workshopId, workshopId),
+                eq(schema.workshopBays.isActive, true)
+            ));
+
+        // Get slots for the date
+        const slotsResult = await this.db.select({
+            slotId: schema.workshopBaySlots.id,
+            bayId: schema.workshopBaySlots.bayId,
+            startTime: schema.workshopBaySlots.startTime,
+            endTime: schema.workshopBaySlots.endTime,
+            status: schema.workshopBaySlots.status,
+            bookingId: schema.workshopBaySlots.bookingId,
+        })
+            .from(schema.workshopBaySlots)
+            .innerJoin(schema.workshopBays, eq(schema.workshopBaySlots.bayId, schema.workshopBays.id))
+            .where(and(
+                eq(schema.workshopBays.workshopId, workshopId),
+                eq(schema.workshopBaySlots.date, date)
+            ));
+
+        return { bays: baysResult, slots: slotsResult, date };
+    }
+
+    // Block or unblock a specific slot
+    async updateSlotStatus(slotId: string, workshopId: string, status: 'AVAILABLE' | 'BLOCKED') {
+        // Verify slot belongs to workshop
+        const slotResult = await this.db.select()
+            .from(schema.workshopBaySlots)
+            .innerJoin(schema.workshopBays, eq(schema.workshopBaySlots.bayId, schema.workshopBays.id))
+            .where(and(
+                eq(schema.workshopBaySlots.id, slotId),
+                eq(schema.workshopBays.workshopId, workshopId)
+            ))
+            .limit(1);
+
+        if (slotResult.length === 0) {
+            throw new NotFoundException('Slot not found or access denied');
+        }
+
+        await this.db.update(schema.workshopBaySlots)
+            .set({ status: status as any })
+            .where(eq(schema.workshopBaySlots.id, slotId));
+
+        return { message: `Slot ${status === 'BLOCKED' ? 'blocked' : 'unblocked'} successfully` };
+    }
+
+    // Get all bookings for a workshop
+    async getWorkshopBookings(workshopId: string) {
+        const bookings = await this.db.select({
+            id: schema.workshopBookings.id,
+            vehicleId: schema.workshopBookings.vehicleId,
+            serviceCategories: schema.workshopBookings.serviceCategories,
+            bookingDate: schema.workshopBookings.bookingDate,
+            slotTime: schema.workshopBookings.slotTime,
+            status: schema.workshopBookings.status,
+            notes: schema.workshopBookings.notes,
+            createdAt: schema.workshopBookings.createdAt,
+            clientId: schema.workshopBookings.clientId,
+        })
+            .from(schema.workshopBookings)
+            .where(eq(schema.workshopBookings.workshopId, workshopId));
+
+        return bookings;
+    }
+
+    // Update booking status (confirm, complete, cancel)
+    async updateBookingStatus(bookingId: string, workshopId: string, status: 'CONFIRMED' | 'COMPLETED' | 'CANCELLED') {
+        const bookingResult = await this.db.select()
+            .from(schema.workshopBookings)
+            .where(and(
+                eq(schema.workshopBookings.id, bookingId),
+                eq(schema.workshopBookings.workshopId, workshopId)
+            ))
+            .limit(1);
+
+        if (bookingResult.length === 0) {
+            throw new NotFoundException('Booking not found or access denied');
+        }
+
+        await this.db.update(schema.workshopBookings)
+            .set({
+                status: status as any,
+                updatedAt: new Date().toISOString(),
+            })
+            .where(eq(schema.workshopBookings.id, bookingId));
+
+        return { message: `Booking ${status.toLowerCase()} successfully` };
+    }
 }
+

@@ -37,4 +37,53 @@ export class SlotController {
     async deleteBay(@Request() req: any, @Param('id') id: string) {
         return this.slotService.deleteBay(id, req.user.workshopId);
     }
+
+    // =============================================
+    // Enhanced Slot Management (for client booking)
+    // =============================================
+
+    // Generate daily slots for all bays
+    @Post('generate')
+    async generateDailySlots(
+        @Request() req: any,
+        @Body() data: { date: string }
+    ) {
+        return this.slotService.generateDailySlots(req.user.workshopId, data.date);
+    }
+
+    // Get slot grid for a specific date
+    @Get('grid')
+    async getSlotGrid(
+        @Request() req: any,
+        @Query('date') date: string
+    ) {
+        return this.slotService.getSlotGrid(req.user.workshopId, date);
+    }
+
+    // Block or unblock a slot
+    @Put(':slotId/status')
+    async updateSlotStatus(
+        @Request() req: any,
+        @Param('slotId') slotId: string,
+        @Body() data: { status: 'AVAILABLE' | 'BLOCKED' }
+    ) {
+        return this.slotService.updateSlotStatus(slotId, req.user.workshopId, data.status);
+    }
+
+    // Get workshop bookings
+    @Get('bookings')
+    async getWorkshopBookings(@Request() req: any) {
+        return this.slotService.getWorkshopBookings(req.user.workshopId);
+    }
+
+    // Update booking status
+    @Put('bookings/:bookingId/status')
+    async updateBookingStatus(
+        @Request() req: any,
+        @Param('bookingId') bookingId: string,
+        @Body() data: { status: 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' }
+    ) {
+        return this.slotService.updateBookingStatus(bookingId, req.user.workshopId, data.status);
+    }
 }
+
