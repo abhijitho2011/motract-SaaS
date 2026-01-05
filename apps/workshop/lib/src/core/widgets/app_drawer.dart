@@ -49,8 +49,9 @@ class AppDrawer extends ConsumerWidget {
           _DrawerItem(
             icon: Icons.garage,
             title: 'Bay Management',
-            route: '/bays',
+            route: '/slots',
           ),
+
           _DrawerItem(
             icon: Icons.inventory_2,
             title: 'Inventory',

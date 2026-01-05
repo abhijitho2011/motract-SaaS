@@ -231,12 +231,7 @@ class _DashboardContent extends StatelessWidget {
           subtitle: 'Manage active jobs',
           onTap: () => context.push('/job-cards'),
         ),
-        _ActionTile(
-          icon: Icons.local_parking,
-          title: 'Bay Management',
-          subtitle: 'Manage bays & slots',
-          onTap: () => context.push('/slots'),
-        ),
+
         _ActionTile(
           icon: Icons.inventory_2,
           title: 'Inventory',

@@ -10,7 +10,7 @@ import 'package:workshop/src/features/job_card/presentation/create_job_card_scre
 import 'package:workshop/src/features/job_card/presentation/job_card_list_screen.dart';
 import 'package:workshop/src/features/inventory/presentation/inventory_screen.dart';
 import 'package:workshop/src/features/billing/presentation/billing_screen.dart';
-import 'package:workshop/src/features/slot/presentation/slot_screen.dart';
+import 'package:workshop/src/features/slot/presentation/enhanced_slot_screen.dart';
 import 'package:workshop/src/features/settings/presentation/settings_screen.dart';
 import 'package:workshop/src/features/job_card/presentation/inspection_screen.dart';
 import 'package:workshop/src/features/job_card/presentation/estimate_screen.dart';
@@ -66,7 +66,10 @@ GoRouter router(Ref ref) {
         path: '/billing',
         builder: (context, state) => const BillingScreen(),
       ),
-      GoRoute(path: '/slots', builder: (context, state) => const SlotScreen()),
+      GoRoute(
+        path: '/slots',
+        builder: (context, state) => const EnhancedSlotScreen(),
+      ),
       GoRoute(
         path: '/job-cards',
         builder: (context, state) => const JobCardListScreen(),
