@@ -39,6 +39,20 @@ abstract class SlotApi {
     @Path('bookingId') String bookingId,
     @Body() Map<String, dynamic> body,
   );
+
+  // Holiday Management
+  @POST('/slots/holidays')
+  Future<dynamic> blockEntireDay(@Body() Map<String, dynamic> body);
+
+  @DELETE('/slots/holidays/{date}')
+  Future<dynamic> unblockDay(@Path('date') String date);
+
+  @GET('/slots/holidays')
+  Future<dynamic> getWorkshopHolidays();
+
+  // Bay Templates (for dropdown)
+  @GET('/slots/bay-templates')
+  Future<dynamic> getBayNameTemplates();
 }
 
 @riverpod
