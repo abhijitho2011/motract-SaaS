@@ -568,4 +568,32 @@ export class SuperAdminService {
             .where(eq(bayNameTemplates.id, id));
         return { message: 'Bay name template deleted' };
     }
+
+    // Seed default bay templates on startup
+    async onModuleInit() {
+        const templates = await this.db.select().from(bayNameTemplates).limit(1);
+        if (templates.length === 0) {
+            console.log('Seeding default bay name templates...');
+            const defaults = [
+                'General Service Bay',
+                'Wheel Alignment Bay',
+                'Water Wash Bay',
+                'Electrical Bay',
+                'Quick Service Bay',
+                'Denting & Painting Bay',
+                'Inspection Bay',
+            ];
+
+            for (const name of defaults) {
+                await this.db.insert(bayNameTemplates).values({
+                    id: crypto.randomUUID(),
+                    name,
+                    description: 'Standard ' + name,
+                    isActive: true,
+                    createdAt: new Date().toISOString(),
+                });
+            }
+            console.log('Seeding complete.');
+        }
+    }
 }

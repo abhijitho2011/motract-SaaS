@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:workshop/src/core/theme/theme_controller.dart';
 import 'package:workshop/src/features/settings/presentation/inventory_settings_screen.dart';
 import 'package:workshop/src/features/settings/presentation/inspection_settings_screen.dart';
+import 'package:workshop/src/core/widgets/app_drawer.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
@@ -16,6 +17,7 @@ class SettingsScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Settings')),
+      drawer: const AppDrawer(),
       body: ListView(
         children: [
           const _SectionHeader(title: 'General'),

@@ -42,6 +42,23 @@ export class SlotController {
     // Enhanced Slot Management (for client booking)
     // =============================================
 
+    // Create manual slot
+    @Post('create')
+    async createManualSlot(
+        @Request() req: any,
+        @Body() data: { bayId: string; date: string; startTime: string; endTime: string }
+    ) {
+        try {
+            return await this.slotService.createManualSlot({
+                ...data,
+                workshopId: req.user.workshopId,
+            });
+        } catch (e) {
+            throw new Error(e.message);
+            // In a real app, use HttpException filtering
+        }
+    }
+
     // Generate daily slots for all bays
     @Post('generate')
     async generateDailySlots(

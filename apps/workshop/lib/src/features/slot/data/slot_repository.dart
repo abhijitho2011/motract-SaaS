@@ -53,6 +53,12 @@ abstract class SlotApi {
   // Bay Templates (for dropdown)
   @GET('/slots/bay-templates')
   Future<dynamic> getBayNameTemplates();
+
+  @DELETE('/slots/bays/{id}')
+  Future<dynamic> deleteBay(@Path('id') String bayId);
+
+  @POST('/slots/create')
+  Future<dynamic> createManualSlot(@Body() Map<String, dynamic> data);
 }
 
 @riverpod

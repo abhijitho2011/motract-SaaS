@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:workshop/src/features/job_card/presentation/job_card_list_controller.dart';
+import 'package:workshop/src/core/widgets/app_drawer.dart';
 
 class JobCardListScreen extends ConsumerWidget {
   const JobCardListScreen({super.key});
@@ -13,6 +14,7 @@ class JobCardListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(title: const Text('Job Cards')),
+      drawer: const AppDrawer(),
       body: jobState.when(
         data: (jobs) => jobs.isEmpty
             ? const Center(child: Text('No active job cards.'))

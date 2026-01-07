@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:intl/intl.dart';
 import 'package:workshop/src/features/slot/data/slot_repository.dart';
+import 'package:workshop/src/features/slot/presentation/slot_controller.dart';
+import 'package:workshop/src/core/widgets/app_drawer.dart';
 
 class EnhancedSlotScreen extends ConsumerStatefulWidget {
   const EnhancedSlotScreen({super.key});
@@ -244,6 +246,7 @@ class _EnhancedSlotScreenState extends ConsumerState<EnhancedSlotScreen>
           ],
         ),
       ),
+      drawer: const AppDrawer(),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : TabBarView(
@@ -296,13 +299,9 @@ class _EnhancedSlotScreenState extends ConsumerState<EnhancedSlotScreen>
                         ),
                         title: Text(bay['name'] ?? 'Bay'),
                         subtitle: Text('Type: ${bay['type'] ?? 'N/A'}'),
-                        trailing: Icon(
-                          bay['isActive'] == true
-                              ? Icons.check_circle
-                              : Icons.cancel,
-                          color: bay['isActive'] == true
-                              ? Colors.green
-                              : Colors.red,
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Colors.red),
+                          onPressed: () => _deleteBay(bay['id']),
                         ),
                       ),
                     );
@@ -311,6 +310,51 @@ class _EnhancedSlotScreenState extends ConsumerState<EnhancedSlotScreen>
         ),
       ],
     );
+  }
+
+  Future<void> _deleteBay(String bayId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Bay'),
+        content: const Text('Are you sure you want to delete this bay?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      setState(() => _isLoading = true);
+      try {
+        final api = ref.read(slotApiProvider);
+        await api.deleteBay(bayId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Bay deleted successfully'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          _loadData();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          );
+        }
+      }
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   // Slots Tab with Holiday Support
@@ -405,9 +449,9 @@ class _EnhancedSlotScreenState extends ConsumerState<EnhancedSlotScreen>
                   const Gap(8),
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: isHoliday ? null : _generateSlots,
-                      icon: const Icon(Icons.auto_awesome),
-                      label: const Text('Generate'),
+                      onPressed: isHoliday ? null : _showAddSlotDialog,
+                      icon: const Icon(Icons.add_circle_outline),
+                      label: const Text('Add Slot'),
                     ),
                   ),
                 ],
@@ -452,14 +496,14 @@ class _EnhancedSlotScreenState extends ConsumerState<EnhancedSlotScreen>
               : _slotGrid.isEmpty
               ? const Center(
                   child: Text(
-                    'No slots for this date\nTap "Generate" to create',
+                    'No slots for this date\nTap "Add Slot" to create',
                   ),
                 )
               : GridView.builder(
                   padding: const EdgeInsets.all(16),
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 4,
-                    childAspectRatio: 1.5,
+                    crossAxisCount: 3,
+                    childAspectRatio: 2.0,
                     crossAxisSpacing: 8,
                     mainAxisSpacing: 8,
                   ),
@@ -479,11 +523,19 @@ class _EnhancedSlotScreenState extends ConsumerState<EnhancedSlotScreen>
                           : null,
                       child: Card(
                         color: color,
-                        child: Center(
-                          child: Text(
-                            slot['startTime'] ?? '',
-                            style: const TextStyle(fontSize: 12),
-                          ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              '${slot['startTime']} - ${slot['endTime']}',
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                            // find bay name from bayId locally if possible, or just show times
+                            // Should be fine as is
+                          ],
                         ),
                       ),
                     );
@@ -491,6 +543,119 @@ class _EnhancedSlotScreenState extends ConsumerState<EnhancedSlotScreen>
                 ),
         ),
       ],
+    );
+  }
+
+  void _showAddSlotDialog() {
+    String? selectedBayId;
+    TimeOfDay startTime = const TimeOfDay(hour: 9, minute: 0);
+    TimeOfDay endTime = const TimeOfDay(hour: 10, minute: 0);
+
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          title: const Text('Add Manual Slot'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Bay Dropdown
+              DropdownButtonFormField<String>(
+                value: selectedBayId,
+                decoration: const InputDecoration(labelText: 'Select Bay'),
+                hint: const Text('Choose a bay'),
+                items: _bays.map<DropdownMenuItem<String>>((bay) {
+                  return DropdownMenuItem(
+                    value: bay['id'],
+                    child: Text(bay['name'] ?? 'Bay'),
+                  );
+                }).toList(),
+                onChanged: (value) =>
+                    setDialogState(() => selectedBayId = value),
+              ),
+              const Gap(16),
+              // Start Time
+              ListTile(
+                title: const Text('Start Time'),
+                trailing: Text(startTime.format(context)),
+                onTap: () async {
+                  final t = await showTimePicker(
+                    context: context,
+                    initialTime: startTime,
+                  );
+                  if (t != null) setDialogState(() => startTime = t);
+                },
+              ),
+              // End Time
+              ListTile(
+                title: const Text('End Time'),
+                trailing: Text(endTime.format(context)),
+                onTap: () async {
+                  final t = await showTimePicker(
+                    context: context,
+                    initialTime: endTime,
+                  );
+                  if (t != null) setDialogState(() => endTime = t);
+                },
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () async {
+                if (selectedBayId == null) {
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(const SnackBar(content: Text('Select a bay')));
+                  return;
+                }
+                // Formatting time as HH:mm manually to ensure 24h format for backend
+                final startH = startTime.hour.toString().padLeft(2, '0');
+                final startM = startTime.minute.toString().padLeft(2, '0');
+                final endH = endTime.hour.toString().padLeft(2, '0');
+                final endM = endTime.minute.toString().padLeft(2, '0');
+
+                final startStr = '$startH:$startM';
+                final endStr = '$endH:$endM';
+
+                Navigator.pop(context);
+                setState(() => _isLoading = true);
+                try {
+                  await ref
+                      .read(slotControllerProvider.notifier)
+                      .createManualSlot(
+                        bayId: selectedBayId!,
+                        date: DateFormat('yyyy-MM-dd').format(_selectedDate),
+                        startTime: startStr,
+                        endTime: endStr,
+                      );
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Slot created'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                  _loadData();
+                } catch (e) {
+                  if (mounted)
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Error: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                }
+                if (mounted) setState(() => _isLoading = false);
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gap/gap.dart';
 import 'package:go_router/go_router.dart';
 import 'package:workshop/src/features/billing/presentation/billing_controller.dart';
+import 'package:workshop/src/core/widgets/app_drawer.dart';
 
 class BillingScreen extends ConsumerStatefulWidget {
   const BillingScreen({super.key});
@@ -27,13 +28,8 @@ class _BillingScreenState extends ConsumerState<BillingScreen> {
     final state = ref.watch(billingControllerProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Billing & Invoicing'),
-        leading: IconButton(
-          icon: const Icon(Icons.home),
-          onPressed: () => context.go('/dashboard'),
-        ),
-      ),
+      appBar: AppBar(title: const Text('Billing & Invoicing')),
+      drawer: const AppDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

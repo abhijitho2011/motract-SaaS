@@ -14,24 +14,27 @@ export class SlotService {
     ) { }
 
     async createBay(data: any) {
-        const [bay] = await this.db.insert(bays).values({
+        const [bay] = await this.db.insert(schema.workshopBays).values({
             id: crypto.randomUUID(),
             workshopId: data.workshopId,
             name: data.name,
-            type: data.type,
+            serviceCategories: [data.type], // Map type to serviceCategories
             isActive: true
         }).returning();
         return bay;
     }
 
     async findBays(workshopId: string) {
-        return this.db.query.bays.findMany({
-            where: eq(bays.workshopId, workshopId),
-            with: { slotBookings: true }
+        return this.db.query.workshopBays.findMany({
+            where: eq(schema.workshopBays.workshopId, workshopId),
+            with: { slots: true }
         });
     }
 
     async bookSlot(data: any) {
+        // ... unused legacy logic update if needed, but keeping separate ...
+        // Legacy bookSlot used slotBookings table. New system uses workshopBaySlots.
+        // Leaving this as is if it's legacy api.
         const [booking] = await this.db.insert(slotBookings).values({
             id: crypto.randomUUID(),
             bayId: data.bayId,
@@ -45,28 +48,32 @@ export class SlotService {
     }
 
     async updateBay(id: string, data: { name?: string; type?: string; isActive?: boolean }) {
-        const [updated] = await this.db.update(bays)
-            .set({
-                name: data.name,
-                type: data.type as any,
-                isActive: data.isActive,
-            })
-            .where(eq(bays.id, id))
+        const updateData: any = {
+            name: data.name,
+            isActive: data.isActive,
+        };
+        if (data.type) {
+            updateData.serviceCategories = [data.type];
+        }
+
+        const [updated] = await this.db.update(schema.workshopBays)
+            .set(updateData)
+            .where(eq(schema.workshopBays.id, id))
             .returning();
         return updated;
     }
 
     async deleteBay(id: string, workshopId: string) {
         // Verify bay belongs to workshop before deleting
-        const bay = await this.db.query.bays.findFirst({
-            where: and(eq(bays.id, id), eq(bays.workshopId, workshopId)),
+        const bay = await this.db.query.workshopBays.findFirst({
+            where: and(eq(schema.workshopBays.id, id), eq(schema.workshopBays.workshopId, workshopId)),
         });
 
         if (!bay) {
             throw new NotFoundException('Bay not found or access denied');
         }
 
-        await this.db.delete(bays).where(eq(bays.id, id));
+        await this.db.delete(schema.workshopBays).where(eq(schema.workshopBays.id, id));
         return { message: 'Bay deleted successfully' };
     }
 
@@ -74,7 +81,55 @@ export class SlotService {
     // Enhanced Slot Management (for client booking)
     // =============================================
 
-    // Generate daily slots for all bays of a workshop
+    // Create a manual slot (Time based)
+    async createManualSlot(data: { workshopId: string; bayId: string; date: string; startTime: string; endTime: string }) {
+        // 1. Verify bay belongs to workshop
+        const bay = await this.db.query.workshopBays.findFirst({
+            where: and(eq(schema.workshopBays.id, data.bayId), eq(schema.workshopBays.workshopId, data.workshopId)),
+        });
+
+        if (!bay) {
+            throw new NotFoundException('Bay not found or access denied');
+        }
+
+        // 2. Validate time
+        if (data.startTime >= data.endTime) {
+            throw new Error('Start time must be before end time');
+        }
+
+        // 3. Check for overlaps
+        // Overlap condition: (StartA < EndB) and (EndA > StartB)
+        const overlaps = await this.db.select()
+            .from(schema.workshopBaySlots)
+            .where(and(
+                eq(schema.workshopBaySlots.bayId, data.bayId),
+                eq(schema.workshopBaySlots.date, data.date),
+
+            ));
+
+        // Filter in memory to be safe with string comparisons
+        const hasOverlap = overlaps.some(slot => {
+            return data.startTime < slot.endTime && data.endTime > slot.startTime;
+        });
+
+        if (hasOverlap) {
+            throw new Error('Slot overlaps with an existing slot');
+        }
+
+        // 4. Create slot
+        const [slot] = await this.db.insert(schema.workshopBaySlots).values({
+            id: crypto.randomUUID(),
+            bayId: data.bayId,
+            date: data.date,
+            startTime: data.startTime,
+            endTime: data.endTime,
+            status: 'AVAILABLE',
+        }).returning();
+
+        return slot;
+    }
+
+    // Generate daily slots for all bays of a workshop (Automatic)
     async generateDailySlots(workshopId: string, date: string) {
         // Get workshop working hours
         const workshopResult = await this.db.select({

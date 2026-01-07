@@ -36,4 +36,27 @@ class SlotController extends _$SlotController {
       return state.value!;
     });
   }
+
+  Future<void> createManualSlot({
+    required String bayId,
+    required String date,
+    required String startTime,
+    required String endTime,
+  }) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final api = ref.read(slotApiProvider);
+      await api.createManualSlot({
+        'bayId': bayId,
+        'date': date,
+        'startTime': startTime,
+        'endTime': endTime,
+      });
+
+      // Refresh list
+      ref.invalidateSelf();
+      await future;
+      return state.value!;
+    });
+  }
 }

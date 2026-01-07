@@ -1,0 +1,9 @@
+Found 4 connected devices:
+  Lenovo YT J706X (mobile) • 192.168.1.13:42059 • android-arm64  • Android 12 (API 31)
+  Windows (desktop)        • windows            • windows-x64    • Microsoft Windows [Version 10.0.26200.7462]
+  Chrome (web)             • chrome             • web-javascript • Google Chrome 143.0.7499.170
+  Edge (web)               • edge               • web-javascript • Microsoft Edge 143.0.3650.96
+
+Run "flutter emulators" to list and start any available device emulators.
+
+If you expected another device to be detected, please run "flutter doctor" to diagnose potential issues. You may also try increasing the time to wait for connected devices with the "--device-timeout" flag. Visit https://flutter.dev/setup/ for troubleshooting tips.
