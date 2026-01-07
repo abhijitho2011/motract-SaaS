@@ -214,7 +214,21 @@ export class SlotService {
 
     // Get slot grid for a specific date (for workshop app to view)
     async getSlotGrid(workshopId: string, date: string) {
-        // Get bays
+        // 1. Check if slots exist for this date
+        const existingSlotsCount = await this.db.select({ count: sql<number>`count(*)` })
+            .from(schema.workshopBaySlots)
+            .innerJoin(schema.workshopBays, eq(schema.workshopBaySlots.bayId, schema.workshopBays.id))
+            .where(and(
+                eq(schema.workshopBays.workshopId, workshopId),
+                eq(schema.workshopBaySlots.date, date)
+            ));
+
+        // 2. If no slots, auto-generate them
+        if (Number(existingSlotsCount[0].count) === 0) {
+            await this.generateDailySlots(workshopId, date);
+        }
+
+        // 3. Get bays
         const baysResult = await this.db.select()
             .from(schema.workshopBays)
             .where(and(
@@ -222,7 +236,7 @@ export class SlotService {
                 eq(schema.workshopBays.isActive, true)
             ));
 
-        // Get slots for the date
+        // 4. Get slots for the date (now guaranteed to exist if config is right)
         const slotsResult = await this.db.select({
             slotId: schema.workshopBaySlots.id,
             bayId: schema.workshopBaySlots.bayId,
@@ -262,6 +276,31 @@ export class SlotService {
             .where(eq(schema.workshopBaySlots.id, slotId));
 
         return { message: `Slot ${status === 'BLOCKED' ? 'blocked' : 'unblocked'} successfully` };
+    }
+
+    // Delete a specific slot
+    async deleteSlot(slotId: string, workshopId: string) {
+        // Verify slot belongs to workshop
+        const slotResult = await this.db.select()
+            .from(schema.workshopBaySlots)
+            .innerJoin(schema.workshopBays, eq(schema.workshopBaySlots.bayId, schema.workshopBays.id))
+            .where(and(
+                eq(schema.workshopBaySlots.id, slotId),
+                eq(schema.workshopBays.workshopId, workshopId)
+            ))
+            .limit(1);
+
+        if (slotResult.length === 0) {
+            throw new NotFoundException('Slot not found or access denied');
+        }
+
+        // Optional: Check if booked? Assuming allow delete even if booked for now or check status
+        // if (slotResult[0].workshop_bay_slots.status === 'BOOKED') { throw ... }
+
+        await this.db.delete(schema.workshopBaySlots)
+            .where(eq(schema.workshopBaySlots.id, slotId));
+
+        return { message: 'Slot deleted successfully' };
     }
 
     // Get all bookings for a workshop

@@ -86,41 +86,6 @@ class _EnhancedSlotScreenState extends ConsumerState<EnhancedSlotScreen>
     return holiday?['reason'];
   }
 
-  Future<void> _generateSlots() async {
-    if (_isHoliday(_selectedDate)) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Cannot generate slots for a holiday'),
-          backgroundColor: Colors.red,
-        ),
-      );
-      return;
-    }
-
-    setState(() => _isLoading = true);
-    try {
-      final api = ref.read(slotApiProvider);
-      final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate);
-      final result = await api.generateDailySlots({'date': dateStr});
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(result['message'] ?? 'Slots generated'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        _loadData();
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-        );
-      }
-    }
-    if (mounted) setState(() => _isLoading = false);
-  }
-
   Future<void> _toggleHoliday() async {
     final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDate);
     final isCurrentlyHoliday = _isHoliday(_selectedDate);
@@ -521,6 +486,7 @@ class _EnhancedSlotScreenState extends ConsumerState<EnhancedSlotScreen>
                       onTap: status == 'AVAILABLE' || status == 'BLOCKED'
                           ? () => _toggleSlotBlock(slot)
                           : null,
+                      onLongPress: () => _deleteSlot(slot['slotId']),
                       child: Card(
                         color: color,
                         child: Column(
@@ -692,6 +658,50 @@ class _EnhancedSlotScreenState extends ConsumerState<EnhancedSlotScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
       );
+    }
+  }
+
+  Future<void> _deleteSlot(String slotId) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete Slot'),
+        content: const Text('Are you sure you want to delete this slot?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      setState(() => _isLoading = true);
+      try {
+        await ref.read(slotControllerProvider.notifier).deleteSlot(slotId);
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Slot deleted'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          _loadData();
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          );
+        }
+      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 

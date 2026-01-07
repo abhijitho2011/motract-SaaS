@@ -59,4 +59,17 @@ class SlotController extends _$SlotController {
       return state.value!;
     });
   }
+
+  Future<void> deleteSlot(String slotId) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      final api = ref.read(slotApiProvider);
+      await api.deleteSlot(slotId);
+
+      // Refresh list
+      ref.invalidateSelf();
+      await future;
+      return state.value!;
+    });
+  }
 }

@@ -59,6 +59,9 @@ abstract class SlotApi {
 
   @POST('/slots/create')
   Future<dynamic> createManualSlot(@Body() Map<String, dynamic> data);
+
+  @DELETE('/slots/{slotId}')
+  Future<dynamic> deleteSlot(@Path('slotId') String slotId);
 }
 
 @riverpod

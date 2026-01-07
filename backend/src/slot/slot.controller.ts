@@ -87,6 +87,15 @@ export class SlotController {
         return this.slotService.updateSlotStatus(slotId, req.user.workshopId, data.status);
     }
 
+    // Delete a specific slot
+    @Delete(':slotId')
+    async deleteSlot(
+        @Request() req: any,
+        @Param('slotId') slotId: string
+    ) {
+        return this.slotService.deleteSlot(slotId, req.user.workshopId);
+    }
+
     // Get workshop bookings
     @Get('bookings')
     async getWorkshopBookings(@Request() req: any) {
